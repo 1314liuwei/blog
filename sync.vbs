@@ -1,0 +1,1 @@
+WScript.CreateObject("WScript.Shell").Run "sync.cmd",0

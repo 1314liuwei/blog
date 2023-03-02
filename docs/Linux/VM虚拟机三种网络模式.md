@@ -1,0 +1,31 @@
+# VM 虚拟机三种网络模式
+
+VMware 作为一种使用极其广泛的虚拟机软件，它为我们提供了三种网络工作模式，它们分别是：**Bridged（桥接模式）**、**NAT（网络地址转换模式）**、**Host-Only（仅主机模式）**，三种网络模式都各自有各自的特点。
+
+## Bridged（桥接模式）
+
+VMnet0 默认桥接模式。桥接模式下虚拟机通过 VMnet0 虚拟交换机实现与物理机在同一个局域网中。在这种模式下，虚拟机和物理机能够互 ping，物理机能上网虚拟机也能够上网：
+
+![preview](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/v2-9975d183a80007222385916b434181f2_r.jpg)
+
+## Host-Only（仅主机模式）
+
+VMnet1 默认仅主机模式。仅主机模式下，虚拟机处于 VMnet1 虚拟路由器和虚拟交换机构建的网络中。该模式下，主机模式下的虚拟机，是一种与世隔绝的状态。由于没有去 Internet 的路由，因此虚拟机不能上网：
+
+![preview](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/v2-360f997cae7fec29a31ca93bae53080b_r.jpg)
+
+## NAT模式（网络地址转换模式）
+
+VMnet8 默认 NAT 模式。NAT 模式与仅主机模式十分相像，但是不同的是，使用NAT模式网络连接时，VMware会在主机上建立单独的专用网络，用以在主机和虚拟机之间相互通信。
+
+虚拟机向外部网络发送的请求数据 "包裹"，都会交由NAT网络适配器加上"特殊标记"并以主机的名义转发出去，外部网络返回的响应数据"包裹"，也是先由主机接收，然后交由NAT网络适配器根据"特殊标记"进行识别并转发给对应的虚拟机，因此，虚拟机在外部网络中不必具有自己的IP地址。从外部网络来看，**虚拟机和主机在共享一个IP地址**，默认情况下，**外部网络终端也无法访问到虚拟机**。
+
+在一台主机上只允许有一个NAT模式的虚拟网络。因此，同一台主机上的多个采用NAT模式网络连接的虚拟机也是可以相互访问的：
+
+![img](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/v2-2c4cf8aeb89d041dde166c8e949b8570_1440w.jpg)
+
+> 参考来源：
+>
+> [桥接模式、NAT模式和仅主机模式_swadian2008的博客-CSDN博客_桥接模式和nat模式和仅主机模式](https://blog.csdn.net/swadian2008/article/details/109518783)
+>
+> [三言两语说清VM虚拟机的三种网卡模式 - 知乎 (zhihu.com)](https://zhuanlan.zhihu.com/p/98548852)
