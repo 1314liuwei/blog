@@ -69,3 +69,29 @@ make
 ./wrk -t10 -c300 -d20s --latency http://www.baidu.com
 ```
 
+## 5. 关机重启
+
+```bash
+# 立即关机
+shutdown -h now
+init 0 # graceful
+
+# 定时关机
+shutdown -h 23:30 # 23:30 关机
+shutdown -h +15   # 15分钟后关机
+
+# 重启
+shutdown -r now
+reboot
+init 6 # graceful
+```
+
+## 6. WiFi 和 蓝牙 电源管理
+
+```bash
+# 关闭
+rfkill block wifi # 关闭 wifi 设备
+# 开启
+rfkill unblock wifi # 开启 wifi 设备
+```
+
