@@ -16,4 +16,10 @@
 - singleflight 使用与原理解析
 - WireGuard 使用
 - Go 实现 P2P 穿透
+- Zstandard 算法使用
+- Kill Switch 简介
+- Socks5 和 HTTP 代理分析与实现
+- BIRD 路由协议软件(参考：[url](https://soha.moe/post/bird-bgp-kickstart.html#1-%E4%BB%80%E4%B9%88%E6%98%AF-bird))
+- Go 创建虚拟网卡
+- gViso 了解
 
