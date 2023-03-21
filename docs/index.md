@@ -27,4 +27,5 @@
 - NaCI 加密算法(参考：[url](https://segmentfault.com/a/1190000000476866))
 - Noise 加密算法了解(参考：[url](http://www.noiseprotocol.org/noise.html))
 - Disco 加密算法了解(参考：[url](https://www.discocrypto.com/#/))
+- WebSocket 链接连接流程分析
 
