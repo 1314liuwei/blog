@@ -27,4 +27,6 @@
 - Disco 加密算法了解(参考：[url](https://www.discocrypto.com/#/))
 - WebSocket 链接连接流程分析
 - P2P 详解
+- UDP 流量伪装为 TCP
+- KCP 协议
 
