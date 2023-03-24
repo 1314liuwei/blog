@@ -96,5 +96,34 @@ qrencode -t ansiutf8 < client.conf
 
 ### 2. Peer to LAN
 
+```bash
+# LAN 中的机器
+# 开启 ip 报文转发
+echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.conf
+echo "net.ipv4.conf.all.proxy_arp = 1" >> /etc/sysctl.conf
+sysctl -p /etc/sysctl.conf
+
+
+```
+
+```bash
+# 拥有公网 IP 的机器
+# 配置
+[Interface]
+Address = 172.30.66.1/32
+ListenPort = 12345
+PrivateKey = GFw4BUsqlZFxBDdbGy64gATQtC6VfeCc820XRZpfLWs=
+
+PostUp   = iptables -t nat -A POSTROUTING -o %i -j MASQUERADE
+PostDown = iptables -t nat -D POSTROUTING -o %i -j MASQUERADE
+
+[Peer]
+PublicKey = l6ZuOCtYWCvW4o2o1QIZ1W4kGGCErVt3ERdzyxwJ9h8=
+AllowedIPs = 172.30.66.12/32,10.113.0.0/16, 10.20.0.0/16, 10.50.0.0/16, 192.168.80.0/24, 192.168.3.0/24, 192.168.8.0/24, 192.168.10.0/24, 192.168.12.0/24, 192.168.24.0/24, 192.168.25.0/24, 192.168.26.0/24, 192.168.27.0/24, 192.168.30.0/24, 192.168.32.0/24
+PersistentKeepalive = 5
+```
+
+
+
 ### 3. LAN to LAN
 
