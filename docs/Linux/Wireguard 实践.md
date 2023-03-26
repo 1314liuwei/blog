@@ -39,6 +39,10 @@ Windows 下载完成后，会存在一个后台服务和一个 GUI 的界面
 
 ### 1. Peer to Peer
 
+
+
+
+
 ### 2. Peer to LAN
 
 ### 3. LAN to LAN
