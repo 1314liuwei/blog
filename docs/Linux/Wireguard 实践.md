@@ -39,11 +39,97 @@ Windows 下载完成后，会存在一个后台服务和一个 GUI 的界面
 
 ### 1. Peer to Peer
 
+<<<<<<< HEAD
 
 
 
+=======
+```bash
+# 安装 wireguard
+apt install wireguard
+
+# 进入文件夹
+cd /etc/wireguard
+# 修改文件夹权限
+umask 077
+
+# 生成服务端公私钥
+wg genkey | tee server_privatekey | wg pubkey > server_publickey
+
+# 生成客户端公私钥
+wg genkey | tee client_privatekey | wg pubkey > client_publickey
+
+# 生成服务端配置文件
+echo "[Interface]
+PrivateKey = $(cat server_privatekey) # 填写本机的privatekey 内容
+Address = 192.168.199.1/24
+PostUp   = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -A FORWARD -o $(ip r | grep default | awk '{print $5}') -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -D FORWARD -o $(ip r | grep default | awk '{print $5}') -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
+ListenPort = 12345 # 注意该端口是UDP端口
+DNS = 8.8.8.8
+MTU = 1420
+
+[Peer]
+PublicKey =  $(cat client_publickey)  # 填写对端的publickey 内容
+AllowedIPs = 192.168.199.2/24 " > wg0.conf
+
+# 启动网卡
+ wg-quick up wg0
+ 
+ # 加入开机自启动
+ systemctl enable wg-quick@wg0.service
+
+# 生成客户端配置文件
+echo "[Interface]
+PrivateKey = $(cat client_privatekey) # 填写客户端的privatekey 内容
+Address = 192.168.199.2/32
+DNS = 8.8.8.8
+MTU = 1420
+
+[Peer]
+PublicKey =  $(cat server_publickey)  # 填写对端的publickey 内容
+Endpoint = $(ip a | grep $(ip r | grep default | awk '{print $5}') | grep inet | awk '{print $2}' | cut -d'/' -f 1):12345 # 对端地址
+AllowedIPs = 192.168.199.1/24 
+PersistentKeepalive = 25 " > client.conf
+
+# 为了方便使用，可以生成二维码
+apt install qrencode
+qrencode -t ansiutf8 < client.conf
+
+# 客户端导入配置即可连接到服务端
+```
+>>>>>>> 10f5b256b1de7fa100139b81787628677fe1a393
 
 ### 2. Peer to LAN
+
+```bash
+# LAN 中的机器
+# 开启 ip 报文转发
+echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.conf
+echo "net.ipv4.conf.all.proxy_arp = 1" >> /etc/sysctl.conf
+sysctl -p /etc/sysctl.conf
+
+
+```
+
+```bash
+# 拥有公网 IP 的机器
+# 配置
+[Interface]
+Address = 172.30.66.1/32
+ListenPort = 12345
+PrivateKey = GFw4BUsqlZFxBDdbGy64gATQtC6VfeCc820XRZpfLWs=
+
+PostUp   = iptables -t nat -A POSTROUTING -o %i -j MASQUERADE
+PostDown = iptables -t nat -D POSTROUTING -o %i -j MASQUERADE
+
+[Peer]
+PublicKey = l6ZuOCtYWCvW4o2o1QIZ1W4kGGCErVt3ERdzyxwJ9h8=
+AllowedIPs = 172.30.66.12/32,10.113.0.0/16, 10.20.0.0/16, 10.50.0.0/16, 192.168.80.0/24, 192.168.3.0/24, 192.168.8.0/24, 192.168.10.0/24, 192.168.12.0/24, 192.168.24.0/24, 192.168.25.0/24, 192.168.26.0/24, 192.168.27.0/24, 192.168.30.0/24, 192.168.32.0/24
+PersistentKeepalive = 5
+```
+
+
 
 ### 3. LAN to LAN
 

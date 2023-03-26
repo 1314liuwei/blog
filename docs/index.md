@@ -5,14 +5,12 @@
 **预告**：
 
 - TCP 和 HTTP 的长连接
-- TCP 粘包问题
 - sync.Map 详解
 - Go TCP 编程
 - Go UDP 编程
 - Go 原始套接字编程
 - Go 链路层套接字编程
 - iptables 三表五链
-- VPN 流量分析
 - singleflight 使用与原理解析
 - WireGuard 使用
 - Go 实现 P2P 穿透
@@ -28,4 +26,7 @@
 - Noise 加密算法了解(参考：[url](http://www.noiseprotocol.org/noise.html))
 - Disco 加密算法了解(参考：[url](https://www.discocrypto.com/#/))
 - WebSocket 链接连接流程分析
+- P2P 详解
+- UDP 流量伪装为 TCP
+- KCP 协议
 
