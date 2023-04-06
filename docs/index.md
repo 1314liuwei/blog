@@ -6,7 +6,6 @@
 
 - TCP 和 HTTP 的长连接
 - sync.Map 详解
-- Go TCP 编程
 - Go UDP 编程
 - Go 原始套接字编程
 - Go 链路层套接字编程
