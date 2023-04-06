@@ -12,7 +12,6 @@
 - Go 链路层套接字编程
 - iptables 三表五链
 - singleflight 使用与原理解析
-- WireGuard 使用
 - Go 实现 P2P 穿透
 - Zstandard 算法使用
 - Kill Switch 简介
