@@ -39,11 +39,6 @@ Windows 下载完成后，会存在一个后台服务和一个 GUI 的界面
 
 ### 1. Peer to Peer
 
-<<<<<<< HEAD
-
-
-
-=======
 ```bash
 # 安装 wireguard
 apt install wireguard
@@ -98,7 +93,6 @@ qrencode -t ansiutf8 < client.conf
 
 # 客户端导入配置即可连接到服务端
 ```
->>>>>>> 10f5b256b1de7fa100139b81787628677fe1a393
 
 ### 2. Peer to LAN
 
@@ -133,3 +127,4 @@ PersistentKeepalive = 5
 
 ### 3. LAN to LAN
 
+与 "Peer to LAN" 类似，双端都开放网段，即可打通两个 LAN.
