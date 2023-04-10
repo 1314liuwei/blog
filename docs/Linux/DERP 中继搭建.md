@@ -6,19 +6,17 @@
 > 1. Go 1.20+ 
 > 2. 域名和 https 证书
 
-搭建步骤：
+### 命令行执行
 
 ```bash
 # 1. 安装，路径在 $GOROOT/bin $GOBIN $GOPATH/bin 中的一个，一般在 $GOPATH/bin
 go install tailscale.com/cmd/derper@main
 
-# 
-
 # 2. 执行命令
-derper --hostname=example.com --a=:12345 --certdir=/root/certs 
+derper --hostname=example.com --a=:12345 --certdir=/root/derp  --certmode=manual --http-port=80
 ```
 
-Dockerfile:
+### Docker
 
 ```dockerfile
 FROM golang:latest AS builder
@@ -59,5 +57,23 @@ CMD /app/derper --hostname=$DERP_DOMAIN \
 
 ```
 docker run -d --name derp --restart=always -p 3478:3478/udp -p 9443:9443 -v /root/certs:/app/certs -e DERP_DOMAIN=example.com -e DERP_ADDR=:9443 -e DERP_CERT_MODE=manual derper
+```
+
+### Systemd
+
+```bash
+[Unit]
+Description=derper
+After=syslog.target
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/root/go-work/bin/derper --hostname=derp.try-hard.cn --a=:12345 --certdir=/root/derp  --certmode=manual --http-port=-1
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
 ```
 
