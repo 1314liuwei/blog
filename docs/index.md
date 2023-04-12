@@ -26,4 +26,5 @@
 - UDP 流量伪装为 TCP
 - KCP 协议
 - bufio 包使用
+- netlink套接字
 
