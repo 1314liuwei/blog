@@ -4,7 +4,7 @@ site_name: Lynx's Blog
 theme:
   name: material
   language: 'zh'
-  hljs_style: google light
+  hljs_style: google-light
   palette:
     # Palette toggle for light mode
     - media: "(prefers-color-scheme: light)"
