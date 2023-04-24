@@ -17,7 +17,7 @@ jobs:
           CONFIG_FILE: mkdocs.yml
           EXTRA_PACKAGES: build-base
       - run: pip install mkdocs-material
-      - run: pip install mkdocs-mermaid2-plugin
+#       - run: pip install mkdocs-mermaid2-plugin
       - run: pip install mknotebooks
       - run: pip install mkdocs-macros-plugin
       - run: pip install mkdocs-git-revision-date-plugin
