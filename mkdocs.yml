@@ -4,7 +4,8 @@ site_name: Lynx's Blog
 theme:
   name: material
   language: 'zh'
-  hljs_style: Google Light
+  highlightjs: true
+  hljs_style: Foundation
   palette:
     # Palette toggle for light mode
     - media: "(prefers-color-scheme: light)"
@@ -38,21 +39,15 @@ theme:
 # Extensions
 markdown_extensions:
   - admonition
+  - pymdownx.details
+  - attr_list
+  - md_in_html
   - def_list
   - footnotes
   - meta
-  - toc:
-      permalink: ""
-      slugify: !!python/name:pymdownx.slugs.uslugify
-  - pymdownx.arithmatex:
-      generic: true
+  - tables
   - pymdownx.caret
   - pymdownx.critic
-  - pymdownx.details
-  - pymdownx.emoji:
-      emoji_generator: !!python/name:pymdownx.emoji.to_svg
-  - pymdownx.highlight:
-      linenums: true
   - pymdownx.inlinehilite
   - pymdownx.keys
   - pymdownx.magiclink
@@ -60,6 +55,18 @@ markdown_extensions:
   - pymdownx.snippets
   - pymdownx.progressbar
   - pymdownx.smartsymbols
+  - pymdownx.tilde
+  - toc:
+      permalink: ""
+      slugify: !!python/name:pymdownx.slugs.uslugify
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.emoji:
+      emoji_generator: !!python/name:pymdownx.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
   - pymdownx.superfences:
       custom_fences:
         - name: math
@@ -70,15 +77,13 @@ markdown_extensions:
           format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.tasklist:
       custom_checkbox: true
-  - pymdownx.tilde
   - pymdownx.tabbed:
       alternate_style: true
-
 
 plugins: []
 
 extra_javascript:
   - javascripts/mathjax.js  #数学公式的JS
   - https://lib.baomitu.com/babel-polyfill/7.12.1/polyfill.min.js
-  - https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
 
