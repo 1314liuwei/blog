@@ -23,8 +23,6 @@ jobs:
       - run: pip install mkdocs-mermaid2-plugin
       - run: pip install mknotebooks
       - run: pip install mkdocs-macros-plugin
-      - run: pip install mkdocs-git-revision-date-plugin
-      - run: pip install mkdocs-git-revision-date-localized-plugi
       - run: mkdocs gh-deploy --force
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
