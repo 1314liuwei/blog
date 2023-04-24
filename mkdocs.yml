@@ -17,15 +17,15 @@ theme:
       quote: octicons/quote-16
 markdown_extensions:
   - abbr #缩写或名词
-  - pymdownx.snippets  #片段，将任意文件或部分内容嵌入到文档中  
-  - admonition  #警告或标注
-  - pymdownx.details  #细节折叠
-  - pymdownx.superfences  #超级围栏
-  - attr_list   #属性列表（按钮-颜色图标）
-  - def_list   #定义列表
-  - footnotes  #行内脚注
-  - meta   #元数据
-  - md_in_html  #HTML 中的 Markdown
+  - pymdownx.snippets:  #片段，将任意文件或部分内容嵌入到文档中  
+  - admonition:  #警告或标注
+  - pymdownx.details:  #细节折叠
+  - pymdownx.superfences:  #超级围栏
+  - attr_list:   #属性列表（按钮-颜色图标）
+  - def_list:   #定义列表
+  - footnotes:  #行内脚注
+  - meta:   #元数据
+  - md_in_html:  #HTML 中的 Markdown
   - toc:  #目录
       toc_depth: 3 #目录深度，默认6，0则隐藏
 #      title: On this page  #默认值，自动获取
@@ -37,31 +37,34 @@ markdown_extensions:
       generic: true  
   - pymdownx.betterem:   #粗体斜体
       smart_enable: all
-  - pymdownx.caret  #插入角标符号(`^`)
-  - pymdownx.mark  #双等号(`==`)
-  - pymdownx.tilde  #波浪号(`~`)
+  - pymdownx.caret:  #插入角标符号(`^`)
+  - pymdownx.mark:  #双等号(`==`)
+  - pymdownx.tilde:  #波浪号(`~`)
   - pymdownx.critic:  #评论家(突出显示建议更改)，未推荐
 #      mode: reject #应如何解析标记，默认view查看更改，accept是接受更改，reject是拒绝更改
-  - pymdownx.keys   #键盘键和组合  
+  - pymdownx.keys:   #键盘键和组合  
   - pymdownx.emoji:  #表情符号
       emoji_index: !!python/name:materialx.emoji.twemoji
       emoji_generator: !!python/name:materialx.emoji.to_svg
 #      options: #默认无
 #        custom_icons: #允许列出要在 Markdown 中使用的附加图标集的文件夹
 #          - overrides/.icons
-  - pymdownx.highlight  #代码高亮，对代码块（SuperFences）和行内代码块（InlineHilite）的语法突出显示
-  - pymdownx.inlinehilite  #行内高亮
-  - pymdownx.smartsymbols  #智能符号
+  - pymdownx.highlight:  #代码高亮，对代码块（SuperFences）和行内代码块（InlineHilite）的语法突出显示
+  - pymdownx.inlinehilite:  #行内高亮
+  - pymdownx.smartsymbols:  #智能符号
   - pymdownx.tabbed:  #内容选项卡
       alternate_style: true  #启用内容选项卡替代样式，必须开启
   - pymdownx.tasklist:  #任务列表
       custom_checkbox: true   #切换复选框的呈现样式，将原生复选框样式替换为漂亮的图标
 #      clickable_checkbox: true  #切换复选框是否可点击，默认false，不建议开
+  - search:
+  - mermaid2:
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid
           class: mermaid
           format: !!python/name:pymdownx.superfences.fence_code_format
+    
 
 extra_javascript:
   - https://cdn.jsdelivr.net/npm/baidu-tongji@0.0.1/index.min.js  #百度统计
