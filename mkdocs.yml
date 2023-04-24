@@ -68,7 +68,6 @@ plugins:
   - mermaid2:
 
 extra_javascript:
-  - https://cdn.jsdelivr.net/npm/baidu-tongji@0.0.1/index.min.js  #百度统计
   - javascripts/mathjax.js  #数学公式的JS
   - https://lib.baomitu.com/babel-polyfill/7.12.1/polyfill.min.js
   - https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js
