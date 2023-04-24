@@ -5,7 +5,7 @@ theme:
   name: material
   language: 'zh'
   highlightjs: true
-  hljs_style: Foundation
+  hljs_style: foundation
   palette:
     # Palette toggle for light mode
     - media: "(prefers-color-scheme: light)"
@@ -83,7 +83,6 @@ markdown_extensions:
 plugins: []
 
 extra_javascript:
-  - javascripts/mathjax.js  #数学公式的JS
   - https://lib.baomitu.com/babel-polyfill/7.12.1/polyfill.min.js
   - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
 
