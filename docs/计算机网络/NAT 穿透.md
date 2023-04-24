@@ -31,6 +31,15 @@ sequenceDiagram
 
 ``` mermaid
 sequenceDiagram
+    P1->>NAT1: 192.168.1.2:1234-->3.3.3.3:8080
+    NAT1->>Coordinator: 1.1.1.1:aaaa-->3.3.3.3:8080
+    P1->>NAT1: 192.168.1.2:1234-->3.3.3.3:8081
+    NAT1->>Coordinator: 1.1.1.1:bbbb-->3.3.3.38081
+    Coordinator->>Coordinator: aaaa = bbbb?
+```
+
+``` mermaid
+sequenceDiagram
     P1->>NAT1: 192.168.1.2:1234-->2.2.2.2:4321 ttl=5
     NAT1-->>NAT2: droped
     P2->>NAT2: 192.168.1.2:1234-->1.1.1.1:5678
@@ -48,6 +57,15 @@ P1和P2为两个内网机器，其内网地址都为192.168.1.2，NAT1和NAT2为
 
 
 # 对称-非对称内网穿透
+
+``` mermaid
+sequenceDiagram
+    P1->>NAT1: 192.168.1.2:1234-->3.3.3.3:8080
+    NAT1->>Coordinator: 1.1.1.1:aaaa-->3.3.3.3:8080
+    P1->>NAT1: 192.168.1.2:1234-->3.3.3.3:8081
+    NAT1->>Coordinator: 1.1.1.1:bbbb-->3.3.3.38081
+    Coordinator->>Coordinator: aaaa = bbbb?
+```
 
 ``` mermaid
 sequenceDiagram
