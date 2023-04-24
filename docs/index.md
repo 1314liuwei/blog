@@ -1,8 +1,6 @@
 # Welcome to Lynx's Blog
 
-
-
-**预告**：
+**留的一些坑：**
 
 - TCP 和 HTTP 的长连接
 - sync.Map 详解
