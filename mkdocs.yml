@@ -2,7 +2,7 @@ site_name: Lynx's Blog
 
 # Theme
 theme:
-  name: null
+  name: material
   language: 'zh'
   palette:
     # Palette toggle for light mode
