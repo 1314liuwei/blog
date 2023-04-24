@@ -1,31 +1,74 @@
 site_name: Lynx's Blog
+
+# Theme
 theme:
-  name: material
+  name: null
+  language: 'zh'
+  palette:
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: white
+      accent: red
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: blue
+      accent: blue
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
+  include_search_page: false
+  search_index_only: true
+  favicon: 'favicon.ico'
   icon:
-    admonition:
-      note: octicons/tag-16
-      abstract: octicons/checklist-16
-      info: octicons/info-16
-      tip: octicons/squirrel-16
-      success: octicons/check-16
-      question: octicons/question-16
-      warning: octicons/alert-16
-      failure: octicons/x-circle-16
-      danger: octicons/zap-16
-      bug: octicons/bug-16
-      example: octicons/beaker-16
-      quote: octicons/quote-16
+    logo: 'material/school'
+  features:
+    - navigation.tabs
+    - navigation.instant
+  font:
+    text: 'Fira Sans'
+    code: 'Fira Mono'
+
+# Extensions
 markdown_extensions:
-  - abbr #缩写或名词
-  - pymdownx.snippets:  #片段，将任意文件或部分内容嵌入到文档中  
-  - admonition:  #警告或标注
-  - pymdownx.details:  #细节折叠
-  - pymdownx.superfences:  #超级围栏
-  - attr_list:   #属性列表（按钮-颜色图标）
-  - def_list:   #定义列表
-  - footnotes:  #行内脚注
-  - meta:   #元数据
-  - md_in_html:  #HTML 中的 Markdown
+  - admonition
+  - def_list
+  - footnotes
+  - meta
+  - toc:
+      permalink: ""
+      slugify: !!python/name:pymdownx.slugs.uslugify
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.caret
+  - pymdownx.critic
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_generator: !!python/name:pymdownx.emoji.to_svg
+  - pymdownx.highlight:
+      linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.magiclink
+  - pymdownx.mark
+  - pymdownx.snippets
+  - pymdownx.progressbar
+  - pymdownx.smartsymbols
+  - pymdownx.superfences:
+      custom_fences:
+        - name: math
+          class: arithmatex
+          format: !!python/name:pymdownx.arithmatex.fence_mathjax_format
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+  - pymdownx.tabbed:
+      alternate_style: true
 
 plugins:
   - search
@@ -36,3 +79,4 @@ extra_javascript:
   - https://lib.baomitu.com/babel-polyfill/7.12.1/polyfill.min.js
   - https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js
   - https://unpkg.com/mermaid/dist/mermaid.min.js
+
