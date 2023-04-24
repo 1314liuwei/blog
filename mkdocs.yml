@@ -80,5 +80,4 @@ extra_javascript:
   - javascripts/mathjax.js  #数学公式的JS
   - https://lib.baomitu.com/babel-polyfill/7.12.1/polyfill.min.js
   - https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js
-  - https://unpkg.com/browse/mermaid@7.1.0/dist/mermaid.min.js
 
