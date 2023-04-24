@@ -8,7 +8,7 @@ NAT可以分为
 穿透需要根据不同的NAT类型采取不同的策略。
 判断NAT类型的方法如下：
 
-```mermaid
+``` mermaid
 sequenceDiagram
     P1->>NAT1: 192.168.1.2:1234-->3.3.3.3:8080
     NAT1->>Coordinator: 1.1.1.1:aaaa-->3.3.3.3:8080
@@ -29,7 +29,7 @@ sequenceDiagram
 
 # 双非对称型NAT内网穿透
 
-```mermaid
+``` mermaid
 sequenceDiagram
     P1->>NAT1: 192.168.1.2:1234-->2.2.2.2:4321 ttl=5
     NAT1-->>NAT2: droped
@@ -49,7 +49,7 @@ P1和P2为两个内网机器，其内网地址都为192.168.1.2，NAT1和NAT2为
 
 # 对称-非对称内网穿透
 
-```mermaid
+``` mermaid
 sequenceDiagram
     P1->>P2: 192.168.1.2:1234-->2.2.2.2:2000 ttl=5
     P1->>P2: 192.168.1.2:1234-->2.2.2.2:2001 ttl=5
