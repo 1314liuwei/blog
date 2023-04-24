@@ -18,8 +18,9 @@ jobs:
       - run: pip install mkdocs-macros-plugin
       - run: pip install mkdocs-git-revision-date-plugin
       - run: pip install mkdocs-git-revision-date-localized-plugi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CONFIG_FILE: mkdocs.yml
-          EXTRA_PACKAGES: build-base
+      - run: mkdocs gh-deploy --force
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
 
