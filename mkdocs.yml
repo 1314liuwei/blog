@@ -63,7 +63,10 @@ markdown_extensions:
         - name: mermaid
           class: mermaid
           format: !!python/name:pymdownx.superfences.fence_code_format
-    
+
+plugins:
+  - search
+  - mermaid2:
 
 extra_javascript:
   - https://cdn.jsdelivr.net/npm/baidu-tongji@0.0.1/index.min.js  #百度统计
