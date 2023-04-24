@@ -57,7 +57,6 @@ markdown_extensions:
   - pymdownx.tasklist:  #任务列表
       custom_checkbox: true   #切换复选框的呈现样式，将原生复选框样式替换为漂亮的图标
 #      clickable_checkbox: true  #切换复选框是否可点击，默认false，不建议开
-  - search:
   - mermaid2:
   - pymdownx.superfences:
       custom_fences:
