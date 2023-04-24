@@ -16,9 +16,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CONFIG_FILE: mkdocs.yml
           EXTRA_PACKAGES: build-base
-      - run: pip install mkdocs-material
-      - run: pip install mkdocs-mermaid2-plugin
-      - run: pip install mknotebooks
-      - run: pip install mkdocs-macros-plugin
-      - run: pip install mkdocs-git-revision-date-plugin
-      - run: pip install mkdocs-git-revision-date-localized-plugi
+      - run: pip3 install mkdocs-material
+      - run: pip3 install mkdocs-mermaid2-plugin
+      - run: pip3 install mknotebooks
+      - run: pip3 install mkdocs-macros-plugin
+      - run: pip3 install mkdocs-git-revision-date-plugin
+      - run: pip3 install mkdocs-git-revision-date-localized-plugi
