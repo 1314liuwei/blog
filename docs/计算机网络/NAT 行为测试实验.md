@@ -100,11 +100,32 @@
 
 **实验数据：**
 
+```bash
+# 尝试用500
+2023-04-25 10:18:27.571 [INFO] {2069eac9fa0b591792bbba1b46be6ff5} send over, use 8.0016ms
+2023/04/25 10:18:34 execute 0 times,loss packet: 0.00%
+......
+2023-04-25 11:33:03.031 [INFO] {2069eac9fa0b591792bbba1b46be6ff5} send over, use 12.9997ms
+2023/04/25 11:33:10 execute 5 times,loss packet: 0.00%
 
+# 尝试用800
+2023-04-25 15:39:54.627 [INFO] {d470a967851d59170818856cef2101d2} send over, use 14.3895ms
+2023/04/25 15:40:01 execute 0 times,loss packet: 0.00%
+2023-04-25 15:50:01.753 [INFO] {d470a967851d59170818856cef2101d2} send over, use 12.3033ms
+2023/04/25 16:00:00 execute 1 times,loss packet: 0.00%
+2023-04-25 16:10:00.249 [INFO] {d470a967851d59170818856cef2101d2} send over, use 15ms
+2023/04/25 16:12:01 execute 2 times,loss packet: 20.00%
+......
+2023-04-25 16:52:10.521 [INFO] {d470a967851d59170818856cef2101d2} send over, use 13.362ms
+2023/04/25 16:54:29 execute 5 times,loss packet: 22.00%
+2023-04-25 17:04:29.983 [INFO] {d470a967851d59170818856cef2101d2} send over, use 11.7844ms
+```
 
 **实验结论：**
 
+根据实验发现当产生发包量为 500 时（500条 NAT Filtering Behavior）， 运营商 NAT 没有出现对流量进行风控情况；当产生发包量为 800 时（800条 NAT Filtering Behavior）， 运营商 NAT 出现了流量进行风控情况。
 
+根据实验，500 条是一个较为合适的NAT Filtering Behavior数量。
 
 
 
