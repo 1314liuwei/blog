@@ -26,5 +26,4 @@
 - bufio 包使用
 - netlink套接字
 - nat回流问题
-- Nat 类型探测
 
