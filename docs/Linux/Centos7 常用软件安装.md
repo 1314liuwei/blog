@@ -322,7 +322,7 @@ go version
 
 ```bash
 # 1. 去官网下载最新版二进制包
-wget https://studygolang.com/dl/golang/go1.18.linux-amd64.tar.gz
+wget https://studygolang.com/dl/golang/go1.20.linux-amd64.tar.gz
  
 # 2. 提取压缩包内容
 sudo tar -xzf go1.18.linux-amd64.tar.gz -C /usr/local
