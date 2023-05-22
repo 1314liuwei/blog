@@ -120,3 +120,10 @@ apt install iperf3
 （8）-t，--time：指定数据传输的总时间，即在指定的时间内，重复发送指定长度的数据包。默认10秒。
 
 （9）-A：CPU亲和性，可以将具体的iperf3进程绑定对应编号的逻辑CPU，避免iperf进程在不同的CPU间调度。
+
+## 查看系统路由表
+
+```bash
+ip route list table 0
+```
+
