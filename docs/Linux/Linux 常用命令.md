@@ -127,3 +127,9 @@ apt install iperf3
 ip route list table 0
 ```
 
+## 查询主机外部 IP
+
+```bash
+curl -L ip.tool.lu
+```
+

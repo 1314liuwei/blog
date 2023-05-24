@@ -13,3 +13,13 @@ git reset --hard origin/master
 git pull
 ```
 
+## 2. 新建分支并同步到远程
+
+```bash
+# 1. 新建本地 develop 分支并切换
+git checkout -b develop
+
+# 2. 同步到远程分支
+git push origin develop:develop
+```
+
