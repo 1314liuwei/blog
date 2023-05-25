@@ -4,7 +4,6 @@
 
 - TCP 和 HTTP 的长连接
 - sync.Map 详解
-- Go 链路层套接字编程
 - iptables 三表五链
 - singleflight 使用与原理解析
 - Go 实现 P2P 穿透
