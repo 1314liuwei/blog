@@ -93,3 +93,39 @@ C:\BTP\v1.8.0\x64
 BTETLParse.exe bth_hci_phone.etl
 ```
 
+## hciconfig 使用问题
+
+```
+# hciconfig hci0 up
+Can't init device hci0: No such file or directory (2)
+```
+
+查看系统日志发现有如下报错：
+
+```bash
+hci0: firmware: failed to load intel/ibt-0040-2120.sfi (-2)
+hci0: firmware: failed to load intel/ibt-0040-2120.ddc (-2)
+```
+
+这是由于没有加载对应的固件包导致，解决方案：
+
+```bash
+# apt安装固件包
+apt update && apt install firmware-iwlwifi
+
+# 如果安装了固件包依然存在这种问题，去查看一下对应的固件包是否已经安装
+cd /usr/lib/firmware	# 在这个文件夹下查看是否有对应的固件包
+
+# 如果没有对应的固件包，则可能是由于固件比较新没有包含在 firmware-iwlwifi 中
+# 去 https://anduin.linuxfromscratch.org/sources/linux-firmware/ 下载所需的固件包，放到对应的路径下
+# 更新所有已安装内核的 initramfs
+update-initramfs -kall -u
+```
+
+## bluetoothctl 使用问题
+
+```bash
+# bluetoothctl scan on
+No default controller available
+```
+

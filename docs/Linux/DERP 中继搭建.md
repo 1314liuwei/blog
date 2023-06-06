@@ -13,7 +13,7 @@
 go install tailscale.com/cmd/derper@main
 
 # 2. 执行命令
-derper --hostname=example.com --a=:12345 --certdir=/root/derp  --certmode=manual --http-port=80
+derper --hostname=example.com --a=:12345 --certdir=/root/derp  --certmode=manual --http-port=-1 --stun=false
 ```
 
 ### Docker
