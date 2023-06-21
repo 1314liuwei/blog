@@ -23,7 +23,7 @@
 - bufio 包使用
 - netlink套接字
 - nat回流问题
-- kcttun 项目
+- kcptun 项目
 - quic 协议
 - http3
 - chacha20算法
@@ -33,4 +33,7 @@
 - webtransport 了解
 - 死锁、活锁、饥饿、自旋锁
 - 半虚拟化网卡
+- Forward Error Correction 算法
+- 重放攻击
+- TCP重置报文段(RST)
 
