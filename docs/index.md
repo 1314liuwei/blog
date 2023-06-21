@@ -6,7 +6,6 @@
 - sync.Map 详解
 - iptables 三表五链
 - singleflight 使用与原理解析
-- Go 实现 P2P 穿透
 - Zstandard 算法使用
 - Kill Switch 简介
 - Socks5 和 HTTP 代理分析与实现
@@ -30,4 +29,10 @@
 - quic 协议
 - http3
 - chacha20算法
+- windows namedpipe
+- windows SDDL Syntax
+- webrtc 了解
+- webtransport 了解
+- 死锁、活锁、饥饿、自旋锁
+- 半虚拟化网卡
 
