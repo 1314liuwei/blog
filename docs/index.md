@@ -10,7 +10,6 @@
 - Kill Switch 简介
 - Socks5 和 HTTP 代理分析与实现
 - BIRD 路由协议软件(参考：[url](https://soha.moe/post/bird-bgp-kickstart.html#1-%E4%BB%80%E4%B9%88%E6%98%AF-bird))
-- Go 创建虚拟网卡
 - gViso 了解，协议栈实现
 - BPF 过滤器
 - 端口映射
@@ -24,7 +23,6 @@
 - bufio 包使用
 - netlink套接字
 - nat回流问题
-- wmi 了解
 - kcttun 项目
 - quic 协议
 - http3

@@ -1,4 +1,4 @@
-# WIndows 共享个人应用
+# Windows 共享个人应用
 
 > Windows Server版拥有发布本地的应用为Remote App的能力。用户可以在本机使用远程主机上的应用，除Server版以外的Windows版本都默认不支持该功能，但通过下列操作可以使普通Windows同样开启此能力。
 >
