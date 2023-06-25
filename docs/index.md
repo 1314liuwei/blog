@@ -2,7 +2,6 @@
 
 **留的一些坑：**
 
-- TCP 和 HTTP 的长连接
 - sync.Map 详解
 - iptables 三表五链
 - singleflight 使用与原理解析
@@ -38,4 +37,6 @@
 - TCP重置报文段(RST)
 - Go 调用动态链接库
 - pcap 库学习
+- Go 条件编译
+- Go net.Interfaces() 在安卓端问题
 

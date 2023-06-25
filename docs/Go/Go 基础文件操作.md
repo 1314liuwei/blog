@@ -62,8 +62,6 @@ func main() {
 
 ### 3. 利用 Scanner  逐行读取
 
-​	
-
 ```go
 func main() {
 	file, _ := os.Open("testFile")
