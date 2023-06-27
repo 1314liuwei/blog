@@ -43,4 +43,5 @@
 - linux socket的 **sendmmsg** 和 **recvmmsg** 
 - 一致性哈希算法
 - DHT网络
+- MPC 安全多方计算
 
