@@ -6,7 +6,11 @@
 
 ## 出现原因
 
-根据 debug 发现是由于安卓 10 以上版本对 netlink 套接字的能力进行了限制，不允许进行 bind 操作。查看 `net.InterfaceAddrs()` 源码，发现在 interfaceAddrTable 函数调用的 `syscall.NetlinkRIB` 函数中，进行了 netlink 套接字 bind 操作：
+根据 debug 发现是由于安卓 11 以上版本对 netlink 套接字的能力进行了限制，详情见：[url](https://developer.android.com/training/articles/user-data-ids#mac-11-plus)。
+
+查看 `net.InterfaceAddrs()` 源码，发现在两个地方会存在问题：
+
+（一）在`syscall.NetlinkRIB` 函数中，进行了 netlink 套接字 bind 操作：
 
 ```go
 // NetlinkRIB returns routing information base, as known as RIB, which
@@ -72,84 +76,11 @@ done:
 }
 ```
 
-## 解决方案
-
-在使用 Netlink 套接字时，如果不调用 bind 函数绑定一个本地地址，则内核会随机分配一个可用的本地地址，并将其绑定到该套接字上。因此，不调用bind函数也可以成功地使用Netlink套接字进行通信。
-
-因此通过重写 `net.InterfaceAddrs()` 相关代码，在调用 netlink 套接字时不进行 bind 操作即可解决该问题：
+（二）在 `interfaceTable` 函数中，调用了 Netlink 套接字的 `RTM_GETLINK` 能力：
 
 ```go
-package rnet
-
-import (
-	"errors"
-	"net"
-	"os"
-	"runtime"
-	"syscall"
-	"unsafe"
-)
-
-const (
-	// See linux/if_arp.h.
-	// Note that Linux doesn't support IPv4 over IPv6 tunneling.
-	sysARPHardwareIPv4IPv4 = 768 // IPv4 over IPv4 tunneling
-	sysARPHardwareIPv6IPv6 = 769 // IPv6 over IPv6 tunneling
-	sysARPHardwareIPv6IPv4 = 776 // IPv6 over IPv4 tunneling
-	sysARPHardwareGREIPv4  = 778 // any over GRE over IPv4 tunneling
-	sysARPHardwareGREIPv6  = 823 // any over GRE over IPv6 tunneling
-)
-
-var (
-	errNoSuchInterface = errors.New("no such network interface")
-)
-
-func InterfaceAddrs() ([]net.Addr, error) {
-	switch runtime.GOOS {
-	case "android":
-		ifat, err := interfaceAddrTable(nil)
-		if err != nil {
-			err = &net.OpError{Op: "route", Net: "ip+net", Source: nil, Addr: nil, Err: err}
-		}
-		return ifat, err
-	case "linux":
-		return net.InterfaceAddrs()
-	default:
-		return nil, errors.New("unsupported system")
-	}
-}
-
-// If the ifi is nil, interfaceAddrTable returns addresses for all
-// network interfaces. Otherwise it returns addresses for a specific
-// interface.
-func interfaceAddrTable(ifi *net.Interface) ([]net.Addr, error) {
-	tab, err := NetlinkRIB(syscall.RTM_GETADDR, syscall.AF_UNSPEC)
-	if err != nil {
-		return nil, os.NewSyscallError("netlinkrib", err)
-	}
-	msgs, err := syscall.ParseNetlinkMessage(tab)
-	if err != nil {
-		return nil, os.NewSyscallError("parsenetlinkmessage", err)
-	}
-	var ift []net.Interface
-	if ifi == nil {
-		var err error
-		ift, err = interfaceTable(0)
-		if err != nil {
-			return nil, err
-		}
-	}
-	ifat, err := addrTable(ift, ifi, msgs)
-	if err != nil {
-		return nil, err
-	}
-	return ifat, nil
-}
-
-// If the ifindex is zero, interfaceTable returns mappings of all
-// network interfaces. Otherwise it returns a mapping of a specific
-// interface.
-func interfaceTable(ifindex int) ([]net.Interface, error) {
+func interfaceTable(ifindex int) ([]Interface, error) {
+    // 调用了 syscall.RTM_GETLINK 套接字
 	tab, err := syscall.NetlinkRIB(syscall.RTM_GETLINK, syscall.AF_UNSPEC)
 	if err != nil {
 		return nil, os.NewSyscallError("netlinkrib", err)
@@ -158,7 +89,7 @@ func interfaceTable(ifindex int) ([]net.Interface, error) {
 	if err != nil {
 		return nil, os.NewSyscallError("parsenetlinkmessage", err)
 	}
-	var ift []net.Interface
+	var ift []Interface
 loop:
 	for _, m := range msgs {
 		switch m.Header.Type {
@@ -180,70 +111,53 @@ loop:
 	}
 	return ift, nil
 }
+```
 
-func newLink(ifim *syscall.IfInfomsg, attrs []syscall.NetlinkRouteAttr) *net.Interface {
-	ifi := &net.Interface{Index: int(ifim.Index), Flags: linkFlags(ifim.Flags)}
-	for _, a := range attrs {
-		switch a.Attr.Type {
-		case syscall.IFLA_ADDRESS:
-			// We never return any /32 or /128 IP address
-			// prefix on any IP tunnel interface as the
-			// hardware address.
-			switch len(a.Value) {
-			case net.IPv4len:
-				switch ifim.Type {
-				case sysARPHardwareIPv4IPv4, sysARPHardwareGREIPv4, sysARPHardwareIPv6IPv4:
-					continue
-				}
-			case net.IPv6len:
-				switch ifim.Type {
-				case sysARPHardwareIPv6IPv6, sysARPHardwareGREIPv6:
-					continue
-				}
-			}
-			var nonzero bool
-			for _, b := range a.Value {
-				if b != 0 {
-					nonzero = true
-					break
-				}
-			}
-			if nonzero {
-				ifi.HardwareAddr = a.Value[:]
-			}
-		case syscall.IFLA_IFNAME:
-			ifi.Name = string(a.Value[:len(a.Value)-1])
-		case syscall.IFLA_MTU:
-			ifi.MTU = int(*(*uint32)(unsafe.Pointer(&a.Value[:4][0])))
-		}
+
+
+## 解决方案
+
+因此通过重写 `net.InterfaceAddrs()` 相关代码，解决上诉问题：
+
+```go
+package p2p
+
+import (
+	"net"
+	"os"
+	"syscall"
+	"unsafe"
+)
+
+func InterfaceAddrs() ([]net.Addr, error) {
+	ifat, err := interfaceAddrTable()
+	if err != nil {
+		err = &net.OpError{Op: "route", Net: "ip+net", Source: nil, Addr: nil, Err: err}
 	}
-	return ifi
+	return ifat, err
 }
 
-func linkFlags(rawFlags uint32) net.Flags {
-	var f net.Flags
-	if rawFlags&syscall.IFF_UP != 0 {
-		f |= net.FlagUp
+// If the ifi is nil, interfaceAddrTable returns addresses for all
+// network interfaces. Otherwise it returns addresses for a specific
+// interface.
+func interfaceAddrTable() ([]net.Addr, error) {
+	tab, err := NetlinkRIB(syscall.RTM_GETADDR, syscall.AF_UNSPEC)
+	if err != nil {
+		return nil, os.NewSyscallError("netlinkrib", err)
 	}
-	if rawFlags&syscall.IFF_RUNNING != 0 {
-		f |= net.FlagRunning
+	msgs, err := syscall.ParseNetlinkMessage(tab)
+	if err != nil {
+		return nil, os.NewSyscallError("parsenetlinkmessage", err)
 	}
-	if rawFlags&syscall.IFF_BROADCAST != 0 {
-		f |= net.FlagBroadcast
+
+	ifat, err := addrTable(msgs)
+	if err != nil {
+		return nil, err
 	}
-	if rawFlags&syscall.IFF_LOOPBACK != 0 {
-		f |= net.FlagLoopback
-	}
-	if rawFlags&syscall.IFF_POINTOPOINT != 0 {
-		f |= net.FlagPointToPoint
-	}
-	if rawFlags&syscall.IFF_MULTICAST != 0 {
-		f |= net.FlagMulticast
-	}
-	return f
+	return ifat, nil
 }
 
-func addrTable(ift []net.Interface, ifi *net.Interface, msgs []syscall.NetlinkMessage) ([]net.Addr, error) {
+func addrTable(msgs []syscall.NetlinkMessage) ([]net.Addr, error) {
 	var ifat []net.Addr
 loop:
 	for _, m := range msgs {
@@ -252,22 +166,13 @@ loop:
 			break loop
 		case syscall.RTM_NEWADDR:
 			ifam := (*syscall.IfAddrmsg)(unsafe.Pointer(&m.Data[0]))
-			if len(ift) != 0 || ifi.Index == int(ifam.Index) {
-				if len(ift) != 0 {
-					var err error
-					ifi, err = interfaceByIndex(ift, int(ifam.Index))
-					if err != nil {
-						return nil, err
-					}
-				}
-				attrs, err := syscall.ParseNetlinkRouteAttr(&m)
-				if err != nil {
-					return nil, os.NewSyscallError("parsenetlinkrouteattr", err)
-				}
-				ifa := newAddr(ifam, attrs)
-				if ifa != nil {
-					ifat = append(ifat, ifa)
-				}
+			attrs, err := syscall.ParseNetlinkRouteAttr(&m)
+			if err != nil {
+				return nil, os.NewSyscallError("parsenetlinkrouteattr", err)
+			}
+			ifa := newAddr(ifam, attrs)
+			if ifa != nil {
+				ifat = append(ifat, ifa)
 			}
 		}
 	}
@@ -301,15 +206,6 @@ func newAddr(ifam *syscall.IfAddrmsg, attrs []syscall.NetlinkRouteAttr) net.Addr
 	return nil
 }
 
-func interfaceByIndex(ift []net.Interface, index int) (*net.Interface, error) {
-	for _, ifi := range ift {
-		if index == ifi.Index {
-			return &ifi, nil
-		}
-	}
-	return nil, errNoSuchInterface
-}
-
 // NetlinkRIB returns routing information base, as known as RIB, which
 // consists of network facility information, states and parameters.
 func NetlinkRIB(proto, family int) ([]byte, error) {
@@ -319,9 +215,11 @@ func NetlinkRIB(proto, family int) ([]byte, error) {
 	}
 	defer syscall.Close(s)
 	sa := &syscall.SockaddrNetlink{Family: syscall.AF_NETLINK}
-	if err := syscall.Bind(s, sa); err != nil {
-		return nil, err
-	}
+	//if err := syscall.Bind(s, sa); err != nil {
+	//	if err != syscall.EACCES {
+	//		return nil, err
+	//	}
+	//}
 	wb := newNetlinkRouteRequest(proto, 1, family)
 	if err := syscall.Sendto(s, wb, 0, sa); err != nil {
 		return nil, err
