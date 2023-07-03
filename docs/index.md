@@ -46,4 +46,9 @@
 - MPC 安全多方计算
 - go 接口类型转换
 - udp  recvfrom: connection refused
+- MPTCP 学习 [url](https://mp.weixin.qq.com/s/aC7omLYJ6Anm9f-8b4qYAg)
+- Groupcache 学习
+- BT Sync（Resilio Sync）自动同步
+- vpn gate使用
+- chord 算法
 
