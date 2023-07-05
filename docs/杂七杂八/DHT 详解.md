@@ -17,7 +17,36 @@ DHT是一个广泛的概念，有许多不同的实现和变体，例如Chord、
 
 ## Chord 算法
 
-Chord 算法的核心在于**一致性哈希算法**和**跳表**。
+### 基本要素
+
+Chord 算法的核心在于**一致性哈希算法**和**跳表**。Chord算法将节点 IP 和资源 Key 使用统一用某个哈希函数（如SHA-1）计算出一个 m 位的 ID 号。将计算出的 ID 号对 2^m 取模后按顺序排列在环上，该环被称为 **identifier space**。
+
+对于一个资源 Key ，用哈希函数计算后的 ID 号为 k，该 Key 由环上第一个 ID 号大于 k 的节点负责维护这个资源。
+
+环上的每个节点都维护着自身的后继节点，如下图中，N1 节点保存着 N8 节点的信息，N8 节点保存着 N14 节点的信息，以此类推就构成了一个环形链表结构。
+
+如下图， K10 这个资源就由 N14 这个节点进行负责（14 > 10）。
+
+![img](https://www.researchgate.net/profile/David-Karger/publication/228057545/figure/fig2/AS:302371067449349@1449102288710/figure-fig2.png)
+
+
+
+### 资源定位
+
+当节点想要查询一个节点的位置时，根据现有结构，他需要依次遍历每一个后继节点，直到查找到资源为止。
+
+如下图中，节点 N8 想要查找到资源 K54，那么它需要执行 N8 -> N14 -> N21 -> N32 -> N38 -> N42 -> N51 -> N56才能找到 N54 对应的资源。
+
+![image-20230705093922930](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/2023/07/05/20230705-093923.png)
+
+### 引入跳表
+
+为了解决链表结构查询资源缓慢的问题，Chord 引入了 **finger table**，这实际上就是一个跳表。
+
+在 finger table 中，在每个节点 N 上都维护了最多有 m 项（m为 ID 的位数）的路由表（称为 finger table），用来定位资源。
+
+![img](https://www.researchgate.net/profile/David-Karger/publication/228057545/figure/fig5/AS:668680417472520@1536437243266/a-Simple-but-slow-pseudocode-to-find-the-successor-node-of-an-identifier-id-Remote.png)
+
 
 ## Kademlia 算法
 
