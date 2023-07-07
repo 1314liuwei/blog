@@ -2,8 +2,6 @@
 
 **留的一些坑：**
 
-- sync.Map 详解
-
 - iptables 三表五链
 
 - singleflight 使用与原理解析
@@ -91,6 +89,10 @@
 - vpn gate使用
 
 - Go 使用不同编码
+
+- lock-free 编程
+
+- CAS 机制
 
   
 
