@@ -4,6 +4,8 @@
 
 - iptables 三表五链
 
+- sync.Once 使用与实现
+
 - singleflight 使用与原理解析
 
 - Zstandard 算法使用
@@ -70,8 +72,6 @@
 
 - Go 条件编译
 
-- TOTP和HOTP原理
-
 - linux socket的 **sendmmsg** 和 **recvmmsg** 
 
 - 一致性哈希算法
@@ -93,6 +93,8 @@
 - CAS 机制
 
 - hmac 了解
+
+- double-defer 机制
 
   
 
