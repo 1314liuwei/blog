@@ -96,7 +96,5 @@
 
 - UEFI 和 BIOS
 
-- runtime.Goexit 和 runtime.Gosched
-
   
 
