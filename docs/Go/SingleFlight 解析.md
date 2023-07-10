@@ -83,6 +83,30 @@ func (g *Group) Do(key string, fn func() (interface{}, error)) (v interface{}, e
 	return c.val, c.err, c.dups > 0
 }
 
+func (g *Group) DoChan(key string, fn func() (interface{}, error)) <-chan Result {
+	ch := make(chan Result, 1)
+	g.mu.Lock()
+	if g.m == nil {
+		g.m = make(map[string]*call)
+	}
+	if c, ok := g.m[key]; ok {
+		c.dups++
+		c.chans = append(c.chans, ch)
+		g.mu.Unlock()
+		return ch
+	}
+    // 创建 channel
+	c := &call{chans: []chan<- Result{ch}}
+	c.wg.Add(1)
+	g.m[key] = c
+	g.mu.Unlock()
+	// 新开 goroutine 执行函数
+	go g.doCall(c, key, fn)
+
+	return ch
+}
+
+
 func (g *Group) doCall(c *call, key string, fn func() (interface{}, error)) {
     // 用于标记是否正常返回
 	normalReturn := false
@@ -107,7 +131,7 @@ func (g *Group) doCall(c *call, key string, fn func() (interface{}, error)) {
 
 		if e, ok := c.err.(*panicError); ok {
 			if len(c.chans) > 0 {
-                // 如果返回的是 panic 错误，为了避免这个错误被 recover捕获而造成 channel 死锁，
+                // 如果返回的是 panic 错误，为了避免这个错误被上层 recover捕获而造成 channel 死锁，
                 // 因此需要再开一个 goroutine 进行 panic 
 				go panic(e)
                 // 阻塞当前 goroutine 避免被垃圾回收
@@ -116,6 +140,7 @@ func (g *Group) doCall(c *call, key string, fn func() (interface{}, error)) {
 				panic(e)
 			}
 		} else if c.err == errGoexit {
+            // 当前 goroutine 已经退出，不需要再进行处理
 		} else {
             // 返回结果到 chan
 			for _, ch := range c.chans {
@@ -124,25 +149,30 @@ func (g *Group) doCall(c *call, key string, fn func() (interface{}, error)) {
 		}
 	}()
 
+    // 使用匿名函数的目的是为了在内部再使用一个 defer 用来捕获 panic
 	func() {
 		defer func() {
 			if !normalReturn {
 				if r := recover(); r != nil {
+                    // 构建 panic 错误
 					c.err = newPanicError(r)
 				}
 			}
 		}()
 
+        // 执行函数返回结果 
 		c.val, c.err = fn()
 		normalReturn = true
 	}()
 
+    // 判断是否 panic
 	if !normalReturn {
 		recovered = true
 	}
 }
 
 func newPanicError(v interface{}) error {
+    // 获取堆栈信息
 	stack := debug.Stack()
 	if line := bytes.IndexByte(stack[:], '\n'); line >= 0 {
 		stack = stack[line+1:]
@@ -151,3 +181,6 @@ func newPanicError(v interface{}) error {
 }
 ```
 
+在上面的代码中，可以发现 `doCall` 函数的设计是十分巧妙的，它通过两个 defer 巧妙的区分了到底是发生了 panic 还是用户主动调用了 runtime.Goexit。
+
+同时在其中使用匿名函数来保证第二个 defer 能够在第一个 defer 之前执行。

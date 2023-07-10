@@ -6,8 +6,6 @@
 
 - sync.Once 使用与实现
 
-- singleflight 使用与原理解析
-
 - Zstandard 算法使用
 
 - Kill Switch 简介
@@ -95,6 +93,10 @@
 - hmac 了解
 
 - double-defer 机制
+
+- UEFI 和 BIOS
+
+- runtime.Goexit 和 runtime.Gosched
 
   
 
