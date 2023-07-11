@@ -4,8 +4,6 @@
 
 - iptables 三表五链
 
-- sync.Once 使用与实现
-
 - Zstandard 算法使用
 
 - Kill Switch 简介
