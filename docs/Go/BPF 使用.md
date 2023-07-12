@@ -118,7 +118,132 @@ bpf.Assemble([]bpf.Instruction{
 ```go
 var assembled = []bpf.RawInstruction{
 	{40, 0, 0, 12},
+	{21, 0, 6, 34525},
+	{48, 0, 0, 20},
+	{21, 0, 15, 6},
+	{40, 0, 0, 54},
+	{21, 12, 0, 8080},
+	{40, 0, 0, 56},
+	{21, 10, 11, 8080},
+	{21, 0, 10, 2048},
+	{48, 0, 0, 23},
+	{21, 0, 8, 6},
+	{40, 0, 0, 20},
+	{69, 6, 0, 8191},
+	{177, 0, 0, 14},
+	{72, 0, 0, 14},
+	{21, 2, 0, 8080},
+	{72, 0, 0, 16},
+	{21, 0, 1, 8080},
+	{6, 0, 0, 262144},
+	{6, 0, 0, 0},
 }
 ```
 
 ## 设置 BPF 过滤
+
+要为 Go 标准库的 `net.PacketConn` 设置BPF过滤，有两种种方法，
+
+1. 调用`syscall.SetsockoptInt`进行设置；
+2. [golang.org/x/net/ipv4](https://pkg.go.dev/golang.org/x/net/ipv4#PacketConn.SetBPF)提供了`SetBPF`方法，可以直接将标准库的 `net.PacketConn`转换成`ipv4.PacketConn`，再进行设置。
+
+
+
+**调用 `syscall.SetsockoptInt`进行设置：**
+
+```go
+package main
+
+import (
+	"net"
+	"unsafe"
+
+	"golang.org/x/net/bpf"
+	"golang.org/x/sys/unix"
+)
+
+func main() {
+	filter, err := bpf.Assemble([]bpf.Instruction{
+		// 加载端口值到寄存器
+		bpf.LoadAbsolute{Off: 22, Size: 2},
+		// 如果值为 8080，则执行下一行。否则跳过下一行
+		bpf.JumpIf{Cond: bpf.JumpNotEqual, Val: 8080, SkipTrue: 1},
+		// 返回这个包的最多 0xffff 字节的数据
+		bpf.RetConstant{Val: 0xffff},
+		// 返回这个包的最多 0 字节的数据，即忽略这个包
+		bpf.RetConstant{Val: 0},
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	conn, err := net.ListenPacket("ip:17", "")
+	if err != nil {
+		panic(err)
+	}
+
+	raw, err := conn.(*net.IPConn).SyscallConn()
+	if err != nil {
+		panic(err)
+	}
+
+	prog := &unix.SockFprog{
+		Len:    uint16(len(filter)),
+		Filter: (*unix.SockFilter)(unsafe.Pointer(&filter[0])),
+	}
+
+	var setErr error
+	err = raw.Control(func(fd uintptr) {
+		setErr = unix.SetsockoptSockFprog(int(fd), unix.SOL_SOCKET, unix.SO_ATTACH_FILTER, prog)
+	})
+	if err != nil {
+		panic(err)
+	}
+	if setErr != nil {
+		panic(err)
+	}
+}
+```
+
+
+
+**通过 SetPBF设置：**
+
+```go
+package main
+
+import (
+	"net"
+
+	"golang.org/x/net/bpf"
+	"golang.org/x/net/ipv4"
+)
+
+func main() {
+	filter, err := bpf.Assemble([]bpf.Instruction{
+		// 加载端口值到寄存器
+		bpf.LoadAbsolute{Off: 22, Size: 2},
+		// 如果值为 8080，则执行下一行。否则跳过下一行
+		bpf.JumpIf{Cond: bpf.JumpNotEqual, Val: 8080, SkipTrue: 1},
+		// 返回这个包的最多 0xffff 字节的数据
+		bpf.RetConstant{Val: 0xffff},
+		// 返回这个包的最多 0 字节的数据，即忽略这个包
+		bpf.RetConstant{Val: 0},
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	conn, err := net.ListenPacket("ip:17", "")
+	if err != nil {
+		panic(err)
+	}
+
+	pc := ipv4.NewPacketConn(conn)
+	err = pc.SetBPF(filter)
+	if err != nil {
+		panic(err)
+	}
+}
+```
+
