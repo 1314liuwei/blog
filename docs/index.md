@@ -14,10 +14,6 @@
 
 - gViso 了解，协议栈实现
 
-- BPF 过滤器
-
-- 端口映射
-
 - NaCI 加密算法(参考：[url](https://segmentfault.com/a/1190000000476866))
 
 - Noise 加密算法了解(参考：[url](http://www.noiseprotocol.org/noise.html))
