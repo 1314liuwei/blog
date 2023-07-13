@@ -30,8 +30,6 @@
 
 - netlink套接字
 
-- nat回流问题
-
 - kcptun 项目
 
 - quic 协议
