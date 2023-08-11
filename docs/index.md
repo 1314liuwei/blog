@@ -62,3 +62,4 @@
 - go mod 原理
 - github.com/ulule/deepcopier
 - webkit
+- //go:linkname
