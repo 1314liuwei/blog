@@ -85,4 +85,5 @@ plugins: []
 extra_javascript:
   - https://lib.baomitu.com/babel-polyfill/7.12.1/polyfill.min.js
   - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+  - http://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js
 
