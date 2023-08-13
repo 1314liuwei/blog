@@ -80,9 +80,7 @@ markdown_extensions:
   - pymdownx.tabbed:
       alternate_style: true
 
-plugins: 
-  - macros:
-      track_pageviews: true
+plugins: []
 
 
 extra_javascript:
