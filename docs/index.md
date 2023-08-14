@@ -62,4 +62,6 @@
 - go mod 原理
 - github.com/ulule/deepcopier
 - webkit
-- //go:linkname
+- //go:linkname 、//go:nosplit 等Go编译器指令
+-  runtime.procyield
+- gob
