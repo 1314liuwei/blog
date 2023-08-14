@@ -66,3 +66,4 @@
 -  runtime.procyield
 - gob
 - fsnotify
+- sync.Cond
