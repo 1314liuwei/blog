@@ -65,3 +65,4 @@
 - //go:linkname 、//go:nosplit 等Go编译器指令
 -  runtime.procyield
 - gob
+- fsnotify
