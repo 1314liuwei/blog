@@ -67,3 +67,5 @@
 - gob
 - fsnotify
 - sync.Cond
+- sqlite wal模式
+- 文件读写锁
