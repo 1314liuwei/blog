@@ -71,3 +71,4 @@
 - 文件读写锁
 - geohash
 - geojson 使用
+- GraphQL
