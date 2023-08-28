@@ -73,3 +73,4 @@
 - geojson 使用
 - GraphQL
 - Temporal 
+- actor 模型
