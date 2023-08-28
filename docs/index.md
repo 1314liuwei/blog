@@ -74,3 +74,4 @@
 - GraphQL
 - Temporal 
 - actor 模型
+- 扇入和扇出
