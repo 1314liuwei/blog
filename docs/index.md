@@ -75,3 +75,5 @@
 - Temporal 
 - actor 模型
 - 扇入和扇出
+- linux attribute
+- epoll 机制原理
