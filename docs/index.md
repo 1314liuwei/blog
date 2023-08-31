@@ -78,3 +78,4 @@
 - linux attribute
 - epoll 机制原理
 - 限流机制：计数器、滑动窗口、漏桶、令牌桶
+- bert和vit 
