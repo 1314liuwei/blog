@@ -85,3 +85,4 @@
 - Happy Eyeballs 机制
 - 过滤器：**BitMap**、**布隆过滤器**
 - 分布式数据协议 - DDP
+- 竞态检测：src\internal\race.Enabled
