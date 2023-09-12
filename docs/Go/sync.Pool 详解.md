@@ -53,6 +53,8 @@ type poolLocalInternal struct {
 - `private`：缓存对象，同时只能被一个 P 访问；
 - `shared`：共享缓存对象，同时可以被多个 P 访问。
 
+
+
 ## `Put`方法
 
 ```go
@@ -156,4 +158,217 @@ func (p *Pool) pinSlow() (*poolLocal, int) {
 
 
 ## `Get`方法
+
+```go
+func (p *Pool) Get() any {
+	if race.Enabled {
+		race.Disable()
+	}
+    // 返回当前 M 绑定的 P 的ID号以及所对应的 poolLocal
+	l, pid := p.pin()
+    // 获取 poolLocal 上的 private，然后将其置空
+	x := l.private
+	l.private = nil
+    
+	if x == nil {
+		// Try to pop the head of the local shard. We prefer
+		// the head over the tail for temporal locality of
+		// reuse.
+        // 如果变量为空，则尝试从自身共享 shared 上拿去一个
+		x, _ = l.shared.popHead()
+        
+        // 如果依然为空，则尝试从其他 P 的 poolLocal 中拿取一个
+		if x == nil {
+			x = p.getSlow(pid)
+		}
+	}
+    
+    // 解绑 P
+	runtime_procUnpin()
+	if race.Enabled {
+		race.Enable()
+		if x != nil {
+			race.Acquire(poolRaceAddr(x))
+		}
+	}
+    
+    // 如果整个对象池中都不存在数据，则尝试调用 New 方法创建一个
+	if x == nil && p.New != nil {
+		x = p.New()
+	}
+	return x
+}
+```
+
+```go
+func (p *Pool) getSlow(pid int) any {
+	// See the comment in pin regarding ordering of the loads.
+    // 加载 local 和 size
+	size := runtime_LoadAcquintptr(&p.localSize) // load-acquire
+	locals := p.local                            // load-consume
+    
+	// Try to steal one element from other procs.
+    // 从其他 P 对应的 poolLocal 的共享对象中尝试拿去一个
+	for i := 0; i < int(size); i++ {
+		l := indexLocal(locals, (pid+i+1)%int(size))
+		if x, _ := l.shared.popTail(); x != nil {
+			return x
+		}
+	}
+
+	// Try the victim cache. We do this after attempting to steal
+	// from all primary caches because we want objects in the
+	// victim cache to age out if at all possible.
+    // 如果从当前 local 拿不到数据，则从老的 victim 中尝试拿数据
+	size = atomic.LoadUintptr(&p.victimSize)
+	if uintptr(pid) >= size {
+		return nil
+	}
+	locals = p.victim
+	l := indexLocal(locals, pid)
+	if x := l.private; x != nil {
+		l.private = nil
+		return x
+	}
+	for i := 0; i < int(size); i++ {
+		l := indexLocal(locals, (pid+i)%int(size))
+		if x, _ := l.shared.popTail(); x != nil {
+			return x
+		}
+	}
+
+	// Mark the victim cache as empty for future gets don't bother
+	// with it.
+    // 如果从老的数据中依然取不到数据，则下次将 victimSize 置空，避免下次再尝试从 victim 中取数据
+	atomic.StoreUintptr(&p.victimSize, 0)
+
+	return nil
+}
+```
+
+
+
+## poolChain
+
+`poolChain`是一个链头非并发安全，链尾并发安全的链表。
+
+### 结构
+
+```go
+type poolChain struct {
+	head *poolChainElt
+	tail *poolChainElt
+}
+
+type poolChainElt struct {
+	poolDequeue
+	next, prev *poolChainElt
+}
+
+type poolDequeue struct {
+	headTail uint64
+	vals []eface
+}
+
+type eface struct {
+	typ, val unsafe.Pointer
+}
+```
+
+
+
+## Other Method
+
+```go
+func init() {
+	// 将 poolCleanup 注册到 runtime, 该函数会在 GC 执行前执行
+    runtime_registerPoolCleanup(poolCleanup)
+}
+
+// poolCleanup 用于清理缓存对象，避免缓存对象一直不过期
+// 缓存对象会在第二个 GC 到来前被清理
+func poolCleanup() {
+    // 由于在执行 poolCleanup 时，已经进入了 STW 状态，因此不能执行 runtime 相关函数以及新对象的创建
+	// This function is called with the world stopped, at the beginning of a garbage collection.
+	// It must not allocate and probably should not call any runtime functions.
+
+	// Because the world is stopped, no pool user can be in a
+	// pinned section (in effect, this has all Ps pinned).
+
+	// Drop victim caches from all pools.
+    // 将老的 pool 的 victim 全部清空 
+	for _, p := range oldPools {
+		p.victim = nil
+		p.victimSize = 0
+	}
+
+	// Move primary cache to victim cache.
+    // 将 poolLocal 的当前 local 移动到 victim
+	for _, p := range allPools {
+		p.victim = p.local
+		p.victimSize = p.localSize
+		p.local = nil
+		p.localSize = 0
+	}
+
+	// The pools with non-empty primary caches now have non-empty
+	// victim caches and no pools have primary caches.
+    // 将现在的 pools 标记为老的
+	oldPools, allPools = allPools, nil
+}
+
+var (
+	allPoolsMu Mutex
+	allPools []*Pool
+	oldPools []*Pool
+)
+
+// Implemented in runtime.
+func runtime_registerPoolCleanup(cleanup func())
+func runtime_procPin() int
+func runtime_procUnpin()
+
+// The below are implemented in runtime/internal/atomic and the
+// compiler also knows to intrinsify the symbol we linkname into this
+// package.
+
+//go:linkname runtime_LoadAcquintptr runtime/internal/atomic.LoadAcquintptr
+func runtime_LoadAcquintptr(ptr *uintptr) uintptr
+
+//go:linkname runtime_StoreReluintptr runtime/internal/atomic.StoreReluintptr
+func runtime_StoreReluintptr(ptr *uintptr, val uintptr) uintptr
+```
+
+```go
+// src/runtime/mgc.go
+
+//go:linkname sync_runtime_registerPoolCleanup sync.runtime_registerPoolCleanup
+func sync_runtime_registerPoolCleanup(f func()) {
+	poolcleanup = f
+}
+
+func clearpools() {
+	// clear sync.Pools
+	if poolcleanup != nil {
+		poolcleanup()
+	}
+    ......
+}
+
+func gcStart(trigger gcTrigger) {
+    ......
+    // clearpools before we start the GC. If we wait they memory will not be
+	// reclaimed until the next GC cycle.
+	clearpools()
+    ......
+}
+```
+
+## 总结
+
+通过代码分析发现 `sync.Pool`有以下特性：
+
+- 为每个 P 绑定一个 `poolLocal` 对象，每个 `poolLocal` 中有一个 `private`对象。`private`对象只能被对应的 P 访问，因此访问 `private`时不需要进行加锁；
+- `poolLocal`中的`shared`是一个无锁、并发安全的环形链表。能够同时被不同的 P 访问；
+- 对象池中的对象在遇到的第二个 GC 时会被删除。
 
