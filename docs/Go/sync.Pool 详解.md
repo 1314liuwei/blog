@@ -255,11 +255,13 @@ func (p *Pool) getSlow(pid int) any {
 ### 结构
 
 ```go
+// 双向链表
 type poolChain struct {
 	head *poolChainElt
 	tail *poolChainElt
 }
 
+// 环形队列
 type poolChainElt struct {
 	poolDequeue
 	next, prev *poolChainElt
@@ -272,6 +274,184 @@ type poolDequeue struct {
 
 type eface struct {
 	typ, val unsafe.Pointer
+}
+```
+
+### 方法
+
+```go
+func (c *poolChain) pushHead(val any) {
+	d := c.head
+    // 初始化链表
+	if d == nil {
+		// Initialize the chain.
+		const initSize = 8 // Must be a power of 2
+		d = new(poolChainElt)
+		d.vals = make([]eface, initSize)
+        // 头节点非互斥赋值
+        // 在 sync.Pool 中，头节点是被单 goroutine 用于数据访问的，因此不用做互斥
+		c.head = d
+        // 尾节点互斥赋值
+        // 在 sync.Pool 中，尾节点可能会被多个 goroutine 用于数据访问，因此需要做互斥
+		storePoolChainElt(&c.tail, d)
+	}
+
+    // 将数据放入环形队列头部
+    // 当环形队列满时会返回 False
+	if d.pushHead(val) {
+		return
+	}
+
+	// The current dequeue is full. Allocate a new one of twice
+	// the size.
+    // 创建一个新环形队列，新的环形队列的容量是上一个的两倍，但是不能超过dequeueLimit
+	newSize := len(d.vals) * 2
+	if newSize >= dequeueLimit {
+		// Can't make it any bigger.
+		newSize = dequeueLimit
+	}
+
+    // 添加新节点
+	d2 := &poolChainElt{prev: d}
+	d2.vals = make([]eface, newSize)
+	c.head = d2
+	storePoolChainElt(&d.next, d2)
+	d2.pushHead(val)
+}
+
+func (c *poolChain) popHead() (any, bool) {
+	d := c.head
+    // 遍历链表取值
+	for d != nil {
+		if val, ok := d.popHead(); ok {
+			return val, ok
+		}
+		d = loadPoolChainElt(&d.prev)
+	}
+	return nil, false
+}
+
+func (c *poolChain) popTail() (any, bool) {
+    // 互斥取出尾节点地址
+	d := loadPoolChainElt(&c.tail)
+	if d == nil {
+		return nil, false
+	}
+
+    // 循环遍历节点，弹出数据，直到找到尾节点
+	for {
+		d2 := loadPoolChainElt(&d.next)
+
+		if val, ok := d.popTail(); ok {
+			return val, ok
+		}
+
+		if d2 == nil {
+			return nil, false
+		}
+
+        // 删除空节点
+		if atomic.CompareAndSwapPointer((*unsafe.Pointer)(unsafe.Pointer(&c.tail)), unsafe.Pointer(d), unsafe.Pointer(d2)) {
+			storePoolChainElt(&d2.prev, nil)
+		}
+		d = d2
+	}
+}
+```
+
+```go
+// 解析头尾节点索引
+func (d *poolDequeue) unpack(ptrs uint64) (head, tail uint32) {
+	const mask = 1<<dequeueBits - 1
+	head = uint32((ptrs >> dequeueBits) & mask)
+	tail = uint32(ptrs & mask)
+	return
+}
+
+// 封装头尾节点索引
+func (d *poolDequeue) pack(head, tail uint32) uint64 {
+	const mask = 1<<dequeueBits - 1
+	return (uint64(head) << dequeueBits) | uint64(tail&mask)
+}
+
+func (d *poolDequeue) pushHead(val any) bool {
+	ptrs := atomic.LoadUint64(&d.headTail)
+	head, tail := d.unpack(ptrs)
+    // 如果首尾地址相同代表循环队列已经满了
+	if (tail+uint32(len(d.vals)))&(1<<dequeueBits-1) == head {
+		// Queue is full.
+		return false
+	}
+	slot := &d.vals[head&uint32(len(d.vals)-1)]
+
+	typ := atomic.LoadPointer(&slot.typ)
+	if typ != nil {
+		return false
+	}
+
+	if val == nil {
+		val = dequeueNil(nil)
+	}
+	*(*any)(unsafe.Pointer(slot)) = val
+	
+    // 索引位置增加一位
+	atomic.AddUint64(&d.headTail, 1<<dequeueBits)
+	return true
+}
+
+func (d *poolDequeue) popHead() (any, bool) {
+	var slot *eface
+	for {
+		ptrs := atomic.LoadUint64(&d.headTail)
+		head, tail := d.unpack(ptrs)
+		if tail == head {
+			return nil, false
+		}
+
+		head--
+		ptrs2 := d.pack(head, tail)
+		if atomic.CompareAndSwapUint64(&d.headTail, ptrs, ptrs2) {
+			slot = &d.vals[head&uint32(len(d.vals)-1)]
+			break
+		}
+	}
+
+	val := *(*any)(unsafe.Pointer(slot))
+	if val == dequeueNil(nil) {
+		val = nil
+	}
+
+	*slot = eface{}
+	return val, true
+}
+
+func (d *poolDequeue) popTail() (any, bool) {
+	var slot *eface
+	for {
+		ptrs := atomic.LoadUint64(&d.headTail)
+		head, tail := d.unpack(ptrs)
+		if tail == head {
+			return nil, false
+		}
+
+		ptrs2 := d.pack(head, tail+1)
+		if atomic.CompareAndSwapUint64(&d.headTail, ptrs, ptrs2) {
+			slot = &d.vals[tail&uint32(len(d.vals)-1)]
+			break
+		}
+	}
+
+	val := *(*any)(unsafe.Pointer(slot))
+	if val == dequeueNil(nil) {
+		val = nil
+	}
+
+    // 注意：此处可能与 pushHead 发生竞争，解决方案是：
+	// 1. 让 pushHead 先读取 typ 的值，如果 typ 值不为 nil，则说明 popTail 尚未清理完 slot
+	// 2. 让 popTail 先清理掉 val 中的内容，在清理掉 typ，从而确保不会与 pushHead 对 slot 的写行为发生竞争
+	slot.val = nil
+	atomic.StorePointer(&slot.typ, nil)
+	return val, true
 }
 ```
 
