@@ -35,3 +35,20 @@ git log --format='%aN' | sort -u | while read name; do echo -en "$name\t"; git l
 git config --global credential.helper store
 ```
 
+## 5. 版本重置到指定提交
+
+```bash
+# 1. 查询提交历史版本
+git log 
+
+commit ef42757aa711f4716f8609e46c5618ee4f924dba (HEAD -> dev, origin/dev)
+......
+
+# 2. 重置到指定版本
+# 移动 Head 并重置暂存区和工作区
+git reset --hard ef42757aa711f4716f8609e46c5618ee4f924dba
+
+# 移动 Head 但不重置暂存区和工作区
+git reset --soft ef42757aa711f4716f8609e46c5618ee4f924dba
+```
+
