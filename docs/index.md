@@ -4,7 +4,6 @@
 
 1. iptables 三表五链
 2. sync.WaitGroup
-3. sync.Pool
 4. Zstandard 算法使用
 5. Kill Switch 简介
 6. Socks5 和 HTTP 代理分析与实现
