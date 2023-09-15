@@ -52,3 +52,9 @@ git reset --hard ef42757aa711f4716f8609e46c5618ee4f924dba
 git reset --soft ef42757aa711f4716f8609e46c5618ee4f924dba
 ```
 
+## 6. 强制将本地分支覆盖远程分支
+
+```bash
+git push origin <name> --force
+```
+
