@@ -4,7 +4,7 @@
 
 1. iptables 三表五链
 2. sync.WaitGroup
-6. Socks5 和 HTTP 代理分析与实现
+6. HTTP 代理分析与实现
 7. BIRD 路由协议软件(参考：[url](https://soha.moe/post/bird-bgp-kickstart.html#1-%E4%BB%80%E4%B9%88%E6%98%AF-bird))
 8. gViso 了解，协议栈实现
 9. NaCI 加密算法(参考：[url](https://segmentfault.com/a/1190000000476866))
