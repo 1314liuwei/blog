@@ -75,7 +75,6 @@
 74. linux attribute
 75. epoll 机制原理
 76. 限流机制：计数器、滑动窗口、漏桶、令牌桶
-77. bert和vit 
 78. unix socket抓包
 79. Server Send Event
 80. 聚类算法
