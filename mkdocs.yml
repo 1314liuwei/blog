@@ -33,12 +33,12 @@ theme:
   features:
     - navigation.tabs
     - navigation.instant
+    - search.highlight
+    - search.suggest
   font:
     text: 'Fira Sans'
     code: 'Fira Mono'
-  features:
-    - search.highlight
-    - search.suggest
+
 
 # Extensions
 markdown_extensions:
