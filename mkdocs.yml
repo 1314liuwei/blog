@@ -3,6 +3,7 @@ site_name: Lynx's Blog
 # Theme
 theme:
   name: material
+  custom_dir: overrides
   language: 'zh'
   highlightjs: true
   hljs_style: foundation
