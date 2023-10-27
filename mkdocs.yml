@@ -36,6 +36,9 @@ theme:
   font:
     text: 'Fira Sans'
     code: 'Fira Mono'
+  features:
+    - search.highlight
+    - search.suggest
 
 # Extensions
 markdown_extensions:
@@ -81,10 +84,12 @@ markdown_extensions:
   - pymdownx.tabbed:
       alternate_style: true
 
-plugins: []
+plugins: 
+  - search
 
 
 extra_javascript:
   - https://lib.baomitu.com/babel-polyfill/7.12.1/polyfill.min.js
   - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+  - https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js
 
