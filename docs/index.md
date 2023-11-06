@@ -98,3 +98,6 @@
 94. go unix socket 编程
 95. CoAP 协议
 93.  SOCK_SEQPACKET
+93.  共享内存
+93.  VNC 
+93.  Guacamole Protocol
