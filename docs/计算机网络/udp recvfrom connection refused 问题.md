@@ -48,7 +48,7 @@ listening on enp1s0, link-type EN10MB (Ethernet), snapshot length 262144 bytes
 10:36:06.764420 IP 192.168.1.2 > 192.168.1.5: ICMP 10.0.0.1 udp port 2222 unreachable, length 40
 ```
 
-使用tcp抓包发现目标主机为给主机回复了一个 ICMP 包，用来指示 2222 端口不可达。
+使用 tcpdump 抓包发现目标主机为给主机回复了一个 ICMP 包，用来指示 2222 端口不可达。
 
 根据《UNIX网络编程卷1：套接字联网API（第3版）》第八章第8.9小结所讲，这个 ICMP 错误被称为异步错误（asynchronous error）。
 
