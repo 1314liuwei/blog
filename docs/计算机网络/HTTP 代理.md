@@ -23,4 +23,16 @@ HTTP 代理存在两种形式：
 
 隧道代理在某种程度上来说和 HTTP 关系不大，它只是借用了 HTTP 的 CONNECT 方法建立连接。隧道代理实际上和 SOCK 代理更为相似。
 
+下图（出自《HTTP 权威指南》）展示隧道代理的原理：
+
 ![web_tunnel](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/web_tunnel.png.webp)
+
+隧道代理无论是 HTTP 的流量还是 HTTPS 的流量，都能够进行代理。不仅是 HTTP 和 HTTPS，只要是 TCP 或者是 UDP 协议的流量，他都能够代理。
+
+隧道代理只会无脑转发流量，而不会查看流量，就像一根管子，将两端连接在一起。这也是为什么叫隧道代理的原因。
+
+
+
+参考：
+
+- 《HTTP 权威指南》
