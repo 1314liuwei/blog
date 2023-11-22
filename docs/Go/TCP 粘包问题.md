@@ -116,3 +116,89 @@ TCP 是一种流式传输的协议，数据包在发送和接收的时候都会�
 在明白粘包和半包现象出现的根本原因后，我们就可以通过定义上层协议的边界来避免这种问题的出现。
 
 读取数据时将读到的数据放到缓冲区，再按照我们定义的协议对数据进行解析，这样就能避免我们读取时数据解析错误。
+
+
+
+代码实现：
+
+```go
+package datagram
+
+import (
+	"bytes"
+	"encoding/binary"
+	"errors"
+	"io"
+)
+
+type Parser struct {
+	stream io.ReadWriteCloser
+}
+
+var (
+	HeaderSize = 6
+	HeaderFlag = uint16(0x0d0d)
+)
+
+func NewParser(stream io.ReadWriteCloser) *Parser {
+	return &Parser{stream: stream}
+}
+
+func (p *Parser) Pack(data []byte) error {
+	buf := new(bytes.Buffer)
+
+	// 写入包头
+	err := binary.Write(buf, binary.BigEndian, HeaderFlag)
+	if err != nil {
+		return err
+	}
+
+	// 写入包长度
+	err = binary.Write(buf, binary.BigEndian, uint32(len(data)))
+	if err != nil {
+		return err
+	}
+
+	// 写入原始数据
+	_, err = buf.Write(data)
+	if err != nil {
+		return err
+	}
+
+	// 写入流
+	_, err = p.stream.Write(buf.Bytes())
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (p *Parser) Unpack() ([]byte, error) {
+	header := make([]byte, HeaderSize)
+
+	// 读取包头
+	_, err := io.ReadFull(p.stream, header)
+	if err != nil {
+		return nil, err
+	}
+
+	flag := binary.BigEndian.Uint16(header[:2])
+	if flag != HeaderFlag {
+		return nil, errors.New("unknown packet")
+	}
+
+	// 解析包长度
+	packetSize := binary.BigEndian.Uint32(header[2:])
+
+	// 读取包数据
+	packetData := make([]byte, packetSize)
+	_, err = io.ReadFull(p.stream, packetData)
+	if err != nil {
+		return nil, err
+	}
+
+	return packetData, nil
+}
+```
+
