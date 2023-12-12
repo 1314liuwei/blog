@@ -133,3 +133,24 @@ ip route list table 0
 curl -L ip.tool.lu
 ```
 
+## 网卡速率
+
+```bash
+watch -n 1 ifconfig lo
+```
+
+通过比较 RX 和 TX 计算得出：
+
+```
+Every 1.0s: ifconfig lo                                                                         Tue Dec 12 10:54:50 2023
+
+lo        Link encap:UNSPEC
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          inet6 addr: ::1/128 Scope: Host
+          UP LOOPBACK RUNNING  MTU:65536  Metric:1
+          RX packets:46618912 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:46618912 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000
+          RX bytes:54983068842 TX bytes:54983068842
+```
+
