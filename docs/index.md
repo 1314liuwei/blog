@@ -120,6 +120,7 @@
 116. 华为fillp
 117. tcp Brutal 
 118. dns fallback机制
+119. jni 原理
 
 
 
