@@ -154,3 +154,13 @@ lo        Link encap:UNSPEC
           RX bytes:54983068842 TX bytes:54983068842
 ```
 
+## 查看端口占用
+
+```bash
+ss -ntlp | grep <port>
+
+netstat -ntlp | grep <port>
+
+lsof -i:<port>
+```
+
