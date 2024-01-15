@@ -121,7 +121,8 @@
 117. tcp Brutal 
 118. dns fallback机制
 119. jni 原理
-119. 网站更新订阅
+120. 网站更新订阅
+121. 双缓冲和Exchanger
 
 
 
