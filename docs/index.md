@@ -127,6 +127,7 @@
 123. p2p 工具箱
 124. Windows 电脑双网卡设置优先级
 125. terraform
+125. dns jie'xi
 
 
 
