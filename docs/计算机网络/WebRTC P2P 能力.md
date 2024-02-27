@@ -31,3 +31,24 @@ Data Channel 的通道类型具有以下可选属性：
 - `DATA_CHANNEL_PARTIAL_RELIABLE_REXMIT_UNORDERED` (`0x81`) - 按照请求中的次数重试发送后，消息可能会丢失，且消息可能乱序到达。
 - `DATA_CHANNEL_PARTIAL_RELIABLE_TIMED` (`0x02`) - 如果没有在请求的时间内到达，消息可能会丢失，但消息将依序到达。
 - `DATA_CHANNEL_PARTIAL_RELIABLE_TIMED_UNORDERED` (`0x82`) - 如果没有在请求的时间内到达，消息可能会丢失，且消息可能乱序到达。
+
+## libp2p 如何使用 WebRTC
+
+### WebRTC Direct
+
+```js
+const offerSdp = await peerConnection.createOffer()
+const mungedOfferSdp = sdp.munge(offerSdp, ufrag)
+await peerConnection.setLocalDescription(mungedOfferSdp)
+
+// construct answer sdp from multiaddr and ufrag
+const answerSdp = sdp.fromMultiAddr(ma, ufrag)
+await peerConnection.setRemoteDescription(answerSdp)
+```
+
+在 WebRTC Direct 中，libp2p 直接使用地址转换成 SDP 进行 WebRTC 连接。
+
+### WebRTC 
+
+
+
