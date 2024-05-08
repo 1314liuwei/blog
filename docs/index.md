@@ -136,6 +136,7 @@
 126. HTTP 100 Continue
 126. service worker
 126. arc 缓存
+126. ipv6 zone id
 
 
 
