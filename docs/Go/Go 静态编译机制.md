@@ -59,7 +59,7 @@ windows/arm64
 
 Go 的运行机制发现 Go 程序是通过 `runtime` 这个库实现与操作内核系统交互的。Go 自己实现了 `runtime`，并封装了`syscall`，为不同平台上的`go user level`代码提供封装完成的、统一的go标准库。
 
-![img{512x368}](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/auto-go-runtime-vs-c-runtime.png)
+![img{512x368}](https://pic.try-hard.cn/blog/auto-go-runtime-vs-c-runtime.png)
 
 ## 二、Go 的静态链接
 

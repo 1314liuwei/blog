@@ -40,7 +40,7 @@ git 的版本库里存了很多东西，其中最重要的就是 **暂存区（s
 
 我们在执行 `git add <file>`命令时，git 会将我们添加的文件从工作区添加到暂存区，当我们执行 `git commit`命令时，又会将文件添加到分支中：
 
-![git-repo](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/0.jpg)
+![git-repo](https://pic.try-hard.cn/blog/0.jpg)
 
 下面我们通过实践观察 git 的工作流程：
 

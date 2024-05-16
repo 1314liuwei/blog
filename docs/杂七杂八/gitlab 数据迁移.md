@@ -35,7 +35,7 @@ tree -L 3
 
 这里就是仓库的 Project ID：
 
-![image-20211223143443364](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/1640241288123339000.png)
+![image-20211223143443364](https://pic.try-hard.cn/blog/1640241288123339000.png)
 
 ```bash
 // 执行下面的命令查看 ID 的哈希值

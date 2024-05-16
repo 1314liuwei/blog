@@ -12,7 +12,7 @@
 
 MOV 视频：[MOV](https://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/1675405539.MOV)
 
-JGP 图片：[JPG](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/2023/02/03/20230203-142744.JPG)
+JGP 图片：[JPG](https://pic.try-hard.cn/blog/2023/02/03/20230203-142744.JPG)
 
 使用 [exiftool](https://exiftool.org/) 查看两个文件的 metadata，图片的元数据中有一个 **Media Group UUID**：
 
@@ -57,11 +57,11 @@ func exportLivePhoto () {
 
 Motion Photos 是安卓采用的 Live Photo 方案, Motion Photos 和 苹果的 Live Photos 不同, Motion Photos 是一个 JPG 格式的图片, 他在文件内部嵌入了 Video 的数据, 文件内部结构如下所示: 
 
-![img](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/2023/02/03/20230203-145358.png)
+![img](https://pic.try-hard.cn/blog/2023/02/03/20230203-145358.png)
 
 <center>Motion Photo structure</center>
 
-下面是一张使用小米手机拍摄的 Motion Photos: [Motion Photos](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/2023/02/03/20230203-150007.jpg)
+下面是一张使用小米手机拍摄的 Motion Photos: [Motion Photos](https://pic.try-hard.cn/blog/2023/02/03/20230203-150007.jpg)
 
 使用 exiftool 查看它的 metadata, 会发现如下信息:
 

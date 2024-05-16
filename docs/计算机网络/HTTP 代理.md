@@ -11,7 +11,7 @@ HTTP 代理存在两种形式：
 
 下图（出自《HTTP 权威指南》）展示了这种行为：
 
-![web_proxy](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/2023/11/22/20231122-125032.webp)
+![web_proxy](https://pic.try-hard.cn/blog/2023/11/22/20231122-125032.webp)
 
 
 
@@ -25,7 +25,7 @@ HTTP 代理存在两种形式：
 
 下图（出自《HTTP 权威指南》）展示隧道代理的原理：
 
-![web_tunnel](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/web_tunnel.png.webp)
+![web_tunnel](https://pic.try-hard.cn/blog/web_tunnel.png.webp)
 
 隧道代理无论是 HTTP 的流量还是 HTTPS 的流量，都能够进行代理。不仅是 HTTP 和 HTTPS，只要是 TCP 或者是 UDP 协议的流量，他都能够代理。
 

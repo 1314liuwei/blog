@@ -98,4 +98,4 @@ for(int i=0; i<4;i++)
 
 这就是输出结果的由来，大家学废了吗？
 
-![](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/aHR0cDovL2ltZy5kb3V0dWxhLmNvbS9wcm9kdWN0aW9uL3VwbG9hZHMvaW1hZ2UvMjAxNy8wNS8yNi8yMDE3MDUyNjgxMjk4NF9pTW1RZXQuanBn)
+![](https://pic.try-hard.cn/blog/aHR0cDovL2ltZy5kb3V0dWxhLmNvbS9wcm9kdWN0aW9uL3VwbG9hZHMvaW1hZ2UvMjAxNy8wNS8yNi8yMDE3MDUyNjgxMjk4NF9pTW1RZXQuanBn)

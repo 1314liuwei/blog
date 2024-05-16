@@ -86,17 +86,17 @@ IronPython 用.net编写的Python解释器
 JPython 用Java编写的Python解释器
 ### 2.Python解释器安装
 首先到[Python官网](https://www.python.org/)下载合适的解释器安装包（最好选择Python3的版本，Python2官方在2020年1月1日便开始停止更新）。
-![Python解释器安装](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/20190927000057384.png)
-![2](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/20190927000138396.png)
-![3](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/20190927000151922.png)
-![4](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/20190927000247913.png)
-![安装中](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/2019092700031044.png)
+![Python解释器安装](https://pic.try-hard.cn/blog/20190927000057384.png)
+![2](https://pic.try-hard.cn/blog/20190927000138396.png)
+![3](https://pic.try-hard.cn/blog/20190927000151922.png)
+![4](https://pic.try-hard.cn/blog/20190927000247913.png)
+![安装中](https://pic.try-hard.cn/blog/2019092700031044.png)
 
 ### 3.Python的两种模式
 	交互模式：
-![Python的IDLE命令行交互模式](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/20190926235217926.png)
+![Python的IDLE命令行交互模式](https://pic.try-hard.cn/blog/20190926235217926.png)
 	脚本模式（开发者来编写程序的模式）：
-![Python的脚本编写模式](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/20190926235304428.png)
+![Python的脚本编写模式](https://pic.try-hard.cn/blog/20190926235304428.png)
 ### 4.PyCharm安装与配置
 在[PyCharm的官网](https://www.jetbrains.com/)下载安装包，一般选择社区版。
 PyCharm的常规配置：

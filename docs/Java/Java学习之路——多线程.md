@@ -344,7 +344,7 @@ public class Demo {
 
 ## 四、线程的生命周期
 
-![线程状态图（图片来自网络，侵删）](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/线程状态图.jpeg)
+![线程状态图（图片来自网络，侵删）](https://pic.try-hard.cn/blog/线程状态图.jpeg)
 
 总的来说线程的状态有以下六种：
 

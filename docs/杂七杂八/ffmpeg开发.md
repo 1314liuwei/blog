@@ -295,7 +295,7 @@ ffprobe -i 输入视频路径 -v quiet -print_format json -show_format -show_str
 
 ## 结构体之间的关系
 
-![img](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/20130914204051125)
+![img](https://pic.try-hard.cn/blog/20130914204051125)
 
 ## 解协议
 
@@ -323,7 +323,7 @@ void (*deinit)(struct AVFormatContext *);//取消初始化格式。
 int (*check_bitstream)(struct AVFormatContext *, const AVPacket *pkt);//设置任何必要的比特流过滤，并提取全局头部所需的任何额外数据。
 ```
 
-![img](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/20161021114952074)
+![img](https://pic.try-hard.cn/blog/20161021114952074)
 
 ### AVFormatContext
 

@@ -67,7 +67,7 @@
 
 按下 `Win + R` 键，输入 `regedit` 进入注册表编辑，找到 `Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Terminal Server\TSAppAllowList`，新建项(K)`Applications`：
 
-![image-20220107145404436](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/image-20220107145404436.png)
+![image-20220107145404436](https://pic.try-hard.cn/blog/image-20220107145404436.png)
 
 这个`Applications`就是我们允许远程访问 App 的白名单。
 
@@ -77,7 +77,7 @@
 
 2. 为该项添加一个 字符串值 ，名字为`Path`，其值为 `C:\Windows\explorer.exe`(Windows 资源管理器)：
 
-   ![image-20220107145416291](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/image-20220107145416291.png)
+   ![image-20220107145416291](https://pic.try-hard.cn/blog/image-20220107145416291.png)
 
 Windows 服务端更多配置项可查看官方文档：[Search | Microsoft Docs](https://docs.microsoft.com/en-us/search/?terms=Microsoft-Windows-TerminalServices&scope=OEM)
 
@@ -109,7 +109,7 @@ use multimon:i:1
 
 双击打开，输入允许远程访问的用户名和密码，就可以使用服务端的远程应用了：
 
-![image-20220107145430149](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/image-20220107145430149.png)
+![image-20220107145430149](https://pic.try-hard.cn/blog/image-20220107145430149.png)
 
 更多配置项可查看官方文档：[Supported Remote Desktop RDP file settings | Microsoft Docs](https://docs.microsoft.com/en-us/windows-server/remote/remote-desktop-services/clients/rdp-files)
 

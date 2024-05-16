@@ -6,7 +6,7 @@
 
 在 VM 上安装好靶机后，将靶机与攻击机配置到同一局域网内，启动靶机：
 
-![image-20210709230521173](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/image-20210709230521173.png)
+![image-20210709230521173](https://pic.try-hard.cn/blog/image-20210709230521173.png)
 
 ## 0x01：渗透过程
 

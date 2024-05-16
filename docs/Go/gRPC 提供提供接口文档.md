@@ -66,7 +66,7 @@ protoc --doc_out=./doc --doc_opt=html,index.html  pb/*.proto
 
 浏览器打开 index.html 文件：
 
-![image-20221107090636498](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/image-20221107090636498.png)
+![image-20221107090636498](https://pic.try-hard.cn/blog/image-20221107090636498.png)
 
 ## 三、启动静态文件 Web 服务
 

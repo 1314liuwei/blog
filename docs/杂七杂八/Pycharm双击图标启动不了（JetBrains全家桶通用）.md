@@ -20,7 +20,7 @@
 但是关闭 bat 之后 PyCharm 也会关闭！
 
 观察 `pycharm.bat` 运行是的结果，发现会有日志输出：
-![在这里插入图片描述](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/20200806104604697.png)
+![在这里插入图片描述](https://pic.try-hard.cn/blog/20200806104604697.png)
 根据日志信息，发现可能是和自己安装的 JDK 冲突了，暂时还未解决完，先用 pycharm.bat 用着，等会儿有时间了再来研究一下问题。如果有大佬知道怎么解决，麻烦给我指点一下，不胜感激！
 
 后面可以遇到 PyCharm 的问题依然可以直接运行该文件，通过查看日志信息来排查问题。

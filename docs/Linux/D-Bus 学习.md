@@ -123,11 +123,11 @@ cd src
 
 运行 d-feet，打开 Session bus，找到一个叫 “org.fmddlmyy.Test” 连接名，这个链接就是我们刚刚运行的一个D-Bus程序：
 
-![image-20211012094923932](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/1634003366306114300.png)
+![image-20211012094923932](https://pic.try-hard.cn/blog/1634003366306114300.png)
 
 在右侧展开栏我们会发现 `org.fmddlmyy.Test.Basic` 下有一个 Add 方法，我们点击它，输入 `1，2`，点击执行，可以看到给我们返回了结果：
 
-![image-20211012095344567](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/1634003624795407200.png)
+![image-20211012095344567](https://pic.try-hard.cn/blog/1634003624795407200.png)
 
 通过上面的操作我们通过 d-feet 发起了一次 d-bus 请求。
 

@@ -4,7 +4,7 @@
 
 错误状态如图所示：
 
-![案发现场](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/20210122112318231.png)
+![案发现场](https://pic.try-hard.cn/blog/20210122112318231.png)
 
 
 

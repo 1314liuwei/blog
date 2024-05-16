@@ -59,7 +59,7 @@ systemctl start nginx
 
 通过 IP 直接访问服务器，访问成功说明 nginx 开启成功：
 
-![image-20210706142809083](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/2022/12/13/20221213-141628.png)
+![image-20210706142809083](https://pic.try-hard.cn/blog/2022/12/13/20221213-141628.png)
 
 常用命令：
 
@@ -195,6 +195,6 @@ systemctl restart nginx
 
 直接访问服务器 IP：
 
-![image-20210706152141259](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/2022/12/13/20221213-141624.png)
+![image-20210706152141259](https://pic.try-hard.cn/blog/2022/12/13/20221213-141624.png)
 
 配置完成！

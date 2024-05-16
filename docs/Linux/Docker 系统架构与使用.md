@@ -32,7 +32,7 @@ docker -H host
 
 因为镜像包含了完整的 root 文件系统，因此其体积往往是巨大的。为了解决这个问题，采用了 [Union FS (opens new window)](https://en.wikipedia.org/wiki/Union_mount)的技术，将其设计为分层存储的架构，由多层文件系统联合组成：
 
-![img](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/1631179816285823100.png)
+![img](https://pic.try-hard.cn/blog/1631179816285823100.png)
 
 ### 容器
 

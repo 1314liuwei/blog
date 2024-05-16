@@ -6,7 +6,7 @@
 
 Socks 的流程为：
 
-![client-socks5_f.jpg](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/2023/09/14/20230914-153644.jpg)
+![client-socks5_f.jpg](https://pic.try-hard.cn/blog/2023/09/14/20230914-153644.jpg)
 
 ## 实现代码
 

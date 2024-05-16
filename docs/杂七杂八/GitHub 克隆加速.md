@@ -14,7 +14,7 @@
 
 **使用原始链接进行克隆**：
 
-!![image-20210528002246471](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/image-20210528002246471.png)
+!![image-20210528002246471](https://pic.try-hard.cn/blog/image-20210528002246471.png)
 
 结果就是过了半天直接**失败了**！！
 
@@ -22,6 +22,6 @@
 
 替换后的链接：https://github.com.cnpmjs.org/sqlmapproject/sqlmap.git
 
-![image-20210528002403652](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/image-20210528002403652.png)
+![image-20210528002403652](https://pic.try-hard.cn/blog/image-20210528002403652.png)
 
 兄弟们看到没，这速度，牛逼了啊！！！妈妈再也不怕我上不了全球最大同性交往社区了！

@@ -6,7 +6,7 @@
 
 `Docker` 在运行时分为 `Docker 引擎（服务端守护进程）` 和 `客户端工具`，我们日常使用各种 `docker 命令`，其实就是在使用 `客户端工具` 与 `Docker 引擎` 进行交互：
 
-![img](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/1631179825421890600.jpg)
+![img](https://pic.try-hard.cn/blog/1631179825421890600.jpg)
 
 ## 二、Client
 
@@ -32,7 +32,7 @@ docker -H host
 
 因为镜像包含了完整的 root 文件系统，因此其体积往往是巨大的。为了解决这个问题，采用了 [Union FS (opens new window)](https://en.wikipedia.org/wiki/Union_mount)的技术，将其设计为分层存储的架构，由多层文件系统联合组成：
 
-![img](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/1631179816285823100.png)
+![img](https://pic.try-hard.cn/blog/1631179816285823100.png)
 
 ### 容器
 

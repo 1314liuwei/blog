@@ -53,11 +53,11 @@ javadoc Demo.java
 
 随即在当前文件夹下就生成了一堆文件：
 
-![img](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/20201121161751214.png)
+![img](https://pic.try-hard.cn/blog/20201121161751214.png)
 
 打开 **index.html** 文件：
 
-![img](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/20201121162056720.png)
+![img](https://pic.try-hard.cn/blog/20201121162056720.png)
 
 通过 javadoc 程序就生成了一份完整的API文档。大大节省了开发人员的时间。
 
@@ -89,9 +89,9 @@ javadoc Demo.java
 
 在导航栏中找到 **Tools**，选择 **Generate JavaDoc**：
 
-![img](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/2020112116275244.png)
+![img](https://pic.try-hard.cn/blog/2020112116275244.png)
 
-![img](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/20201121163555283.png)
+![img](https://pic.try-hard.cn/blog/20201121163555283.png)
 
 对几个区域简单介绍一下：
 

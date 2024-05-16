@@ -52,7 +52,7 @@ HOSTNAME=minimal  # 主机名
 ip addr 或 ip addr show
 ```
 
-![image-20210831160307101](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/image-20210831160307101.png)
+![image-20210831160307101](https://pic.try-hard.cn/blog/image-20210831160307101.png)
 
 在输出内容中我们可以发现两块网卡：**lo 和 ens33**。
 
@@ -73,11 +73,11 @@ ip addr 或 ip addr show
 
 在上面我们发现我们的 Linux 只有一张网卡，想要配置双网卡的话需要在虚拟机设置里再添加一张网卡：
 
-![image-20210831161959391](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/image-20210831161959391.png)
+![image-20210831161959391](https://pic.try-hard.cn/blog/image-20210831161959391.png)
 
 添加好后重启进入系统就可以发现我们已经有了两张网卡了（ens33 和 ens36）：
 
-![image-20210831162131115](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/image-20210831162131115.png)
+![image-20210831162131115](https://pic.try-hard.cn/blog/image-20210831162131115.png)
 
 ### 2. 配置 DHCP
 
@@ -120,7 +120,7 @@ service network restart
 
 此时再查看，可以发现 ens33 已经获取到 IP 地址了：
 
-![image-20210831164201457](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/image-20210831164201457.png)
+![image-20210831164201457](https://pic.try-hard.cn/blog/image-20210831164201457.png)
 
 ### 3. 配置静态地址
 

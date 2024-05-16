@@ -145,7 +145,7 @@ ConcurrentHashMap 同步容器类是Java 5 增加的一个线程安全的哈希�
 
 ConcurrentHashMap由Segment数组结构和HashEntry数组结构组成；Segment是一种**可重入锁（ReentrantLock）**，HashEntry用于存储键值对数据；一个ConcurrentHashMap包含一个由若干个Segment对象组成的数组，每个Segment对象守护整个散列映射表的**若干个桶**，每个桶是由若干个HashEntry对象链接起来的**链表**，table是一个由HashEntry对象组成的数组，table数组的每一个数组成员就是散列映射表的一个桶。
 
-![img](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/170140029f05960d)
+![img](https://pic.try-hard.cn/blog/170140029f05960d)
 
 ## 五、CountDownLatch 闭锁
 

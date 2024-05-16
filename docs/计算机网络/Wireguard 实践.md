@@ -27,9 +27,9 @@ $ sudo apt install wireguard
 
 Windows 下载完成后，会存在一个后台服务和一个 GUI 的界面
 
-![image-20230305222529698](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/image-20230305222529698.png)
+![image-20230305222529698](https://pic.try-hard.cn/blog/image-20230305222529698.png)
 
-![image-20230305215527942](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/image-20230305215527942.png)
+![image-20230305215527942](https://pic.try-hard.cn/blog/image-20230305215527942.png)
 
 ### Android
 

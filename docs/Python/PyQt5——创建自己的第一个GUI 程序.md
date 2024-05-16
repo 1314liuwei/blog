@@ -60,4 +60,4 @@ sys.exit(app.exec_())  # 运行程序
 
 至此，我们就已经创建好一个 PyQt5 的 GUI 程序了！
 都快去试试吧！
-![在这里插入图片描述](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/20200324143827769.png)
+![在这里插入图片描述](https://pic.try-hard.cn/blog/20200324143827769.png)

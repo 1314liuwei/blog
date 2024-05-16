@@ -4,7 +4,7 @@
 
 **实现效果：OS-A 通过 OS-B 能够访问 OS-C 。**
 
-![image-20230529113551972](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/2023/05/29/20230529-113552.png)
+![image-20230529113551972](https://pic.try-hard.cn/blog/2023/05/29/20230529-113552.png)
 
 ## 实现步骤
 

@@ -2,7 +2,7 @@
 
 ## 一、数据类型分类
 
-![img](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/20201123160405555.png)
+![img](https://pic.try-hard.cn/blog/20201123160405555.png)
 
 ## 二、基本数据类型
 

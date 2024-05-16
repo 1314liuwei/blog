@@ -43,7 +43,7 @@ Ubuntu Core 20是一个轻量，容器化，基于Ubuntu 20.04 LTS且为物联�
 
 不同于传统的Linux，在Ubuntu Core的架构上使用snap架构即从Linux内核到应用层都是以snap包的形式出现。如下图所示，Linux内核单独是一个snap，上面一层是Core snap，再上一层是snap应用程序。
 
-![img](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/2022/12/13/20221213-142244.jpg)
+![img](https://pic.try-hard.cn/blog/2022/12/13/20221213-142244.jpg)
 
 
 

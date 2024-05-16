@@ -17,7 +17,7 @@ type slice struct {
 
 浅拷贝过程如图所示：
 
-![image-20230616155254072](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/2023/06/16/20230616-155255.png)
+![image-20230616155254072](https://pic.try-hard.cn/blog/2023/06/16/20230616-155255.png)
 
 因此，**当新切片中对应位置的数据发生改变时，老切片的数据也会发生改变**。
 

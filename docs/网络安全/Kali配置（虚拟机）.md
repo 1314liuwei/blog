@@ -4,12 +4,12 @@
 
 为了能够实现主机和虚拟机之间的**直接复制粘贴**和**文件传输**，我们需要**安装VMWare Tools**来帮助我们解决这个问题。
 1. **找到VMWare Tools**：
-![点击虚拟机](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/20200207110450982.png)
+![点击虚拟机](https://pic.try-hard.cn/blog/20200207110450982.png)
 2. **找到VMWare Tools安装文件：**
-![文件](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/20200207110717331.png)
+![文件](https://pic.try-hard.cn/blog/20200207110717331.png)
 3. **文件拷贝：**
 将文件放到主目录下，
-![在这里插入图片描述](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/20200207110818445.png)
+![在这里插入图片描述](https://pic.try-hard.cn/blog/20200207110818445.png)
 4. **安装：**
 依次输入下面命令安装VMWare Tools，
 ```bash
@@ -20,7 +20,7 @@ sudo ./vmware-install.pl
 输入命令后一直敲**Enter**键即可。
 5. **安装完成：**
 当出现下图语句时即完成VMWare Tools的安装。
-![安装完成效果图描述](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/20200207111210194.png)
+![安装完成效果图描述](https://pic.try-hard.cn/blog/20200207111210194.png)
 # 二、修改分辨率
 ### 当前修改
 终端输入下列命令：
@@ -116,8 +116,8 @@ Modeline "1920x1080_60.00"  173.00  1920 2048 2248 2576  1080 1083 1088 1120 -hs
 ```
 5. **修改分辨率：**
 通过 settings->displays->resolution中找到刚才添加的分辨率了，修改分辨率后即可永久修改。
-![进入设置](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/20200207105005779.png)
-![更换](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/20200207110036620.png)
+![进入设置](https://pic.try-hard.cn/blog/20200207105005779.png)
+![更换](https://pic.try-hard.cn/blog/20200207110036620.png)
 # 三、修改图标和字体大小
 1. “设置” --> "通用辅助功能" --> "大号字体"
 2. 在终端中输入 “gnome-tweaks” 打开 优化 --> 扩展  --> dash to dock --> 点击齿轮按钮，可以设置图标大小，

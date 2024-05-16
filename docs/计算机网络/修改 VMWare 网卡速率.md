@@ -5,8 +5,8 @@
 在设备管理器上查看两个网卡会发现这两个网卡显示的都是百兆。
 
 <center class="half">
-    <img src="http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/2023/06/21/20230621-092901.png" alt="image-20230621092858154" style="zoom:50%;" />
-    <img src="http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/2023/06/21/20230621-093338.png" alt="image-20230621093337424" style="zoom:50%;" />
+    <img src="https://pic.try-hard.cn/blog/2023/06/21/20230621-092901.png" alt="image-20230621092858154" style="zoom:50%;" />
+    <img src="https://pic.try-hard.cn/blog/2023/06/21/20230621-093338.png" alt="image-20230621093337424" style="zoom:50%;" />
 </center>
 但是，实际上这里的网卡速率是没有影响的，在这里显示的速度仅是一个展示的网络速度，是可以被忽略。详细表述可查看：https://serverfault.com/questions/366704/vmware-server-reports-100mb-nic-when-its-actually-1gb/366707#366707。
 

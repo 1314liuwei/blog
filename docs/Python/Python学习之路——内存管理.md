@@ -50,7 +50,7 @@ del b #B的引用减 1, 最后B对象的引用为 1
 第一阶段是标记阶段，GC会把所有的仍在活动的对象——**活动对象**，打上标记；
 第二阶段是回收阶段，GC把那些没有标记的对象——**非活动对象**，进行回收。
 那么GC又是如何判断哪些是活动对象哪些又是非活动对象的呢？
-相互引用的对象之间构成一张有向图。从根对象（root object）出发，能够到达的对象就是**活动对象**，不能到达的就是**非活动对象**。![对象链接有向图](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/20200131171554560.png)
+相互引用的对象之间构成一张有向图。从根对象（root object）出发，能够到达的对象就是**活动对象**，不能到达的就是**非活动对象**。![对象链接有向图](https://pic.try-hard.cn/blog/20200131171554560.png)
 在上面的有向图中，从黑点（根节点）出发，**1、2、3**对象都可以到达，因此都会被打上标记，不会被GC回收；而**4和5**不能到达，因此无法被标记，在回收阶段会被GC回收。
 标记清除算法主要处理的是一些容器对象，例如list、dict、tuple等，因为**字符串**和**数值对象**是不可能造成循环引用问题。
 ##### 缺点：
@@ -65,10 +65,10 @@ del b #B的引用减 1, 最后B对象的引用为 1
 ### 1. 小整数对象池
 Python为了优化速度， 避免为整数频繁申请和销毁内存空间，对于在[-5, 257)这个区间内的整数使用小整数对象池，这些整数对象是提前建立好的。
 在一个 Python 的程序中，所有位于这个范围内的整数使用的都是同一个对象，不会被垃圾回收。
-![小整数对象池](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/20200131180529335.png)
+![小整数对象池](https://pic.try-hard.cn/blog/20200131180529335.png)
 ### 2. 大整数对象
 在Python中，对于每一个大整数，解释器都会创建一个新的对象。
-![大整数对象](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/20200131180635302.png)
+![大整数对象](https://pic.try-hard.cn/blog/20200131180635302.png)
 ### 字符串
 ### 1. 字符串驻留
 > Incomputer science, string interning is a method of storing only onecopy of each distinct string value, which must be immutable. Interning strings makes some stringprocessing tasks more time- or space-efficient at the cost of requiring moretime when the string is created or interned. The distinct values are stored ina string intern pool. 

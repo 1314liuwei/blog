@@ -67,13 +67,13 @@ eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
         TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
 ```
 
-通过这种方式，主机可以跟容器通信，容器之间也可以相互通信。Docker 就创建了在主机和所有容器之间一个虚拟共享网络：![docker网络](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/2022/12/13/20221213-141939.png)
+通过这种方式，主机可以跟容器通信，容器之间也可以相互通信。Docker 就创建了在主机和所有容器之间一个虚拟共享网络：![docker网络](https://pic.try-hard.cn/blog/2022/12/13/20221213-141939.png)
 
 ## 三、Host 模式
 
 Docker 为了实现网络的隔离，使用了 Network Namespace 对网络进行隔离。但如果启动容器的时候使用host模式，那么这个容器将不会获得一个独立的 Network Namespace，而是和宿主机共用一个 Network Namespace。容器将不会虚拟出自己的网卡，配置自己的IP等，而是使用宿主机的 IP 和端口。
 
-![image-20220114110501693](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/image-20220114110501693.png)
+![image-20220114110501693](https://pic.try-hard.cn/blog/image-20220114110501693.png)
 
 ```bash
 # 查看最开始的网络配置
@@ -93,7 +93,7 @@ ip addr
 
 Container 模式指定新创建的容器和已经存在的一个容器共享一个 Network Namespace，而不是和宿主机共享。新创建的容器不会创建自己的网卡，配置自己的IP，而是和一个指定的容器共享IP、端口范围等。同样，两个容器除了网络方面，其他的如文件系统、进程列表等还是隔离的。两个容器的进程可以通过 lo 网卡设备通信。
 
-![22](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/1631244516713921000.jpg)
+![22](https://pic.try-hard.cn/blog/1631244516713921000.jpg)
 
 ```bash
 # 以默认模式一个容器

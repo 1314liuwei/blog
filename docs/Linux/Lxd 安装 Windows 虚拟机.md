@@ -53,7 +53,7 @@ lxc start win10 --console=vga
 
 开始运行虚拟机后就会进入到这个界面：
 
-![img](http://blog-img-figure.oss-cn-chengdu.aliyuncs.com/img/1640310873445822500.png)
+![img](https://pic.try-hard.cn/blog/1640310873445822500.png)
 
 然后完成 windows 的安装流程后就可以正常使用 windows 虚拟机了。
 
