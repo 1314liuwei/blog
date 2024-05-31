@@ -137,6 +137,8 @@
 126. service worker
 126. arc 缓存
 126. ipv6 zone id
+126. 未 listen 的 TCP socket能否接收新的连接
+126. TCP 打洞
 
 
 
