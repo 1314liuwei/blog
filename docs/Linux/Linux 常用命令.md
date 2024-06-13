@@ -164,3 +164,9 @@ netstat -ntlp | grep <port>
 lsof -i:<port>
 ```
 
+## 查看最后一个文件
+
+```bash
+ls -l | awk '{print $NF}' | tail -n 1 | xargs tail -f
+```
+
