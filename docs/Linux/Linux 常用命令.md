@@ -170,3 +170,9 @@ lsof -i:<port>
 ls -l | awk '{print $NF}' | tail -n 1 | xargs tail -f
 ```
 
+## 查询指定文件夹下包含指定内容的文件
+
+```bash
+grep -r "关键词" /path/dir
+```
+
