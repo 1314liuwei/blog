@@ -274,17 +274,17 @@
 
 136. 未 listen 的 TCP socket能否接收新的连接
 
-136. TCPdive go 重写 https://github.com/fastos/tcpdive
+137. TCPdive go 重写 https://github.com/fastos/tcpdive
 
-136. mdns服务
+138. mdns服务
 
-136. udplite
+139. udplite
 
-136. listen link-local IP 需要携带 zone index
+140. listen link-local IP 需要携带 zone index
 
-136. go tag使用
+141. go tag使用
 
-     
+142. tracert 原理
 
 
 
