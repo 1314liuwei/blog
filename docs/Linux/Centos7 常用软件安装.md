@@ -480,17 +480,17 @@ npm -v
 
 ```bash
 # 1. 官网下载二进制发行版的压缩包
-wget https://nodejs.org/dist/v14.17.6/node-v14.17.6-linux-x64.tar.xz
+wget https://nodejs.org/dist/v20.15.1/node-v20.15.1-linux-x64.tar.xz
 
 # 2. 解压
-tar -xf node-v14.17.6-linux-x64.tar.xz -C /usr/local/
+tar -xf node-v20.15.1-linux-x64.tar.xz -C /usr/local/
 
 # 3. 创建软连接
-ln -s /usr/local/node-v14.17.6-linux-x64/bin/* /usr/bin/
+ln -s /usr/local/node-v20.15.1-linux-x64/bin/* /usr/bin/
 
 # 4. 添加环境变量
 # 编辑环境变量配置文件 $HOME/.bashrc，在文件末尾追加：
-export NODE_HOME=/usr/local/node-v14.17.6-linux-x64
+export NODE_HOME=/usr/local/node-v20.15.1-linux-x64
 export PATH=$NODE_HOME/bin:$PATH
 
 # 使更改生效
