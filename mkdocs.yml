@@ -1,4 +1,6 @@
 site_name: Lynx's Blog
+repo_name: wlynxg/blog
+repo_url: https://github.com/wlynxg/
 
 # Theme
 theme:
@@ -97,3 +99,7 @@ extra_javascript:
   - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
   - https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js
 
+
+extra_css:
+  - 'from_oi_wiki/css/extra.css?v=13'
+  - ../css/neoteroi-mkdocs.css
