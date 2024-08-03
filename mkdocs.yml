@@ -86,6 +86,11 @@ markdown_extensions:
 
 plugins: 
   - search
+  - git-revision-date-localized:
+    type: datetime
+    timezone: Asia/Shanghai
+    locale: zh
+    enable_creation_date: true
 
 extra_javascript:
   - https://lib.baomitu.com/babel-polyfill/7.12.1/polyfill.min.js
