@@ -146,6 +146,7 @@
 142. qpp https://github.com/xtaci/qpp https://link.springer.com/content/pdf/10.1140/epjqt/s40507-023-00164-3.pdf
 142. delve 原理
 142. wireshark noise 插件开发
+142. TLS 校验流程（时间不同步引发的校验失败问题）
 
 
 
