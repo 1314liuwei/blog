@@ -52,31 +52,65 @@
   ## 实用工具
 
 - [VxKex](https://github.com/i486/VxKex)：允许一些 Windows 8、8.1 和 10 独有的应用程序在 Windows 7 上运行
+
 - [aria2](https://github.com/aria2/aria2)：下载工具，支持 HTTP/HTTPS、FTP、SFTP、BitTorrent 和 Metalink
+
 - [conceal](https://github.com/tyrchen/conceal)：基于 noise，通过不安全的通道发送加密文件
+
 - [MyIP](https://github.com/jason5ng32/MyIP)：IP 检测网站
+
 - [netcap](https://github.com/bytedance/netcap)：基于bcc，可对含skb作为参数的系统函数，或者基于DPDK的mbuf抓包分析
+
 - [SpoofDPI](https://github.com/xvzc/SpoofDPI)：规避深度包检测的简单工具
+
 - [zapret](https://github.com/bol-van/zapret)：DPI 翻墙工具
+
 - [GoodbyeDPI](https://github.com/ValdikSS/GoodbyeDPI)：深度数据包检测规避（适用于 Windows）
+
 - [libkcp](https://github.com/xtaci/libkcp)：FEC 在 C++ 中为 iOS/Android 增强的 KCP 会话库
+
 - [Follow](https://github.com/RSSNext/Follow)：RSS 阅读器
+
 - [cobalt](https://github.com/imputnet/cobalt)：媒体下载器
+
 - [lazygit](https://github.com/jesseduffield/lazygit)：git 命令的简单终端用户界面
+
 - [uv](https://github.com/astral-sh/uv)：Rust 编写的 Python 包管理器
+
 - [systrack](https://github.com/mebeim/systrack)：分析 Linux 内核映像 （`vmlinux`） 并提取有关已实现的系统调用的信息
+
 - [goref](https://github.com/cloudwego/goref)：Go 堆对象引用分析工具
+
 - [TranslationPlugin](https://github.com/YiiGuxing/TranslationPlugin)：用于基于 IntelliJ 的 IDE/Android Studio 的翻译插件
+
 - [SteamTools](https://github.com/BeyondDimension/SteamTools)： Steam 工具箱
+
 - [earthworm](https://github.com/cuixueshe/earthworm)：通过用连词造句的方法学习英语
+
 - [DictionaryByGPT4](https://github.com/Ceelog/DictionaryByGPT4)：一本 GPT4 生成的单词书
+
 - [v2ray-core](https://github.com/v2fly/v2ray-core)：翻墙代理工具
+
 - [chinese-programmer-wrong-pronunciation](https://github.com/shimohq/chinese-programmer-wrong-pronunciation)：中国程序员容易发音错误的单词
+
 - [server](https://github.com/screego/server)：面向开发人员的屏幕共享工具
+
 - [ripgrep](https://github.com/BurntSushi/ripgrep)：递归搜索目录以查找正则表达式模式
+
 - [rust-memory-container-cs](https://github.com/usagi/rust-memory-container-cs)：Rust 备忘单
+
 - [node_exporter](https://github.com/prometheus/node_exporter)：Prometheus 导出器，用于 *NIX 内核公开的硬件和操作系统指标
+
 - [everyone-can-use-english](https://github.com/ZuodaoTech/everyone-can-use-english)：人人都能用英语
+
 - [iperf](https://github.com/esnet/iperf)：TCP、UDP 和 SCTP 网络带宽测量工具
+
 - [whydeadcode](https://github.com/aarzilli/whydeadcode)：显示 Go 链接器部分禁用死码消除的原因
+
 - [winfsp](https://github.com/winfsp/winfsp)：FUSE for Windows
+
+- [bumblebee](https://github.com/solo-io/bumblebee)：通过 1 行 bash 获取从云端运行到内核的 eBPF 程序
+
+- [winlator](https://github.com/brunodev85/winlator)：使用 Wine 和 Box86/Box64 运行 Windows 应用程序的 Android 应用程序
+
+- [acme.sh](https://github.com/acmesh-official/acme.sh)：从 letsencrypt 生成免费的证书
