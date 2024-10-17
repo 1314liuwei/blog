@@ -15,3 +15,81 @@
 ## 2. 全局变量显示初始化
 
 复杂的全局变量初始化时，应当显示进行初始化。原因和 `1. 不要使用 init() 函数` 类似。因为全局变量初始化顺序和模块加载顺序强相关。当全局变量初始化逻辑存在依赖时，可能会由于模块加载顺序改变而产生出人意料的 Bug。
+
+
+
+## 3. 判断接口类型是否为 `nil`
+
+在 Go 中，当对象值为空，但是接口类型不为空时，如果直接判断 `v != nil` 会返回 `true`。
+
+在下面的代码中，`u != nil` 会判断为空，因为 `u` 的值虽然为 `nil`，但是 `u` 的类型为 `UserI`。
+
+```go
+package main
+
+type UserI interface {
+	String() string
+}
+
+type User struct {
+	Id string
+}
+
+func (u *User) String() string {
+	return u.Id
+}
+
+func GetUser() UserI {
+	var u *User
+	return u
+}
+
+func main() {
+	u := GetUser()
+	if u != nil {
+		u.String()
+	}
+}
+```
+
+因此为了避免这种问题的出现，需要使用反射做更严格的判断：
+
+```go
+package main
+
+import (
+	"reflect"
+)
+
+type UserI interface {
+	String() string
+}
+
+type User struct {
+	Id string
+}
+
+func (u *User) String() string {
+	return u.Id
+}
+
+func GetUser() UserI {
+	var u *User
+	return u
+}
+
+func IsNilPointer(i interface{}) bool {
+	if i == nil {
+		return true
+	}
+	v := reflect.ValueOf(i)
+	return (v.Kind() == reflect.Ptr || v.Kind() == reflect.Interface) && v.IsNil()
+}
+
+func main() {
+	u := GetUser()
+	if !IsNilPointer(u) {
+		u.String()
+	}
+}
+```
