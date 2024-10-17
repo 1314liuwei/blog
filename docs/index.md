@@ -150,4 +150,6 @@
 142. tc 命令常用用法
 142. Linux Advanced Routing & Traffic Control HOWTO
 142. iptables hashlimit
+142. ecaptures
+142. keylog
 
