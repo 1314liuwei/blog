@@ -121,19 +121,19 @@ apt install iperf3
 
 （9）-A：CPU亲和性，可以将具体的iperf3进程绑定对应编号的逻辑CPU，避免iperf进程在不同的CPU间调度。
 
-## 查看系统路由表
+## 8. 查看系统路由表
 
 ```bash
 ip route list table 0
 ```
 
-## 查询主机外部 IP
+## 9. 查询主机外部 IP
 
 ```bash
 curl -L ip.tool.lu
 ```
 
-## 网卡速率
+## 10. 网卡速率
 
 ```bash
 watch -n 1 ifconfig lo
@@ -154,7 +154,7 @@ lo        Link encap:UNSPEC
           RX bytes:54983068842 TX bytes:54983068842
 ```
 
-## 查看端口占用
+## 11. 查看端口占用
 
 ```bash
 ss -ntlp | grep <port>
@@ -164,15 +164,23 @@ netstat -ntlp | grep <port>
 lsof -i:<port>
 ```
 
-## 查看最后一个文件
+## 12. 查看最后一个文件
 
 ```bash
 ls -l | awk '{print $NF}' | tail -n 1 | xargs tail -f
 ```
 
-## 查询指定文件夹下包含指定内容的文件
+## 13. 查询指定文件夹下包含指定内容的文件
 
 ```bash
 grep -r "关键词" /path/dir
+```
+
+## 14. 通过代理执行 ssh 和 scp
+
+```bash
+ORIGINAL_HOST="baidu.com" ssh -o ProxyCommand='nc -X 5 -x {ProxyAddr} $ORIGINAL_HOST %p' "root@$ORIGINAL_HOST"
+
+ORIGINAL_HOST="baidu.com" scp -o ProxyCommand='nc -X 5 -x {ProxyAddr} $ORIGINAL_HOST %p' "root@$ORIGINAL_HOST:/path/to/remote/file" /path/to/local/destination
 ```
 
