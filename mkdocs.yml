@@ -1,4 +1,6 @@
 site_name: Lynx's Blog
+site_description: Lynx's Blog; feedId:52340201851637768+userId:42117541714060288
+site_url: https://wlynxg.github.io/blog/
 repo_name: wlynxg/blog
 repo_url: https://github.com/wlynxg/
 
@@ -88,6 +90,15 @@ markdown_extensions:
 
 plugins: 
   - search
+  - rss:
+      enabled: True
+      image: https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Feed-icon.svg/128px-Feed-icon.svg.png
+      pretty_print: True
+      length: 1000
+      date_from_meta:
+          as_creation: date.created
+          as_update: date.updated
+      abstract_chars_count: -1
   - git-revision-date-localized:
       type: datetime
       timezone: Asia/Shanghai
