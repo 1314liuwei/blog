@@ -92,7 +92,7 @@ plugins:
   - search
   - rss:
       enabled: True
-      image: https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Feed-icon.svg/128px-Feed-icon.svg.png
+      image: https://avatars.githubusercontent.com/u/48609899?v=4
       pretty_print: True
       length: 1000
       date_from_meta:
