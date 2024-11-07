@@ -184,3 +184,13 @@ ORIGINAL_HOST="baidu.com" ssh -o ProxyCommand='nc -X 5 -x {ProxyAddr} $ORIGINAL_
 ORIGINAL_HOST="baidu.com" scp -o ProxyCommand='nc -X 5 -x {ProxyAddr} $ORIGINAL_HOST %p' "root@$ORIGINAL_HOST:/path/to/remote/file" /path/to/local/destination
 ```
 
+## 15. 查看本地 NAT 转换规则
+
+```bash
+# 查看 iptables 中的 NAT 规则
+iptables -t nat -vL
+
+# 查看连接跟踪表 nf_conntrack
+cat /proc/net/nf_conntrack
+```
+
