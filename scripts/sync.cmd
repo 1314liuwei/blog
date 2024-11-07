@@ -1,17 +1,18 @@
 @echo off
-git fetch origin main:main
-git merge origin/main
+
+git pull origin main
+
 typora ../docs
+
 git add .
-for /f "tokens=*" %%a in ('git status --porcelain') do (
-    set status=%%a
-    set firstchar=!status:~0,1!
-    if "!firstchar!"=="M" (
-        set action=update
-    ) else if "!firstchar!"=="A" (
-        set action=add
+
+for /f %%i in ('git diff --cached --name-only --diff-filter=ACMR') do (
+    git diff --cached --name-status "%%i" | findstr /R "^M" > nul
+    if %errorlevel% EQU 0 (
+        git commit -m "update: %%i - %date%"
+    ) else (
+        git commit -m "add: %%i - %date%"
     )
-    set filename=!status:~3!
-    git commit -m "!action!:!filename! - %date%"
 )
-git push
+
+git push origin main
