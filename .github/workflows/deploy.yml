@@ -45,6 +45,7 @@ jobs:
 
             - name: Build
               run: hugo --minify --gc
+              working-directory: ./hugo
 
             - name: Deploy 🚀
               uses: JamesIves/github-pages-deploy-action@v4
