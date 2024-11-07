@@ -1,0 +1,102 @@
+{{- $context := .Context -}}
+{{- $limit := default 10 .Params.limit -}}
+
+<section class="widget recent-updates">
+    <div class="widget-icon">
+        {{ partial "helper/icon" "clock" }}
+    </div>
+    <h2 class="widget-title section-title">{{ T "widget.recent.title" | default "Recent Updates" }}</h2>
+
+    {{ $pages := where $context.Site.RegularPages "Type" "in" $context.Site.Params.mainSections }}
+    {{ $notHidden := where $context.Site.RegularPages "Params.hidden" "!=" true }}
+    {{ $filtered := ($pages | intersect $notHidden) }}
+    {{ $sorted := $filtered.ByLastmod.Reverse }}
+    
+    <div class="recent-updates-list">
+        {{ range first $limit $sorted }}
+            <a href="{{ .RelPermalink }}" class="recent-item">
+                <span class="recent-item-title">{{ .Title }}</span>
+                <span class="recent-item-date">{{ .Lastmod.Format "01-02" }}</span>
+            </a>
+        {{ end }}
+    </div>
+</section>
+
+<style>
+.widget.recent-updates {
+    .widget-icon,
+    .widget-title {
+        /* 确保图标和标题不受背景色影响 */
+        position: relative;
+        z-index: 1;
+    }
+
+    .recent-updates-list {
+        margin-top: 1rem;
+        background: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+
+    .recent-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 20px;
+        text-decoration: none;
+        color: var(--card-text-color-main);
+        border-radius: var(--tag-border-radius);
+        transition: box-shadow 0.3s ease;
+
+        &:hover {
+            box-shadow: var(--shadow-l2);
+        }
+    }
+
+    .recent-item-title {
+        font-size: 1.5rem;
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-right: 1rem;
+        font-weight: 500;
+    }
+
+    .recent-item-date {
+        font-size: 1.5rem;
+        color: var(--body-text-color-light);
+        white-space: nowrap;
+    }
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .widget.recent-updates {
+        .recent-item-title {
+            font-size: 1rem;
+        }
+        
+        .recent-item-date {
+            font-size: 0.8rem;
+        }
+    }
+}
+
+.recent-post {
+    transition: transform 0.2s ease;
+}
+
+.recent-post:hover {
+    transform: translateX(4px);
+}
+
+/* 深色模式适配 */
+[data-scheme="dark"] .recent-item:hover {
+    background: var(--card-background-selected);
+}
+</style>

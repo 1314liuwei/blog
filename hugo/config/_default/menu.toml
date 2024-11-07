@@ -1,0 +1,24 @@
+# Configure main menu and social menu
+[[social]]
+identifier = "github"
+name = "GitHub"
+url = "https://github.com/wlynxg"
+
+[social.params]
+icon = "brand-github"
+
+[[social]]
+identifier = "rss"
+name = "RSS"
+url = "/index.xml"
+
+[social.params]
+icon = "brand-rss"
+
+[[social]]
+identifier = "mail"
+name = "Mail"
+url = "mailto:liuauthor@foxmail.com"
+
+[social.params]
+icon = "brand-mail"
