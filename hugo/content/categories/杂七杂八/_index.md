@@ -1,7 +1,7 @@
 ---
 title: 杂七杂八
 description: A description of this category
-image:
+image: "cover.svg"
 
 # Badge style
 style:

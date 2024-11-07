@@ -1,7 +1,7 @@
 ---
 title: Python
 description: A description of this category
-image:
+image: "cover.svg"
 
 # Badge style
 style:

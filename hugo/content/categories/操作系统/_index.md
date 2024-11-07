@@ -1,7 +1,7 @@
 ---
 title: 操作系统
 description: A description of this category
-image:
+image: "操作系统.svg"
 
 # Badge style
 style:
