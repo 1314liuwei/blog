@@ -48,6 +48,7 @@ jobs:
               working-directory: ./hugo
 
             - name: Deploy 🚀
+              working-directory: ./hugo
               uses: JamesIves/github-pages-deploy-action@v4
               with:
                   branch: gh-pages
