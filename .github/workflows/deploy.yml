@@ -41,7 +41,7 @@ jobs:
 
 
             - name: Generate Markdown
-              run: ls -lh && chmod +x ./scripts/update.sh && ./scripts/update.sh
+              run: ls -lh && chmod +x ./scripts/update.bash && ./scripts/update.bash
 
             - name: Build
               run: hugo --minify --gc
