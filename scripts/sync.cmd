@@ -1,4 +1,6 @@
-start /b git pull
+start /b 
+cd ..
+git pull
 typora ../docs
 git add .
 git add .
