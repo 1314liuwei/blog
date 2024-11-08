@@ -5,6 +5,6 @@ image: "操作系统.svg"
 
 # Badge style
 style:
-    background: "#92C7CF"
+    background: "#FFE6E6"
     color: "#fff"
 ---
