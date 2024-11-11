@@ -100,15 +100,17 @@ categories:
 
 EOF
     
-    # 追加原文件内容
-    if grep -q "^---" "$file"; then
-        sed -n '/^---/,/^---/!p' "$file" | tail -n +2 >> "$temp_file"
+    # 根据文件类型处理内容
+    if [[ "$file" == *.md ]]; then
+        # 处理 .md 文件
+        # 删除原有的front matter（如果存在）
+        sed '1{/^---$/!q};1,/^---$/d' "$file" >> "$temp_file"
     else
-        cat "$file" >> "$temp_file"
+        # 处理 .html 文件
+        # 对于HTML文件，保留所有内容但删除可能存在的前置信息
+        sed '1{/^---$/!q};1,/^---$/d' "$file" >> "$temp_file"
     fi
     
-    # 将临时文件移动到目标位置
-    mv "$temp_file" "$target_file"
-    
-    echo "处理完成: $file -> $target_file"
+    # 替换原文件
+    mv "$temp_file" "$file"
 done
