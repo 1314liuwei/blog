@@ -55,20 +55,23 @@ fi
 
 # 处理其他 .md 文件
 find docs -type f \( -name "*.md" -o -name "*.html" \) | while read -r file; do
+    # 获取文件扩展名
+    ext="${file##*.}"
+    
     # 跳过 plan.md
     if [ "$file" = "docs/plan.md" ]; then
         continue
     fi
     
     # 获取文件名（不带扩展名）
-    filename=$(basename "$file" .md)
+    filename=$(basename "$file" ."$ext")
     
     # 获取上级目录名
     category=$(basename "$(dirname "$file")")
     
-    # 构建目标文件路径
+    # 构建目标文件路径（保持原始扩展名）
     target_dir="hugo/content/post/$category"
-    target_file="$target_dir/$filename.md"
+    target_file="$target_dir/$filename.$ext"
     
     # 创建目标目录
     mkdir -p "$target_dir"
@@ -91,7 +94,7 @@ find docs -type f \( -name "*.md" -o -name "*.html" \) | while read -r file; do
     # 写入新的头部信息
     cat > "$temp_file" << EOF
 ---
-title: $filename
+title: "$filename"
 date: $created
 lastmod: $modified
 categories:
@@ -100,17 +103,11 @@ categories:
 
 EOF
     
-    # 根据文件类型处理内容
-    if [[ "$file" == *.md ]]; then
-        # 处理 .md 文件
-        # 删除原有的front matter（如果存在）
-        sed '1{/^---$/!q};1,/^---$/d' "$file" >> "$temp_file"
-    else
-        # 处理 .html 文件
-        # 对于HTML文件，保留所有内容但删除可能存在的前置信息
-        sed '1{/^---$/!q};1,/^---$/d' "$file" >> "$temp_file"
-    fi
+    # 直接追加原文件内容
+    cat "$file" >> "$temp_file"
     
-    # 替换原文件
-    mv "$temp_file" "$file"
+    # 将临时文件移动到目标位置
+    mv "$temp_file" "$target_file"
+    
+    echo "处理完成: $file -> $target_file"
 done
