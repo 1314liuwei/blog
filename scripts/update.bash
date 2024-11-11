@@ -54,7 +54,7 @@ EOF
 fi
 
 # 处理其他 .md 文件
-find docs -type f -name "*.md" | while read -r file; do
+find docs -type f \( -name "*.md" -o -name "*.html" \) | while read -r file; do
     # 跳过 plan.md
     if [ "$file" = "docs/plan.md" ]; then
         continue
