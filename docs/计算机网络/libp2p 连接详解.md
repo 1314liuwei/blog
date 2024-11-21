@@ -26,18 +26,22 @@ libp2p 模块的整体结构如上图所示：
 
 当需要创建流时，本地 libp2p 节点到 peer A 可能有多个可用连接，libp2p 需要从众多连接中挑选出一个连接。
 
-libp2p 默认的排序逻辑为：
+libp2p 默认的连接排序逻辑为：
 
 - 先建立的连接 > 后建立的连接；
 - 直连连接 > 中继连接；
 - 当前打开 Stream 数量较多的连接 > 当前打开 Stream 数量较少的连接。
 
-由于 libp2p 的连接选择逻辑较为简单，因此我们对排序逻辑进行了部分优化：
+
+
+由于 libp2p 的连接选择逻辑较为简单，因此我们对连接排序逻辑进行了部分优化：
 
 - 先建立的连接 > 后建立的连接；
 - Private IP 连接 > Public IP 连接 > 中继连接；
 - QUIC > WebTransport > WebRTC > TCP > WebSocket；
 - 当前打开 Stream 数量较多的连接 > 当前打开 Stream 数量较少的连接。
+
+
 
 由于固定逻辑的排序选择无法适应复杂的网络环境，因此将连接排序函数设置为可自定义，后续可由外层做基于更多指标的连接排序，如连接带宽、丢包率等。
 
@@ -53,8 +57,10 @@ libp2p 默认的排序逻辑为：
 
 libp2p 默认的地址排序逻辑为:
 
-- Private IP 地址 > Public IP 地址 > 中继连接地址
-- WebRTC > QUIC IPv6 > QUIC IPv4 > WebTransport IPv6 > WebTransport IPv4 > TCP IPv6 > TCP IPv4
+- Private IP 地址 > Public IP 地址 > 中继连接地址；
+- WebRTC > QUIC IPv6 > QUIC IPv4 > WebTransport IPv6 > WebTransport IPv4 > TCP IPv6 > TCP IPv4。
+
+
 
 对连接地址进行排序后，libp2p 会对所有的地址依次进行连接。但是 libp2p 不会等到连接结果返回再连接下一个。在尝试一个连接后，如果一定延时内（毫秒级别）没有结果返回的话，libp2p 会立即尝试下一个地址。
 
