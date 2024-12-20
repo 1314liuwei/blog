@@ -1,0 +1,21 @@
+<section class="article-content">
+    <!-- Refer to https://discourse.gohugo.io/t/responsive-tables-in-markdown/10639/5 -->
+    {{ $wrappedTable := printf "<div class=\"table-wrapper\">${1}</div>" }}
+    {{ .Content | replaceRE "(<table>(?:.|\n)+?</table>)" $wrappedTable | safeHTML }}
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+    mermaid.initialize({ startOnLoad: true });
+    document.addEventListener('DOMContentLoaded', function () {
+        var mermaidBlocks = document.querySelectorAll('pre code.language-mermaid');
+
+        mermaidBlocks.forEach(function (block) {
+            var newDiv = document.createElement('div');
+            newDiv.className = 'mermaid';
+            newDiv.innerHTML = block.textContent;
+            var parent = block.parentElement;
+            parent.parentNode.replaceChild(newDiv, parent);
+        });
+    });
+</script>
