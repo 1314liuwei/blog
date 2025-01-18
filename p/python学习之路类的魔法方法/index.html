@@ -1,0 +1,1166 @@
+<!doctype html><html lang=zh-cn dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content='Python 学习之路——类的魔法方法 前言 类作为Python中最核心的部分，我们作为作为开发人员不仅仅可以为类自定义方法，在Python内部也为我们提供了众多魔法方法来帮助我们完善类的功能。\n一、基本方法 1. __init_subclass__（创建类） 当创建一个类时，它会自动执行父类的该魔法方法。\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 class Parent(object): def __init_subclass__(cls, **kwargs): # kwargs获取的是子类创建时所传递的额外参数 print("Parent class executing") print(f"__init_subclass__({cls}, {kwargs})") for k, v in kwargs.items(): type.__setattr__(cls, k, v) # 为类设置属性 class Subclass(Parent, name=&#39;Python&#39;): pass print(Subclass.name) """ Parent class executing __init_subclass__(<class &#39;__main__.Subclass&#39;>, {&#39;name&#39;: &#39;Python&#39;}) Python """ 2. __new__（创建实例对象） 该方法在创建一个实例对象时调用，用来创建实例对象和为对象分配空间。该方法时继承至object类的静态方法。该方法的调用在 init 方法之前。\n'><title>Python学习之路——类的魔法方法</title>
+<link rel=canonical href=https://wlynxg.github.io/blog/p/python%E5%AD%A6%E4%B9%A0%E4%B9%8B%E8%B7%AF%E7%B1%BB%E7%9A%84%E9%AD%94%E6%B3%95%E6%96%B9%E6%B3%95/><link rel=stylesheet href=/blog/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css><meta property='og:title' content="Python学习之路——类的魔法方法"><meta property='og:description' content='Python 学习之路——类的魔法方法 前言 类作为Python中最核心的部分，我们作为作为开发人员不仅仅可以为类自定义方法，在Python内部也为我们提供了众多魔法方法来帮助我们完善类的功能。\n一、基本方法 1. __init_subclass__（创建类） 当创建一个类时，它会自动执行父类的该魔法方法。\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 class Parent(object): def __init_subclass__(cls, **kwargs): # kwargs获取的是子类创建时所传递的额外参数 print("Parent class executing") print(f"__init_subclass__({cls}, {kwargs})") for k, v in kwargs.items(): type.__setattr__(cls, k, v) # 为类设置属性 class Subclass(Parent, name=&#39;Python&#39;): pass print(Subclass.name) """ Parent class executing __init_subclass__(<class &#39;__main__.Subclass&#39;>, {&#39;name&#39;: &#39;Python&#39;}) Python """ 2. __new__（创建实例对象） 该方法在创建一个实例对象时调用，用来创建实例对象和为对象分配空间。该方法时继承至object类的静态方法。该方法的调用在 init 方法之前。\n'><meta property='og:url' content='https://wlynxg.github.io/blog/p/python%E5%AD%A6%E4%B9%A0%E4%B9%8B%E8%B7%AF%E7%B1%BB%E7%9A%84%E9%AD%94%E6%B3%95%E6%96%B9%E6%B3%95/'><meta property='og:site_name' content="Wlynxg's Blog"><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:published_time' content='2023-03-02T09:55:21+08:00'><meta property='article:modified_time' content='2023-03-02T09:55:21+08:00'><meta name=twitter:title content="Python学习之路——类的魔法方法"><meta name=twitter:description content='Python 学习之路——类的魔法方法 前言 类作为Python中最核心的部分，我们作为作为开发人员不仅仅可以为类自定义方法，在Python内部也为我们提供了众多魔法方法来帮助我们完善类的功能。\n一、基本方法 1. __init_subclass__（创建类） 当创建一个类时，它会自动执行父类的该魔法方法。\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 class Parent(object): def __init_subclass__(cls, **kwargs): # kwargs获取的是子类创建时所传递的额外参数 print("Parent class executing") print(f"__init_subclass__({cls}, {kwargs})") for k, v in kwargs.items(): type.__setattr__(cls, k, v) # 为类设置属性 class Subclass(Parent, name=&#39;Python&#39;): pass print(Subclass.name) """ Parent class executing __init_subclass__(<class &#39;__main__.Subclass&#39;>, {&#39;name&#39;: &#39;Python&#39;}) Python """ 2. __new__（创建实例对象） 该方法在创建一个实例对象时调用，用来创建实例对象和为对象分配空间。该方法时继承至object类的静态方法。该方法的调用在 init 方法之前。\n'><link rel="shortcut icon" href=/blog/favicon.ico></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label=切换菜单>
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/blog/><img src=/blog/img/file_hu6889846174828548036.png width=300 height=300 class=site-logo loading=lazy alt=Avatar>
+</a><span class=emoji>🐂</span></figure><div class=site-meta><h1 class=site-name><a href=/blog>Wlynxg's Blog</a></h1><h2 class=site-description>The harder, ther luckier!</h2></div></header><ol class=menu-social><li><a href=https://github.com/wlynxg target=_blank title=GitHub rel=me><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li><li><a href=mailto:liuauthor@foxmail.com target=_blank title=Mail rel=me><svg t="1730733819354" class="icon" viewBox="0 0 1024 1024" p-id="3570" width="24" height="24"><path d="M942.08 200.704s-1.024.0.0.0c-1.024-2.048-1.024-4.096-2.048-6.144-1.024-1.024-2.048-3.072-3.072-4.096l-1.024-1.024-1.024-1.024c-1.024-1.024-2.048-2.048-4.096-2.048h-1.024c-2.048-1.024-3.072-1.024-5.12-1.024h-1.024C788.48 163.84 649.216 153.6 512 153.6s-276.48 10.24-412.672 30.72h-1.024c-2.048.0-3.072 1.024-5.12 1.024H92.16c-1.024 1.024-3.072 1.024-4.096 2.048l-1.024 1.024-1.024 1.024c-1.024 1.024-2.048 2.048-3.072 4.096v1.024c-1.024 2.048-1.024 3.072-2.048 5.12C61.44 304.128 51.2 408.576 51.2 512s10.24 207.872 30.72 311.296c2.048 8.192 8.192 15.36 17.408 16.384C235.52 860.16 374.784 870.4 512 870.4s276.48-10.24 412.672-30.72c8.192-1.024 15.36-8.192 17.408-16.384C962.56 719.872 972.8 615.424 972.8 512s-10.24-207.872-30.72-311.296zm-60.416 19.456c-44.032 50.176-96.256 97.28-156.672 142.336C654.336 415.744 582.656 457.728 512 489.472c-77.824-36.864-148.48-78.848-212.992-126.976-56.32-41.984-108.544-90.112-156.672-142.336 122.88-17.408 246.784-25.6 369.664-25.6s246.784 8.192 369.664 25.6zm22.528 580.608C774.144 820.224 642.048 829.44 512 829.44s-262.144-9.216-392.192-28.672C101.376 705.536 92.16 608.256 92.16 512c0-87.04 8.192-175.104 22.528-262.144 48.128 53.248 102.4 102.4 159.744 145.408 69.632 52.224 144.384 96.256 229.376 135.168 3.072 1.024 6.144 2.048 8.192 2.048 3.072.0 5.12-1.024 8.192-2.048 76.8-32.768 153.6-78.848 229.376-135.168 60.416-46.08 114.688-94.208 159.744-144.384C924.672 337.92 931.84 424.96 931.84 512c0 96.256-9.216 193.536-27.648 288.768z" p-id="3571" fill="#707070"/></svg></a></li><li><a href=/blog/index.xml target=_blank title=RSS rel=me><svg t="1730718821658" class="icon" viewBox="0 0 1024 1024" p-id="21619" width="24" height="24"><path d="M554.666667 896C529.066667 896 512 878.933333 512 853.333333 512 665.6 358.4 512 170.666667 512 145.066667 512 128 494.933333 128 469.333333s17.066667-42.666667 42.666667-42.666666c234.666667.0 426.666667 192 426.666666 426.666666.0 25.6-17.066667 42.666667-42.666666 42.666667z" p-id="21620" fill="#707070"/><path d="M853.333333 896c-25.6.0-42.666667-17.066667-42.666666-42.666667.0-354.133333-285.866667-640-640-640-25.6.0-42.666667-17.066667-42.666667-42.666666S145.066667 128 170.666667 128C571.733334 128 896 452.266667 896 853.333333 896 878.933333 878.933333 896 853.333333 896z" p-id="21621" fill="#707070"/><path d="M213.333333 810.666667m-85.333333.0a85.333333 85.333333.0 10170.666667.0 85.333333 85.333333.0 10-170.666667.0z" p-id="21622" fill="#707070"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/blog/><svg class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>Home</span></a></li><li><a href=/blog/archives/><svg class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+<span>Archives</span></a></li><li><a href=/blog/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>Search</span></a></li><li><a href=/blog/links/><svg class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg>
+<span>Links</span></a></li><li><a href=/blog/plan/><svg t="1730733517435" class="icon" viewBox="0 0 1024 1024" p-id="1581" width="24" height="24"><path d="M874.24 1013.76H143.36a94.72 94.72.0 01-94.72-94.72V188.16a94.72 94.72.0 0194.72-94.72h730.88a95.36 95.36.0 0194.72 94.72v730.88a94.72 94.72.0 01-94.72 94.72zM143.36 156.8a31.36 31.36.0 00-32 31.36v730.88a32 32 0 0032 32h730.88a32 32 0 0031.36-32V188.16a31.36 31.36.0 00-31.36-31.36z" fill="#707070" p-id="1582"/><path d="M926.08 399.36h-832a32 32 0 010-64h832a32 32 0 110 64zM339.84 273.28a31.36 31.36.0 01-31.36-32V39.04a31.36 31.36.0 0131.36-32 32 32 0 0132 32v202.24a32 32 0 01-32 32zm337.28.0a31.36 31.36.0 01-31.36-32V39.04a31.36 31.36.0 1164 0v202.24a31.36 31.36.0 01-32.64 32zM444.16 841.6a33.92 33.92.0 01-23.04-9.6l-128-138.24a32 32 0 1146.08-43.52L448 768l280.32-279.68a30.72 30.72.0 0144.8.0 31.36 31.36.0 010 44.16L466.56 832a32 32 0 01-22.4 9.6z" fill="#707070" p-id="1583"/></svg>
+<span>Plan</span></a></li><li class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>暗色模式</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">目录</h2><div class=widget--toc><nav id=TableOfContents><ol><li><ol><li><a href=#1-__init_subclass__创建类>1. __init_subclass__（创建类）</a></li><li><a href=#2-__new__创建实例对象>2. __new__（创建实例对象）</a></li><li><a href=#3-__init__初始化实例对象>3. __init__（初始化实例对象）</a></li><li><a href=#4-__hash__hash>4. __hash__（hash()）</a></li><li><a href=#5-__dir__dir>5. __dir__（dir()）</a></li><li><a href=#6-__sizeof__分配空间大小>6. __sizeof__（分配空间大小）</a></li><li><a href=#7-__format__format>7. __format__（format()）</a></li><li><a href=#8__del__删除对象>8.__del__（删除对象）</a></li><li><a href=#9__call__实例对象像函数一样调用>9.__call__（实例对象像函数一样调用）</a></li><li><a href=#10__len__len>10.__len__（len()）</a></li><li><a href=#11__int__int>11.__int__（int()）</a></li><li><a href=#12__float__float>12.__float__（float()）</a></li><li><a href=#13__bytes__bytes>13.__bytes__（bytes()）</a></li><li><a href=#14__bool__bool>14.__bool__（bool()）</a></li><li><a href=#15__round__round>15.__round__（round()）</a></li></ol></li></ol><ol><li><ol><li><a href=#1-__delattr__删除属性>1. __delattr__（删除属性）</a></li><li><a href=#2-__getattribute__访问属性>2. __getattribute__（访问属性）</a></li><li><a href=#3-__setattr__设置属性>3. __setattr__（设置属性）</a></li><li><a href=#4-__repr__显示对象属性>4. __repr__（显示对象属性）</a></li><li><a href=#5-__str__显示对象属性>5. __str__（显示对象属性）</a></li></ol></li></ol><ol><li><ol><li><a href=#1-运算符>1. 运算符</a></li><li><a href=#2-反运算符>2. 反运算符</a></li><li><a href=#3-增量赋值运算符>3. 增量赋值运算符</a></li><li><a href=#4-一元操作符>4. 一元操作符</a></li></ol></li></ol><ol><li><ol><li><a href=#1-__len__获取对象长度>1. __len__（获取对象长度）</a></li><li><a href=#2-__iter__定义迭代器>2. __iter__（定义迭代器）</a></li><li><a href=#3-对容器指定元素的操作>3. 对容器指定元素的操作</a></li><li><a href=#4-__reversed__反转>4. __reversed__（反转）</a></li><li><a href=#5-__contains__判断元素位置>5. __contains__（判断元素位置）</a></li></ol></li></ol></nav></div></section></aside><main class="main full-width"><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/blog/categories/python/ style=background-color:#79d4fd;color:#fff>Python</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/blog/p/python%E5%AD%A6%E4%B9%A0%E4%B9%8B%E8%B7%AF%E7%B1%BB%E7%9A%84%E9%AD%94%E6%B3%95%E6%96%B9%E6%B3%95/>Python学习之路——类的魔法方法</a></h2></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published>Mar 02, 2023</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>阅读时长: 9 分钟</time></div></footer></div></header><section class=article-content><h1 id=python-学习之路类的魔法方法>Python 学习之路——类的魔法方法</h1><h1 id=前言>前言</h1><p>类作为Python中最核心的部分，我们作为作为开发人员不仅仅可以为类自定义方法，在Python内部也为我们提供了众多魔法方法来帮助我们完善类的功能。</p><h1 id=一基本方法>一、基本方法</h1><h3 id=1-__init_subclass__创建类>1. __init_subclass__（创建类）</h3><p>当创建一个类时，它会自动执行父类的该魔法方法。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>class</span> <span class=nc>Parent</span><span class=p>(</span><span class=nb>object</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>__init_subclass__</span><span class=p>(</span><span class=bp>cls</span><span class=p>,</span> <span class=o>**</span><span class=n>kwargs</span><span class=p>):</span>  
+</span></span><span class=line><span class=cl>    <span class=c1># kwargs获取的是子类创建时所传递的额外参数</span>
+</span></span><span class=line><span class=cl>        <span class=nb>print</span><span class=p>(</span><span class=s2>&#34;Parent class executing&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=nb>print</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;__init_subclass__(</span><span class=si>{</span><span class=bp>cls</span><span class=si>}</span><span class=s2>, </span><span class=si>{</span><span class=n>kwargs</span><span class=si>}</span><span class=s2>)&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>for</span> <span class=n>k</span><span class=p>,</span> <span class=n>v</span> <span class=ow>in</span> <span class=n>kwargs</span><span class=o>.</span><span class=n>items</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>            <span class=nb>type</span><span class=o>.</span><span class=fm>__setattr__</span><span class=p>(</span><span class=bp>cls</span><span class=p>,</span> <span class=n>k</span><span class=p>,</span> <span class=n>v</span><span class=p>)</span>  <span class=c1># 为类设置属性</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>class</span> <span class=nc>Subclass</span><span class=p>(</span><span class=n>Parent</span><span class=p>,</span> <span class=n>name</span><span class=o>=</span><span class=s1>&#39;Python&#39;</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>pass</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=n>Subclass</span><span class=o>.</span><span class=n>name</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>Parent class executing
+</span></span></span><span class=line><span class=cl><span class=s2>__init_subclass__(&lt;class &#39;__main__.Subclass&#39;&gt;, {&#39;name&#39;: &#39;Python&#39;})
+</span></span></span><span class=line><span class=cl><span class=s2>Python
+</span></span></span><span class=line><span class=cl><span class=s2>&#34;&#34;&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=2-__new__创建实例对象>2. __new__（创建实例对象）</h3><p>该方法在创建一个实例对象时调用，用来创建实例对象和为对象分配空间。该方法时继承至<strong>object</strong>类的静态方法。该方法的调用在 <strong>init</strong> 方法之前。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>class</span> <span class=nc>Demo</span><span class=p>(</span><span class=nb>object</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>name</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>name</span> <span class=o>=</span> <span class=n>name</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__new__</span><span class=p>(</span><span class=bp>cls</span><span class=p>,</span> <span class=o>*</span><span class=n>args</span><span class=p>,</span> <span class=o>**</span><span class=n>kwargs</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=nb>print</span><span class=p>(</span><span class=sa>f</span><span class=s1>&#39;__new__(cls, *</span><span class=si>{</span><span class=n>args</span><span class=si>}</span><span class=s1>, **</span><span class=si>{</span><span class=n>kwargs</span><span class=si>}</span><span class=s1>)&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=nb>super</span><span class=p>()</span><span class=o>.</span><span class=fm>__new__</span><span class=p>(</span><span class=bp>cls</span><span class=p>)</span> <span class=c1># 返回一个实例对象</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>a</span> <span class=o>=</span> <span class=n>Demo</span><span class=p>(</span><span class=s1>&#39;Python&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=n>a</span><span class=o>.</span><span class=n>name</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=c1># Python</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=3-__init__初始化实例对象>3. __init__（初始化实例对象）</h3><p>该方法在类实例化时会自动调用。用来为实例对象进行初始化操作。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>class</span> <span class=nc>Demo</span><span class=p>(</span><span class=nb>object</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>name</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>name</span> <span class=o>=</span> <span class=n>name</span>
+</span></span><span class=line><span class=cl>        
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl><span class=n>a</span> <span class=o>=</span> <span class=n>Demo</span><span class=p>(</span><span class=s1>&#39;Python&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=n>a</span><span class=o>.</span><span class=n>name</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=c1># Python</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=4-__hash__hash>4. __hash__（hash()）</h3><p>该方法会由内置函数hash（）调用，用于对哈希集合（包括set，frozenset和dict）的成员执行操作。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>class</span> <span class=nc>Demo</span><span class=p>(</span><span class=nb>object</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>name</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>name</span> <span class=o>=</span> <span class=n>name</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__hash__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=mi>1</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>a</span> <span class=o>=</span> <span class=n>Demo</span><span class=p>(</span><span class=s1>&#39;Python&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=nb>hash</span><span class=p>(</span><span class=n>a</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=c1># 1</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=5-__dir__dir>5. __dir__（dir()）</h3><p>调用 <strong>dir()</strong> 函数时，会自动调用该魔法方法。在<strong>object</strong>类中，该方法会返回实例的属性与方法名。该方法的返回值必须是一个可迭代对象。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>class</span> <span class=nc>Demo</span><span class=p>(</span><span class=nb>object</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>name</span> <span class=o>=</span> <span class=s1>&#39;demo&#39;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__dir__</span><span class=p>(</span><span class=bp>self</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=n>Iterable</span><span class=p>[</span><span class=nb>str</span><span class=p>](</span><span class=bp>self</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=s1>&#39;ABCD&#39;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>a</span> <span class=o>=</span> <span class=n>Demo</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=nb>dir</span><span class=p>(</span><span class=n>a</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=c1># [&#39;A&#39;, &#39;B&#39;, &#39;C&#39;, &#39;D&#39;]</span>
+</span></span><span class=line><span class=cl><span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>默认输出格式：
+</span></span></span><span class=line><span class=cl><span class=s2>[&#39;__class__&#39;, &#39;__delattr__&#39;, &#39;__dict__&#39;, &#39;__dir__&#39;, &#39;__doc__&#39;, 
+</span></span></span><span class=line><span class=cl><span class=s2>&#39;__eq__&#39;, &#39;__format__&#39;, &#39;__ge__&#39;, &#39;__getattribute__&#39;, &#39;__gt__&#39;, 
+</span></span></span><span class=line><span class=cl><span class=s2>&#39;__hash__&#39;, &#39;__init__&#39;, &#39;__init_subclass__&#39;, &#39;__le__&#39;, &#39;__lt__&#39;, 
+</span></span></span><span class=line><span class=cl><span class=s2>&#39;__module__&#39;, &#39;__ne__&#39;, &#39;__new__&#39;, &#39;__reduce__&#39;, &#39;__reduce_ex__&#39;,
+</span></span></span><span class=line><span class=cl><span class=s2>&#39;__repr__&#39;, &#39;__setattr__&#39;, &#39;__sizeof__&#39;, &#39;__str__&#39;, &#39;__subclasshook__&#39;, 
+</span></span></span><span class=line><span class=cl><span class=s2>&#39;__weakref__&#39;, &#39;name&#39;]
+</span></span></span><span class=line><span class=cl><span class=s2>&#34;&#34;&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=6-__sizeof__分配空间大小>6. __sizeof__（分配空间大小）</h3><p>用以返回对象系统分配空间的大小。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>class</span> <span class=nc>Demo</span><span class=p>(</span><span class=nb>object</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>pass</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>a</span> <span class=o>=</span> <span class=n>Demo</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=n>a</span><span class=o>.</span><span class=n>__sizeof__</span><span class=p>())</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=7-__format__format>7. __format__（format()）</h3><p>我们知道在字符串的内置方法中有一个fomat()方法，它可以添加任意对象到字符串。当使用str.format()方法或者使用format()函数时，调用的就是这个魔法方法。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>class</span> <span class=nc>Demo</span><span class=p>(</span><span class=nb>object</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>name</span> <span class=o>=</span> <span class=s1>&#39;demo&#39;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__format__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>format_spec</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    	<span class=c1># format_spec 指的是格式规范，默认为空</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=bp>self</span><span class=o>.</span><span class=n>name</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>a</span> <span class=o>=</span> <span class=n>Demo</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=nb>format</span><span class=p>(</span><span class=n>a</span><span class=p>))</span> <span class=c1># Return value.__format__(format_spec)</span>
+</span></span><span class=line><span class=cl><span class=c1># demo</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=s2>&#34;name:</span><span class=si>{}</span><span class=s2>&#34;</span><span class=o>.</span><span class=n>format</span><span class=p>(</span><span class=n>a</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=c1># name:demo</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=8__del__删除对象>8.__del__（删除对象）</h3><p>该魔法方法在删除一个实例对象时使用。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>class</span> <span class=nc>Demo</span><span class=p>(</span><span class=nb>object</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__del__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=nb>print</span><span class=p>(</span><span class=s1>&#39;Have been deleted&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>a</span> <span class=o>=</span> <span class=n>Demo</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=k>del</span> <span class=n>a</span>
+</span></span><span class=line><span class=cl><span class=c1># Have been deleted</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=9__call__实例对象像函数一样调用>9.__call__（实例对象像函数一样调用）</h3><p>该魔法方法可以使实例对象像函数一样被调用。在下面这个例子中，执行 a(&lsquo;Python&rsquo;) 该语句时，实际执行的是 a.__call__(&lsquo;Python&rsquo;)。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>class</span> <span class=nc>Demo</span><span class=p>(</span><span class=nb>object</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__call__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=o>*</span><span class=n>args</span><span class=p>,</span> <span class=o>**</span><span class=n>kwargs</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=nb>print</span><span class=p>(</span><span class=sa>f</span><span class=s1>&#39;__call__(self, *</span><span class=si>{</span><span class=n>args</span><span class=si>}</span><span class=s1>, **</span><span class=si>{</span><span class=n>kwargs</span><span class=si>}</span><span class=s1>):&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>a</span> <span class=o>=</span> <span class=n>Demo</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=n>a</span><span class=p>(</span><span class=s1>&#39;Python&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=c1># Python</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=10__len__len>10.__len__（len()）</h3><p>当调用 len() 方法获取对象长度时，就会调用该方法。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>class</span> <span class=nc>Demo</span><span class=p>(</span><span class=nb>object</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__len__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=mi>10</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>a</span> <span class=o>=</span> <span class=n>Demo</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=nb>len</span><span class=p>(</span><span class=n>a</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=c1># 10</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=11__int__int>11.__int__（int()）</h3><p>调用 int() 方法时会调用类中该方法。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>class</span> <span class=nc>Demo</span><span class=p>(</span><span class=nb>object</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__int__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=mi>10</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>a</span> <span class=o>=</span> <span class=n>Demo</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=nb>int</span><span class=p>(</span><span class=n>a</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=c1># 10</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=12__float__float>12.__float__（float()）</h3><p>调用 float() 方法时会调用类中该方法。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>class</span> <span class=nc>Demo</span><span class=p>(</span><span class=nb>object</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__float__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=mf>10.0</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>a</span> <span class=o>=</span> <span class=n>Demo</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=nb>float</span><span class=p>(</span><span class=n>a</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=c1># 10.0</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=13__bytes__bytes>13.__bytes__（bytes()）</h3><p>调用 bytes() 方法时会调用类中该方法。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>class</span> <span class=nc>Demo</span><span class=p>(</span><span class=nb>object</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__bytes__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=mi>10</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>a</span> <span class=o>=</span> <span class=n>Demo</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=nb>bytes</span><span class=p>(</span><span class=n>a</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=c1># 10</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=14__bool__bool>14.__bool__（bool()）</h3><p>调用 bool() 方法时会调用类中该方法。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>class</span> <span class=nc>Demo</span><span class=p>(</span><span class=nb>object</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__bool__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=kc>True</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>a</span> <span class=o>=</span> <span class=n>Demo</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=nb>bool</span><span class=p>(</span><span class=n>a</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=c1># True</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=15__round__round>15.__round__（round()）</h3><p>调用 round() 方法时会调用类中该方法。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>class</span> <span class=nc>Demo</span><span class=p>(</span><span class=nb>object</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__round__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=mi>10</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>a</span> <span class=o>=</span> <span class=n>Demo</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=nb>round</span><span class=p>(</span><span class=n>a</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=c1># 10</span>
+</span></span></code></pre></td></tr></table></div></div><h1 id=二属性操作>二、属性操作</h1><h3 id=1-__delattr__删除属性>1. __delattr__（删除属性）</h3><p>在删除类的实例属性时，该方法会自动调用。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>class</span> <span class=nc>Demo</span><span class=p>(</span><span class=nb>object</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>name</span> <span class=o>=</span> <span class=s1>&#39;demo&#39;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__delattr__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>item</span><span class=p>):</span> <span class=c1># item会传入被删除的属性名</span>
+</span></span><span class=line><span class=cl>        <span class=nb>print</span><span class=p>(</span><span class=n>item</span><span class=p>,</span> <span class=s1>&#39;: 该属性已被删除&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=nb>super</span><span class=p>()</span><span class=o>.</span><span class=fm>__delattr__</span><span class=p>(</span><span class=n>item</span><span class=p>)</span> 
+</span></span><span class=line><span class=cl>        <span class=c1># 重写该方法后需要继承object类的该方法才能够真正删除实例属性</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>a</span> <span class=o>=</span> <span class=n>Demo</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=k>del</span> <span class=n>a</span><span class=o>.</span><span class=n>name</span>
+</span></span><span class=line><span class=cl><span class=c1># name : 该属性已被删除</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=2-__getattribute__访问属性>2. __getattribute__（访问属性）</h3><p><strong>getattribute</strong>是属性访问拦截器。当类中的方法和属性被访问时，就会首先调用这个方法。只要是继承<strong>object</strong>了的类，就默认存在属性拦截器，只是调用后没有进行任何操作，而是直接返回。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>class</span> <span class=nc>Demo</span><span class=p>(</span><span class=nb>object</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>name</span> <span class=o>=</span> <span class=s1>&#39;demo&#39;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>test</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=nb>print</span><span class=p>(</span><span class=s1>&#39;Hello World!&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__getattribute__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>item</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=nb>print</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;</span><span class=si>{</span><span class=n>item</span><span class=si>}</span><span class=s2> property is called!&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=nb>super</span><span class=p>()</span><span class=o>.</span><span class=fm>__getattribute__</span><span class=p>(</span><span class=n>item</span><span class=p>)</span> <span class=c1># 调用object的方法返回</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>a</span> <span class=o>=</span> <span class=n>Demo</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=n>a</span><span class=o>.</span><span class=n>name</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>a</span><span class=o>.</span><span class=n>test</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=s2>&#34;&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>name property is called!
+</span></span></span><span class=line><span class=cl><span class=s2>demo
+</span></span></span><span class=line><span class=cl><span class=s2>test property is called!
+</span></span></span><span class=line><span class=cl><span class=s2>Hello World!
+</span></span></span><span class=line><span class=cl><span class=s2>&#34;&#34;&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=3-__setattr__设置属性>3. __setattr__（设置属性）</h3><p>当我们为实例对象设置属性时会调用该魔法方法。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>class</span> <span class=nc>Demo</span><span class=p>(</span><span class=nb>object</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>name</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>name</span> <span class=o>=</span> <span class=n>name</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__setattr__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>key</span><span class=p>,</span> <span class=n>value</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=nb>print</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;__setattr__(</span><span class=si>{</span><span class=bp>self</span><span class=si>}</span><span class=s2>, </span><span class=si>{</span><span class=n>key</span><span class=si>}</span><span class=s2>, </span><span class=si>{</span><span class=n>value</span><span class=si>}</span><span class=s2>)&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=nb>super</span><span class=p>()</span><span class=o>.</span><span class=fm>__setattr__</span><span class=p>(</span><span class=n>key</span><span class=p>,</span> <span class=n>value</span><span class=p>)</span>  <span class=c1>#必须要调用object的该方法才能成功设置属性</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>a</span> <span class=o>=</span> <span class=n>Demo</span><span class=p>(</span><span class=s1>&#39;Python&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>a</span><span class=o>.</span><span class=n>name</span> <span class=o>=</span> <span class=s1>&#39;Java&#39;</span>
+</span></span><span class=line><span class=cl><span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>__setattr__(&lt;__main__.Demo object at 0x0000032F586D1CC8&gt;, name, Python)
+</span></span></span><span class=line><span class=cl><span class=s2>__setattr__(&lt;__main__.Demo object at 0x0000032F586D1CC8&gt;, name, Java)
+</span></span></span><span class=line><span class=cl><span class=s2>&#34;&#34;&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=4-__repr__显示对象属性>4. __repr__（显示对象属性）</h3><p>该魔法方法的功能是显示实例对象的属性。
+当我们采用下面的方式输出时，打印结果为：<strong>类名+object at+内存地址</strong>，这样的结果对我们用处不大，这个时候我们就可以通过重写__repr__方法来输出我们想要的结果。
+<strong>重写前：</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>class</span> <span class=nc>Demo</span><span class=p>(</span><span class=nb>object</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>pass</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>a</span> <span class=o>=</span> <span class=n>Demo</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=n>a</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=c1># &lt;__main__.Demo object at 0x00000000E70B1208&gt;</span>
+</span></span></code></pre></td></tr></table></div></div><p><strong>重写后：</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>class</span> <span class=nc>Demo</span><span class=p>(</span><span class=nb>object</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__repr__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=s2>&#34;I&#39;m a Demo.&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>a</span> <span class=o>=</span> <span class=n>Demo</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=n>a</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=c1># I&#39;m a Demo.</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=5-__str__显示对象属性>5. __str__（显示对象属性）</h3><p>该魔法方法和__repr__方法的功能是极为类似的，都是在查看属性时返回信息。
+<strong>不同之处</strong>：
+__repe__函数返回的信息是数据的元数据，一般供给程序员查看，通过object和repr（object）来调用；
+__str__函数返回的是经过转换过的数据，一般给用户查看，通过print (objects)来调用。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>class</span> <span class=nc>Demo</span><span class=p>(</span><span class=nb>object</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__str__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=s1>&#39;Demo&#39;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__repr__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=s1>&#39;demo&#39;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>a</span> <span class=o>=</span> <span class=n>Demo</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=nb>str</span><span class=p>(</span><span class=n>a</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=nb>repr</span><span class=p>(</span><span class=n>a</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>Demo
+</span></span></span><span class=line><span class=cl><span class=s2>demo
+</span></span></span><span class=line><span class=cl><span class=s2>&#34;&#34;&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><h1 id=三-对象间比较操作>三、 对象间比较操作</h1><div class=table-wrapper><table><thead><tr><th>魔法方法</th><th>比较方法</th></tr></thead><tbody><tr><td>__eq__</td><td>==</td></tr><tr><td>__ne__</td><td>!=</td></tr><tr><td>__ge__</td><td>>=</td></tr><tr><td>__gt__</td><td>></td></tr><tr><td>__le__</td><td>&lt;=</td></tr><tr><td>__lt__</td><td>&lt;</td></tr></tbody></table></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>class</span> <span class=nc>Demo</span><span class=p>(</span><span class=nb>object</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>name</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>name</span> <span class=o>=</span> <span class=n>name</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__eq__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>other</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=bp>self</span><span class=o>.</span><span class=n>name</span> <span class=o>==</span> <span class=n>other</span><span class=o>.</span><span class=n>name</span>
+</span></span><span class=line><span class=cl>	
+</span></span><span class=line><span class=cl>	<span class=k>def</span> <span class=fm>__ne__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>other</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=bp>self</span><span class=o>.</span><span class=n>name</span> <span class=o>!=</span> <span class=n>other</span><span class=o>.</span><span class=n>name</span>
+</span></span><span class=line><span class=cl>        
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__ge__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>other</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=bp>self</span><span class=o>.</span><span class=n>name</span> <span class=o>&gt;=</span> <span class=n>other</span><span class=o>.</span><span class=n>name</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__gt__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>other</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=bp>self</span><span class=o>.</span><span class=n>name</span> <span class=o>&gt;</span> <span class=n>other</span><span class=o>.</span><span class=n>name</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__lt__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>other</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=bp>self</span><span class=o>.</span><span class=n>name</span> <span class=o>&lt;</span> <span class=n>other</span><span class=o>.</span><span class=n>name</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__le__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>other</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=bp>self</span><span class=o>.</span><span class=n>name</span> <span class=o>&lt;=</span> <span class=n>other</span><span class=o>.</span><span class=n>name</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>a</span> <span class=o>=</span> <span class=n>Demo</span><span class=p>(</span><span class=s1>&#39;Python&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>b</span> <span class=o>=</span> <span class=n>Demo</span><span class=p>(</span><span class=s1>&#39;Java&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=n>a</span> <span class=o>==</span> <span class=n>b</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=n>a</span> <span class=o>&gt;=</span> <span class=n>b</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=n>a</span> <span class=o>&lt;=</span> <span class=n>b</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=n>a</span> <span class=o>&gt;</span> <span class=n>b</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=n>a</span> <span class=o>&lt;</span> <span class=n>b</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>False
+</span></span></span><span class=line><span class=cl><span class=s2>True
+</span></span></span><span class=line><span class=cl><span class=s2>False
+</span></span></span><span class=line><span class=cl><span class=s2>True
+</span></span></span><span class=line><span class=cl><span class=s2>False
+</span></span></span><span class=line><span class=cl><span class=s2>&#34;&#34;&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><p>如果我们想要完善方法，这样一个一个写是比较麻烦的，这个时候我们就可以引入一个外部装饰器来帮助我们完善类比较的方法。
+只要我们定义的类中有__ge__、__gt__、__lt__、__le__中任意一个魔法方法，就可以完善所有的方法。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=n>from</span> <span class=n>functools</span> <span class=n>import</span> <span class=n>total_ordering</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=err>@</span><span class=n>total_ordering</span>
+</span></span><span class=line><span class=cl><span class=n>class</span> <span class=nf>Demo</span><span class=p>(</span><span class=n>object</span><span class=p>)</span><span class=o>:</span>
+</span></span><span class=line><span class=cl>    <span class=n>def</span> <span class=nf>__init__</span><span class=p>(</span><span class=n>self</span><span class=p>,</span> <span class=n>name</span><span class=p>)</span><span class=o>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>self</span><span class=p>.</span><span class=n>name</span> <span class=o>=</span> <span class=n>name</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=n>def</span> <span class=nf>__eq__</span><span class=p>(</span><span class=n>self</span><span class=p>,</span> <span class=n>other</span><span class=p>)</span><span class=o>:</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=n>self</span><span class=p>.</span><span class=n>name</span> <span class=o>==</span> <span class=n>other</span><span class=p>.</span><span class=n>name</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=n>def</span> <span class=nf>__le__</span><span class=p>(</span><span class=n>self</span><span class=p>,</span> <span class=n>other</span><span class=p>)</span><span class=o>:</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span>  <span class=n>self</span><span class=p>.</span><span class=n>name</span> <span class=o>&lt;=</span> <span class=n>other</span><span class=p>.</span><span class=n>name</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>a</span> <span class=o>=</span> <span class=nf>Demo</span><span class=p>(</span><span class=err>&#39;</span><span class=n>Python</span><span class=err>&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>b</span> <span class=o>=</span> <span class=nf>Demo</span><span class=p>(</span><span class=err>&#39;</span><span class=n>Java</span><span class=err>&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nf>print</span><span class=p>(</span><span class=n>a</span> <span class=o>==</span> <span class=n>b</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nf>print</span><span class=p>(</span><span class=n>a</span> <span class=o>&gt;=</span> <span class=n>b</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nf>print</span><span class=p>(</span><span class=n>a</span> <span class=o>&lt;=</span> <span class=n>b</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nf>print</span><span class=p>(</span><span class=n>a</span> <span class=o>&gt;</span> <span class=n>b</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nf>print</span><span class=p>(</span><span class=n>a</span> <span class=o>&lt;</span> <span class=n>b</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=err>&#39;&#39;&#39;</span>
+</span></span><span class=line><span class=cl><span class=n>False</span>
+</span></span><span class=line><span class=cl><span class=n>True</span>
+</span></span><span class=line><span class=cl><span class=n>False</span>
+</span></span><span class=line><span class=cl><span class=n>True</span>
+</span></span><span class=line><span class=cl><span class=n>False</span>
+</span></span><span class=line><span class=cl><span class=err>&#39;&#39;&#39;</span>
+</span></span></code></pre></td></tr></table></div></div><blockquote><p>注意：在Python中，当我们只定义一个相反比较时只定义其中一个时，在进行比较时会自动取反。如果两个都定义了就分别调用两个方法。</p></blockquote><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>class</span> <span class=nc>Demo</span><span class=p>(</span><span class=nb>object</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>name</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>name</span> <span class=o>=</span> <span class=n>name</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__gt__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>other</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=nb>print</span><span class=p>(</span><span class=bp>self</span><span class=o>.</span><span class=n>name</span><span class=p>,</span> <span class=n>other</span><span class=o>.</span><span class=n>name</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=bp>self</span><span class=o>.</span><span class=n>name</span> <span class=o>&gt;</span> <span class=n>other</span><span class=o>.</span><span class=n>name</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>a</span> <span class=o>=</span> <span class=n>Demo</span><span class=p>(</span><span class=s1>&#39;Python&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>b</span> <span class=o>=</span> <span class=n>Demo</span><span class=p>(</span><span class=s1>&#39;Java&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=n>a</span> <span class=o>&gt;</span> <span class=n>b</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=n>a</span> <span class=o>&lt;</span> <span class=n>b</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>Python Java
+</span></span></span><span class=line><span class=cl><span class=s2>True
+</span></span></span><span class=line><span class=cl><span class=s2>Java Python
+</span></span></span><span class=line><span class=cl><span class=s2>False
+</span></span></span><span class=line><span class=cl><span class=s2>&#34;&#34;&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><h1 id=四运算符方法>四、运算符方法</h1><h3 id=1-运算符>1. 运算符</h3><p>可以通过重写下面的魔法方法使实例对象可以进行运算。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span><span class=lnt>62
+</span><span class=lnt>63
+</span><span class=lnt>64
+</span><span class=lnt>65
+</span><span class=lnt>66
+</span><span class=lnt>67
+</span><span class=lnt>68
+</span><span class=lnt>69
+</span><span class=lnt>70
+</span><span class=lnt>71
+</span><span class=lnt>72
+</span><span class=lnt>73
+</span><span class=lnt>74
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>class</span> <span class=nc>Demo</span><span class=p>(</span><span class=nb>object</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>num</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>num</span> <span class=o>=</span> <span class=n>num</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__add__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>other</span><span class=p>):</span>  <span class=c1># 加法</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=bp>self</span><span class=o>.</span><span class=n>num</span> <span class=o>+</span> <span class=n>other</span><span class=o>.</span><span class=n>num</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__sub__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>other</span><span class=p>):</span>  <span class=c1># 减法</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=bp>self</span><span class=o>.</span><span class=n>num</span> <span class=o>-</span> <span class=n>other</span><span class=o>.</span><span class=n>num</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__mul__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>other</span><span class=p>):</span>  <span class=c1># 乘法</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=bp>self</span><span class=o>.</span><span class=n>num</span> <span class=o>*</span> <span class=n>other</span><span class=o>.</span><span class=n>num</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__truediv__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>other</span><span class=p>):</span>  <span class=c1># 除法</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=bp>self</span><span class=o>.</span><span class=n>num</span> <span class=o>/</span> <span class=n>other</span><span class=o>.</span><span class=n>num</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__floordiv__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>other</span><span class=p>):</span>  <span class=c1># 整除</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=bp>self</span><span class=o>.</span><span class=n>num</span> <span class=o>//</span> <span class=n>other</span><span class=o>.</span><span class=n>num</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__mod__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>other</span><span class=p>):</span>  <span class=c1># 取余</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=bp>self</span><span class=o>.</span><span class=n>num</span> <span class=o>%</span> <span class=n>other</span><span class=o>.</span><span class=n>num</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__pow__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>power</span><span class=p>,</span> <span class=n>modulo</span><span class=o>=</span><span class=kc>None</span><span class=p>):</span>  <span class=c1># 幂运算</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=bp>self</span><span class=o>.</span><span class=n>num</span> <span class=o>**</span> <span class=n>power</span><span class=o>.</span><span class=n>num</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__divmod__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>other</span><span class=p>):</span>  <span class=c1># divmod()</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=nb>divmod</span><span class=p>(</span><span class=bp>self</span><span class=o>.</span><span class=n>num</span><span class=p>,</span> <span class=n>other</span><span class=o>.</span><span class=n>num</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__lshift__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>other</span><span class=p>):</span>  <span class=c1># 左移</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=bp>self</span><span class=o>.</span><span class=n>num</span> <span class=o>&lt;&lt;</span> <span class=n>other</span><span class=o>.</span><span class=n>num</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__rshift__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>other</span><span class=p>):</span>  <span class=c1># 右移</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=bp>self</span><span class=o>.</span><span class=n>num</span> <span class=o>&gt;&gt;</span> <span class=n>other</span><span class=o>.</span><span class=n>num</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__and__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>other</span><span class=p>):</span>  <span class=c1># 按位与</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=bp>self</span><span class=o>.</span><span class=n>num</span> <span class=o>&amp;</span> <span class=n>other</span><span class=o>.</span><span class=n>num</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__or__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>other</span><span class=p>):</span>  <span class=c1># 按位或</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=bp>self</span><span class=o>.</span><span class=n>num</span> <span class=o>|</span> <span class=n>other</span><span class=o>.</span><span class=n>num</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__xor__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>other</span><span class=p>):</span>  <span class=c1># 按位异或</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=bp>self</span><span class=o>.</span><span class=n>num</span> <span class=o>^</span> <span class=n>other</span><span class=o>.</span><span class=n>num</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>a</span> <span class=o>=</span> <span class=n>Demo</span><span class=p>(</span><span class=mi>2</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>b</span> <span class=o>=</span> <span class=n>Demo</span><span class=p>(</span><span class=mi>3</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=n>a</span> <span class=o>+</span> <span class=n>b</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=n>a</span> <span class=o>-</span> <span class=n>b</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=n>a</span> <span class=o>*</span> <span class=n>b</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=n>a</span> <span class=o>/</span> <span class=n>b</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=n>a</span> <span class=o>//</span> <span class=n>b</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=n>a</span> <span class=o>%</span> <span class=n>b</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=n>a</span> <span class=o>**</span> <span class=n>b</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=nb>divmod</span><span class=p>(</span><span class=n>a</span><span class=p>,</span> <span class=n>b</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=n>a</span> <span class=o>&lt;&lt;</span> <span class=n>b</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=n>a</span> <span class=o>&gt;&gt;</span> <span class=n>b</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=n>a</span> <span class=o>&amp;</span> <span class=n>b</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=n>a</span> <span class=o>|</span> <span class=n>b</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=n>a</span> <span class=o>^</span> <span class=n>b</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>5
+</span></span></span><span class=line><span class=cl><span class=s2>-1
+</span></span></span><span class=line><span class=cl><span class=s2>6
+</span></span></span><span class=line><span class=cl><span class=s2>0.6666666666666666
+</span></span></span><span class=line><span class=cl><span class=s2>0
+</span></span></span><span class=line><span class=cl><span class=s2>2
+</span></span></span><span class=line><span class=cl><span class=s2>8
+</span></span></span><span class=line><span class=cl><span class=s2>(0, 2)
+</span></span></span><span class=line><span class=cl><span class=s2>16
+</span></span></span><span class=line><span class=cl><span class=s2>0
+</span></span></span><span class=line><span class=cl><span class=s2>2
+</span></span></span><span class=line><span class=cl><span class=s2>3
+</span></span></span><span class=line><span class=cl><span class=s2>1
+</span></span></span><span class=line><span class=cl><span class=s2>&#34;&#34;&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=2-反运算符>2. 反运算符</h3><p>在运算符魔法方法前加一个 <strong>r</strong> 即构成反运算符方法。
+例如：
+在 a + b 时，如果a有 __add__() 方法，那么就执行 a.__add__(b) 操作；如果 a 没有 __add__() 魔法方法，就调用 b的 __radd__() 方法，执行 b.__radd__(a) 操作；如果以上条件都不满足，则抛出 TypeError。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>class</span> <span class=nc>Demo</span><span class=p>(</span><span class=nb>object</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>num</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>num</span> <span class=o>=</span> <span class=n>num</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__radd__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>other</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=nb>print</span><span class=p>(</span><span class=bp>self</span><span class=o>.</span><span class=n>num</span><span class=p>,</span> <span class=n>other</span><span class=o>.</span><span class=n>num</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=bp>self</span><span class=o>.</span><span class=n>num</span> <span class=o>+</span> <span class=n>other</span><span class=o>.</span><span class=n>num</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>class</span> <span class=nc>De</span><span class=p>(</span><span class=nb>object</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>num</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>num</span> <span class=o>=</span> <span class=n>num</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>a</span> <span class=o>=</span> <span class=n>Demo</span><span class=p>(</span><span class=mi>2</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>b</span> <span class=o>=</span> <span class=n>De</span><span class=p>(</span><span class=mi>3</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=n>b</span> <span class=o>+</span> <span class=n>a</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>2 3
+</span></span></span><span class=line><span class=cl><span class=s2>5
+</span></span></span><span class=line><span class=cl><span class=s2>&#34;&#34;&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=3-增量赋值运算符>3. 增量赋值运算符</h3><p>在运算符前面加一个 <strong>i</strong>即可实现增量赋值运算。
+例如：
+i</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>class</span> <span class=nc>Demo</span><span class=p>(</span><span class=nb>object</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>num</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>num</span> <span class=o>=</span> <span class=n>num</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__iadd__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>other</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=bp>self</span><span class=o>.</span><span class=n>num</span> <span class=o>+</span> <span class=n>other</span><span class=o>.</span><span class=n>num</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>a</span> <span class=o>=</span> <span class=n>Demo</span><span class=p>(</span><span class=mi>2</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>b</span> <span class=o>=</span> <span class=n>Demo</span><span class=p>(</span><span class=mi>3</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>a</span> <span class=o>+=</span> <span class=n>b</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=n>a</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>5
+</span></span></span><span class=line><span class=cl><span class=s2>&#34;&#34;&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=4-一元操作符>4. 一元操作符</h3><p>下列方法可以实现一元操作。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>class</span> <span class=nc>Demo</span><span class=p>(</span><span class=nb>object</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>num</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>num</span> <span class=o>=</span> <span class=n>num</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__pos__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=nb>abs</span><span class=p>(</span><span class=bp>self</span><span class=o>.</span><span class=n>num</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__neg__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=o>-</span><span class=bp>self</span><span class=o>.</span><span class=n>num</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__abs__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=nb>abs</span><span class=p>(</span><span class=bp>self</span><span class=o>.</span><span class=n>num</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__invert__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=o>~</span><span class=bp>self</span><span class=o>.</span><span class=n>num</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>a</span> <span class=o>=</span> <span class=n>Demo</span><span class=p>(</span><span class=mi>2</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=o>+</span><span class=n>a</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=o>-</span><span class=n>a</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=nb>abs</span><span class=p>(</span><span class=n>a</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=o>~</span><span class=n>a</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>2
+</span></span></span><span class=line><span class=cl><span class=s2>-2
+</span></span></span><span class=line><span class=cl><span class=s2>2
+</span></span></span><span class=line><span class=cl><span class=s2>-3
+</span></span></span><span class=line><span class=cl><span class=s2>&#34;&#34;&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><h1 id=五描述符>五、描述符</h1><p>关于描述符的介绍可以参照下面这位大佬的文章：
+<a class=link href=https://www.cnblogs.com/Jimmy1988/p/6808237.html target=_blank rel=noopener>大佬的文章</a></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>class</span> <span class=nc>Demo</span><span class=p>(</span><span class=nb>object</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>name</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>name</span> <span class=o>=</span> <span class=n>name</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__get__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>instance</span><span class=p>,</span> <span class=n>owner</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=nb>print</span><span class=p>(</span><span class=s1>&#39;get&#39;</span><span class=p>,</span> <span class=n>instance</span><span class=p>,</span> <span class=n>owner</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__set__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>instance</span><span class=p>,</span> <span class=n>value</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=nb>print</span><span class=p>(</span><span class=s1>&#39;set&#39;</span><span class=p>,</span> <span class=n>instance</span><span class=p>,</span> <span class=n>value</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__delete__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>instance</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=nb>print</span><span class=p>(</span><span class=s1>&#39;delete&#39;</span><span class=p>,</span> <span class=n>instance</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>class</span> <span class=nc>demo</span><span class=p>(</span><span class=nb>object</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=n>x</span> <span class=o>=</span> <span class=n>Demo</span><span class=p>(</span><span class=s1>&#39;Python&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>a</span> <span class=o>=</span> <span class=n>demo</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=n>a</span><span class=o>.</span><span class=n>x</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>a</span><span class=o>.</span><span class=n>x</span> <span class=o>=</span> <span class=mi>1</span>
+</span></span><span class=line><span class=cl><span class=k>del</span> <span class=n>a</span><span class=o>.</span><span class=n>x</span>
+</span></span></code></pre></td></tr></table></div></div><h1 id=六容器操作>六、容器操作</h1><h3 id=1-__len__获取对象长度>1. __len__（获取对象长度）</h3><p>使用 len() 函数时会调用该魔法方法。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>class</span> <span class=nc>Demo</span><span class=p>(</span><span class=nb>object</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>name</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>name</span> <span class=o>=</span> <span class=n>name</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__len__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=nb>len</span><span class=p>(</span><span class=bp>self</span><span class=o>.</span><span class=n>name</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>a</span> <span class=o>=</span> <span class=n>Demo</span><span class=p>(</span><span class=s1>&#39;Python&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=nb>len</span><span class=p>(</span><span class=n>a</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=c1># 6</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=2-__iter__定义迭代器>2. __iter__（定义迭代器）</h3><p>用该方法创建一个迭代器对象。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>class</span> <span class=nc>Demo</span><span class=p>(</span><span class=nb>object</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>data</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>data</span> <span class=o>=</span> <span class=n>data</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__iter__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=bp>self</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__next__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>data</span> <span class=o>+=</span> <span class=mi>1</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=bp>self</span><span class=o>.</span><span class=n>data</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>a</span> <span class=o>=</span> <span class=nb>iter</span><span class=p>(</span><span class=n>Demo</span><span class=p>(</span><span class=mi>1</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=nb>next</span><span class=p>(</span><span class=n>a</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=nb>next</span><span class=p>(</span><span class=n>a</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=c1># 2</span>
+</span></span><span class=line><span class=cl><span class=c1># 3</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=3-对容器指定元素的操作>3. 对容器指定元素的操作</h3><p>对容器内指定元素操作时调用下列方法（字典操作）。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>class</span> <span class=nc>Demo</span><span class=p>(</span><span class=nb>object</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__getitem__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>item</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=nb>print</span><span class=p>(</span><span class=s1>&#39;__getitem__&#39;</span><span class=p>,</span> <span class=n>item</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__setitem__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>key</span><span class=p>,</span> <span class=n>value</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=nb>print</span><span class=p>(</span><span class=s1>&#39;__setitem__&#39;</span><span class=p>,</span> <span class=n>key</span><span class=p>,</span> <span class=n>value</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__delitem__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>key</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=nb>print</span><span class=p>(</span><span class=s1>&#39;__delitem__&#39;</span><span class=p>,</span> <span class=n>key</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>a</span> <span class=o>=</span> <span class=n>Demo</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=n>a</span><span class=p>[</span><span class=s1>&#39;a&#39;</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>a</span><span class=p>[</span><span class=s1>&#39;b&#39;</span><span class=p>]</span> <span class=o>=</span> <span class=mi>123</span>
+</span></span><span class=line><span class=cl><span class=k>del</span> <span class=n>a</span><span class=p>[</span><span class=s1>&#39;c&#39;</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=s2>&#34;&#34;&#34;
+</span></span></span><span class=line><span class=cl><span class=s2>__getitem__ a
+</span></span></span><span class=line><span class=cl><span class=s2>__setitem__ b 123
+</span></span></span><span class=line><span class=cl><span class=s2>__delitem__ c
+</span></span></span><span class=line><span class=cl><span class=s2>&#34;&#34;&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=4-__reversed__反转>4. __reversed__（反转）</h3><p>当调用 <strong>reversed()</strong> 函数时调用该魔法方法。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>class</span> <span class=nc>Demo</span><span class=p>(</span><span class=nb>object</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>name</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>name</span> <span class=o>=</span> <span class=n>name</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__reversed__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=bp>self</span><span class=o>.</span><span class=n>name</span><span class=p>[::</span><span class=o>-</span><span class=mi>1</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>a</span> <span class=o>=</span> <span class=n>Demo</span><span class=p>(</span><span class=s1>&#39;Python&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=nb>reversed</span><span class=p>(</span><span class=n>a</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=c1># nohtyP</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=5-__contains__判断元素位置>5. __contains__（判断元素位置）</h3><p>当调用 <strong>in</strong> 或者 <strong>not in</strong> 判断元素是否在对象中时会调用该魔法方法。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>class</span> <span class=nc>Demo</span><span class=p>(</span><span class=nb>object</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>name</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>name</span> <span class=o>=</span> <span class=n>name</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__contains__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>item</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=n>item</span> <span class=ow>in</span> <span class=bp>self</span><span class=o>.</span><span class=n>name</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>a</span> <span class=o>=</span> <span class=n>Demo</span><span class=p>(</span><span class=s1>&#39;Python&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=s1>&#39;P&#39;</span> <span class=ow>in</span> <span class=n>a</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=s1>&#39;P&#39;</span> <span class=ow>not</span> <span class=ow>in</span> <span class=n>a</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><h1 id=七with语句>七、with语句</h1><p>with语句是Python中的上下文管理器，可以利用魔法方法来实现自定义。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>class</span> <span class=nc>Demo</span><span class=p>(</span><span class=nb>object</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__enter__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=nb>print</span><span class=p>(</span><span class=s2>&#34;start&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=bp>self</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__exit__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>exc_type</span><span class=p>,</span> <span class=n>exc_val</span><span class=p>,</span> <span class=n>exc_tb</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=nb>print</span><span class=p>(</span><span class=s1>&#39;end&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=nb>print</span><span class=p>(</span><span class=n>exc_type</span><span class=p>,</span> <span class=n>exc_val</span><span class=p>,</span> <span class=n>exc_tb</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=bp>self</span><span class=o>.</span><span class=n>name</span> <span class=o>=</span> <span class=s1>&#39;Python&#39;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>a</span> <span class=o>=</span> <span class=n>Demo</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=k>with</span> <span class=n>a</span> <span class=k>as</span> <span class=n>b</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=nb>print</span><span class=p>(</span><span class=n>b</span><span class=o>.</span><span class=n>name</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=s1>&#39;&#39;&#39;
+</span></span></span><span class=line><span class=cl><span class=s1>start
+</span></span></span><span class=line><span class=cl><span class=s1>Python
+</span></span></span><span class=line><span class=cl><span class=s1>end
+</span></span></span><span class=line><span class=cl><span class=s1>None None None
+</span></span></span><span class=line><span class=cl><span class=s1>&#39;&#39;&#39;</span>
+</span></span><span class=line><span class=cl><span class=k>with</span> <span class=n>a</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=k>raise</span> <span class=ne>ImportError</span>
+</span></span><span class=line><span class=cl><span class=s1>&#39;&#39;&#39;
+</span></span></span><span class=line><span class=cl><span class=s1>start
+</span></span></span><span class=line><span class=cl><span class=s1>end
+</span></span></span><span class=line><span class=cl><span class=s1>&lt;class &#39;ImportError&#39;&gt;  &lt;traceback object at 0x0000026C1C391F88&gt;
+</span></span></span><span class=line><span class=cl><span class=s1>&#39;&#39;&#39;</span>
+</span></span></code></pre></td></tr></table></div></div><p>__enter__()方法管理上文（即开始时刻），__exit__()方法管理下文（即退出时刻）。
+__enter__()方法的返回值可以通过as语句接收；
+__exit__()方法的参数<strong>exc_type, exc_val, exc_tb</strong>用以接收异常类型，异常值，异常跟踪信息。当没有异常时三个参数都为<strong>None</strong>。</p></section><script src=https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js></script><script>mermaid.initialize({startOnLoad:!0}),document.addEventListener("DOMContentLoaded",function(){var e=document.querySelectorAll("pre code.language-mermaid");e.forEach(function(e){var n,t=document.createElement("div");t.className="mermaid",t.innerHTML=e.textContent,n=e.parentElement,n.parentNode.replaceChild(t,n)})})</script><footer class=article-footer><section class=article-copyright><svg class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg>
+<span>Licensed under CC BY-NC-SA 4.0</span></section></footer><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css integrity=sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV crossorigin=anonymous><script src=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js integrity=sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8 crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js integrity=sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05 crossorigin=anonymous defer></script><script>window.addEventListener("DOMContentLoaded",()=>{renderMathInElement(document.body,{delimiters:[{left:"$$",right:"$$",display:!0},{left:"$",right:"$",display:!1},{left:"\\(",right:"\\)",display:!1},{left:"\\[",right:"\\]",display:!0}],ignoredClasses:["gist"]})})</script></article><aside class=related-content--wrapper><h2 class=section-title>相关文章</h2><div class=related-content><div class="flex article-list--tile"><article><a href=/blog/p/python%E7%94%A8whl%E6%96%87%E4%BB%B6%E5%AE%89%E8%A3%85%E5%A4%96%E9%83%A8%E6%A8%A1%E5%9D%97/><div class=article-details><h2 class=article-title>Python用whl文件安装外部模块</h2></div></a></article><article><a href=/blog/p/django-%E6%9D%A1%E4%BB%B6%E8%BF%87%E6%BB%A4%E6%9F%A5%E8%AF%A2/><div class=article-details><h2 class=article-title>Django 条件过滤查询</h2></div></a></article><article><a href=/blog/p/django-%E6%A8%A1%E5%9E%8B%E5%AD%97%E6%AE%B5%E8%AF%B4%E6%98%8E/><div class=article-details><h2 class=article-title>Django 模型字段说明</h2></div></a></article><article><a href=/blog/p/django%E5%B0%86%E6%8E%A7%E5%88%B6%E5%8F%B0%E8%BE%93%E5%87%BA%E9%87%8D%E5%AE%9A%E5%90%91%E8%87%B3%E6%96%87%E4%BB%B6/><div class=article-details><h2 class=article-title>Django将控制台输出重定向至文件</h2></div></a></article><article><a href=/blog/p/pyqt5-%E4%BD%BF%E7%94%A8%E5%A4%9A%E4%B8%AA%E6%A7%BD%E5%87%BD%E6%95%B0%E6%97%B6%E7%A8%8B%E5%BA%8F%E5%8D%A1%E6%AD%BB/><div class=article-details><h2 class=article-title>PyQt5 使用多个槽函数时程序卡死</h2></div></a></article></div></div></aside><footer class=site-footer><section class=copyright>&copy;
+2020 -
+2025 Wlynxg's Blog</section><section class=powerby>使用 <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> 构建<br>主题 <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.29.0>Stack</a></b> 由 <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a> 设计</section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/blog/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>

@@ -1,0 +1,1832 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><follow_challenge><feedId>77250260013802496</feedId><userId>42117541714060288</userId></follow_challenge><title>数据分析 on Wlynxg's Blog</title><link>https://wlynxg.github.io/blog/categories/%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90/</link><description>Recent content in 数据分析 on Wlynxg's Blog</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Thu, 16 May 2024 11:09:11 +0800</lastBuildDate><atom:link href="https://wlynxg.github.io/blog/categories/%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90/index.xml" rel="self" type="application/rss+xml"/><item><title>Keras 中 model.evaluate 和 model.predict 的区别</title><link>https://wlynxg.github.io/blog/p/keras-%E4%B8%AD-model.evaluate-%E5%92%8C-model.predict-%E7%9A%84%E5%8C%BA%E5%88%AB/</link><pubDate>Thu, 02 Mar 2023 09:55:21 +0800</pubDate><guid>https://wlynxg.github.io/blog/p/keras-%E4%B8%AD-model.evaluate-%E5%92%8C-model.predict-%E7%9A%84%E5%8C%BA%E5%88%AB/</guid><description>&lt;h1 id="keras-中-modelevaluate-和-modelpredict-的区别">Keras 中 model.evaluate 和 model.predict 的区别
+&lt;/h1>&lt;h2 id="modeevaluate">mode.evaluate
+&lt;/h2>&lt;p>&lt;strong>官方声明：&lt;/strong>&lt;a class="link" href="https://keras.io/api/models/model_training_apis/#evaluate-method" target="_blank" rel="noopener"
+>传送门&lt;/a>&lt;/p>
+&lt;p>&lt;strong>输入参数：&lt;/strong>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="n">evaluate&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">x&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">None&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">y&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">None&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">batch_size&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">None&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">verbose&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">sample_weight&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">None&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">steps&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">None&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">callbacks&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">None&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">max_queue_size&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">10&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">workers&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">use_multiprocessing&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">False&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>x：输入数据&lt;/li>
+&lt;li>y：输入标签&lt;/li>
+&lt;li>batch_size：批次大小&lt;/li>
+&lt;li>verbose：0不显示进度条，1为显示进度条&lt;/li>
+&lt;li>sample_weight：测试样本的可选Numpy权重数组，用于对损失函数加权&lt;/li>
+&lt;li>steps：样本批次&lt;/li>
+&lt;li>callbacks：评估期间需要应用的回调列表&lt;/li>
+&lt;li>max_queue_size：生成器队列的最大大小&lt;/li>
+&lt;li>workers：执行期间使用的进程数&lt;/li>
+&lt;li>use_multiprocessing：如果为&lt;code>True&lt;/code>，则使用基于进程的线程&lt;/li>
+&lt;/ul>
+&lt;p>&lt;strong>返回值：&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>损失值：网络在训练数据上的损失（预测值和实际值之间的差距），该值和编译模型时选择的损失有关&lt;/li>
+&lt;li>精度：准确率（成功数量与总数据量的比值）&lt;/li>
+&lt;li>返回格式：&lt;code>['loss', 'accuracy']&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>可以通过打印 model.metrics_names 来查看&lt;/p>
+&lt;h2 id="modepredict">mode.predict
+&lt;/h2>&lt;p>&lt;strong>官方文档：&lt;/strong>&lt;a class="link" href="https://keras.io/api/models/model_training_apis/#predict-method" target="_blank" rel="noopener"
+>传送门&lt;/a>&lt;/p>
+&lt;p>&lt;strong>输入参数：&lt;/strong>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="n">predict&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">x&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">batch_size&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">None&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">verbose&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">steps&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">None&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">callbacks&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">None&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">max_queue_size&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">10&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">workers&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">use_multiprocessing&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">False&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>x：输入数据&lt;/li>
+&lt;li>others：同上&lt;/li>
+&lt;/ul>
+&lt;p>&lt;strong>返回值：&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>输出输入数据的预测结果，需要自己手动比较&lt;/li>
+&lt;/ul></description></item><item><title>numpy 常用函数与方法</title><link>https://wlynxg.github.io/blog/p/numpy-%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0%E4%B8%8E%E6%96%B9%E6%B3%95/</link><pubDate>Thu, 02 Mar 2023 09:55:21 +0800</pubDate><guid>https://wlynxg.github.io/blog/p/numpy-%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0%E4%B8%8E%E6%96%B9%E6%B3%95/</guid><description>&lt;h2 id="1-比较运算符">1. 比较运算符
+&lt;/h2>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>符号&lt;/th>
+&lt;th>函数&lt;/th>
+&lt;th>含义&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&amp;gt;&lt;/td>
+&lt;td>np.greater(arr1, arr2)&lt;/td>
+&lt;td>判断 arr1 的元素是否大于 arr2 的&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&amp;gt;=&lt;/td>
+&lt;td>np.greater_equal(arr1, arr2)&lt;/td>
+&lt;td>判断 arr1 的元素是否大于等于 arr2 的&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&amp;lt;&lt;/td>
+&lt;td>np.less(arr1, arr2)&lt;/td>
+&lt;td>判断 arr1 的元素是否小于 arr2 的&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&amp;lt;=&lt;/td>
+&lt;td>np.less_equal(arr1, arr2)&lt;/td>
+&lt;td>判断 arr1 的元素是否小于等于 arr2 的&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>==&lt;/td>
+&lt;td>bp.equal(arr1, arr2)&lt;/td>
+&lt;td>判断 arr1 的元素是否等于 arr2 的&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>!=&lt;/td>
+&lt;td>np.not_equal(arr1, arr2)&lt;/td>
+&lt;td>判断 arr1 的元素是否不等于 arr2 的&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="2-常用数学函数">2. 常用数学函数
+&lt;/h2>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>函数&lt;/th>
+&lt;th>函数说明&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>np.pi&lt;/td>
+&lt;td>常数Π&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>np.e&lt;/td>
+&lt;td>常数e&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>np.fabs(arr)&lt;/td>
+&lt;td>计算各元素的浮点型绝对值&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>np.ceil(arr)&lt;/td>
+&lt;td>对各元素向上取整&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>np.floor(arr)&lt;/td>
+&lt;td>对各元素向下取整&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>np.round(arr)&lt;/td>
+&lt;td>对各元素四舍五入&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>np.fmod(arr1, arr2)&lt;/td>
+&lt;td>计算 arr1 / arr2 的余数&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>np.modf(arr)&lt;/td>
+&lt;td>返回数组元素小数部分和整数部分&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>np.sqrt(arr)&lt;/td>
+&lt;td>计算各元素的算术平方根&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>np.square(arr)&lt;/td>
+&lt;td>计算各元素的平方根&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>np.exp(arr)&lt;/td>
+&lt;td>计算以 e 为底的指数&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>np.power(arr, α)&lt;/td>
+&lt;td>计算各元素的指数&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>np.log2(arr)&lt;/td>
+&lt;td>计算以 2 为底各元素的对数&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>np.log10(arr)&lt;/td>
+&lt;td>计算以 10 为底各元素的对数&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>np.log(arr)&lt;/td>
+&lt;td>计算以 e 为底各元素的对数&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="3-统计函数">3. 统计函数
+&lt;/h2>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>函数&lt;/th>
+&lt;th>函数说明&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>np.min(arr, axis)&lt;/td>
+&lt;td>按照轴的方向计算最小值&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>np.max(arr, axis)&lt;/td>
+&lt;td>按照轴的方向计算最大值&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>np.mean(arr, axis)&lt;/td>
+&lt;td>按照轴的方向计算均值&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>np.median(arr, axis)&lt;/td>
+&lt;td>按照轴的方向计算中位数&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>np.sum(arr, axis)&lt;/td>
+&lt;td>按照轴的方向计算和&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>np.std(arr, axis)&lt;/td>
+&lt;td>按照轴的方向计算标准差&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>np.var(arr, axis)&lt;/td>
+&lt;td>按照轴的方向计算方差&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>np.cumsum(arr, axis)&lt;/td>
+&lt;td>按照轴的方向计算累计和&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>np.cumprod(arr, axis)&lt;/td>
+&lt;td>按照轴的方向计算累计乘积&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>np.argmin(arr, axis)&lt;/td>
+&lt;td>按照轴的方向计算最小值所在的位置&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>np.argmax(arr, axis)&lt;/td>
+&lt;td>按照轴的方向计算最大值所在的位置&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>np.corrcoef(arr)&lt;/td>
+&lt;td>计算皮尔逊相关系数&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>np.cov(arr)&lt;/td>
+&lt;td>计算协方差矩阵&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>&lt;strong>注：axis=1时按水平方向计算，为0时按垂直方向计算&lt;/strong>&lt;/p>
+&lt;h2 id="4-线性代数相关计算">4. 线性代数相关计算
+&lt;/h2>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>函数&lt;/th>
+&lt;th>函数说明&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>np.zeros&lt;/td>
+&lt;td>生成零矩阵&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>np.eye&lt;/td>
+&lt;td>生成单位矩阵&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>np.dot&lt;/td>
+&lt;td>计算两个数组的点积&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>np.diag&lt;/td>
+&lt;td>矩阵主对角线与一维数组间的转换&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>np.ones&lt;/td>
+&lt;td>生成所有元素为 1 的矩阵&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>po.transpose&lt;/td>
+&lt;td>矩阵转置&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>np.inner&lt;/td>
+&lt;td>计算两个数组的内积&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>np.trace&lt;/td>
+&lt;td>矩阵主对角线元素的和&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>np.linalg.det&lt;/td>
+&lt;td>计算矩阵行列式&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>np.linalg.eigvals&lt;/td>
+&lt;td>计算方阵特征根&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>np.linalg.pinv&lt;/td>
+&lt;td>计算方阵的 Moore-Penrose 伪逆&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>np.linalg.lstsq&lt;/td>
+&lt;td>计算 Ax=b 的最小二乘解&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>np.linalg.svd&lt;/td>
+&lt;td>计算奇异值分解&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>np.linalg.eig&lt;/td>
+&lt;td>计算矩阵特征根与特征向量&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>np.linalg.inv&lt;/td>
+&lt;td>计算方阵的逆&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>np.linalg.solve&lt;/td>
+&lt;td>计算 Ax=b 的线性方程组解&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>np.linalg.qr&lt;/td>
+&lt;td>计算 QR 分解&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>np.linalg.norm&lt;/td>
+&lt;td>计算向量或矩阵的范数&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="5-伪随机数的生成">5. 伪随机数的生成
+&lt;/h2>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>函数&lt;/th>
+&lt;th>函数说明&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>seed(n)&lt;/td>
+&lt;td>设置随机数种子&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>beta(a, b, size=None)&lt;/td>
+&lt;td>生成 β 分布随机数&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>chisquare(df, size=None)&lt;/td>
+&lt;td>生成卡方分布随机数&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>choice(a, size=None, replace=True, p=None)&lt;/td>
+&lt;td>从 a 中有放回地随机挑选指定数量地样本&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>exponential(scale=1.0, size=None)&lt;/td>
+&lt;td>生成指数分布随机数&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>f(dfnum, dfden, size=None)&lt;/td>
+&lt;td>生成 F 分布随机数&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>gamma(shape, scale=1.0, size=None)&lt;/td>
+&lt;td>生成 Γ 分布随机数&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>geometric(p, size=None)&lt;/td>
+&lt;td>生成几何分布随机数&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>hypergeometric(ngood, nbad, nsample, size=None)&lt;/td>
+&lt;td>生成超几何分布随机数&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>laplace(loc=0.0, scale=1.0, size=None)&lt;/td>
+&lt;td>生成拉普拉斯分布随机数&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>logistic(loc=0.0, scale=1.0, size=None)&lt;/td>
+&lt;td>生成 Logistic 分布随机数&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>lognormal(mean=0.0, sigma=1.0, size=None)&lt;/td>
+&lt;td>生成对数正态分布随机数&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>negative_binomial(n, p, size=None)&lt;/td>
+&lt;td>生成负二项分布随机数&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>multinomial(n, pvals, size=None)&lt;/td>
+&lt;td>生成多项分布随机数&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>multivariate_normal(mean, cov[, size])&lt;/td>
+&lt;td>生成多元正态分布随机数&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>normal(loc=0.0, scale=1.0, size=None)&lt;/td>
+&lt;td>生成正态分布随机数&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>pareto(a, size=None)&lt;/td>
+&lt;td>生成帕累托分布随机数&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>poisson(lam=1.0, size=None)&lt;/td>
+&lt;td>生成泊松分布随机数&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>rand(d0, d1, .., dn)&lt;/td>
+&lt;td>生成 n 维的均匀分布随机数&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>randn(d0, d1, &amp;hellip;, dn)&lt;/td>
+&lt;td>生成 n 维的标准正态分布随机数&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>randint(low, high=None, size=None, dtype=&amp;lsquo;1&amp;rsquo;)&lt;/td>
+&lt;td>生成指定范围的随机整数&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>random_sample(size=None)&lt;/td>
+&lt;td>生成 [0, 1) 的随机数&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>standard_t(df, size=None)&lt;/td>
+&lt;td>生成标准的 t 分布随机数&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>uniform(low=0.0, high=1.0, size=None)&lt;/td>
+&lt;td>生成指定范围的均匀分布随机数&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>wald(mean, scale, size=None)&lt;/td>
+&lt;td>生成 Wald 分布随机数&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>weibull(a, size=None)&lt;/td>
+&lt;td>生成 Weibull 分布随机数&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>&lt;strong>注：以上随机数生成函数位于 numpy 模块的 random 子模块&lt;/strong>&lt;/p>
+&lt;h2 id="6-其它常用函数">6. 其它常用函数
+&lt;/h2>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>函数&lt;/th>
+&lt;th>函数说明&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>arange&lt;/td>
+&lt;td>类似于 Python 的内建函数 range&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>array&lt;/td>
+&lt;td>构造数组对象&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>ix_&lt;/td>
+&lt;td>构造数组索引&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>genfromtxt&lt;/td>
+&lt;td>读取文本文件数据的函数&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>shape&lt;/td>
+&lt;td>返回数组形状&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>ndim&lt;/td>
+&lt;td>返回数组维数&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>size&lt;/td>
+&lt;td>返回数组元素个数&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>dtype&lt;/td>
+&lt;td>返回数组数据类型&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>reshape&lt;/td>
+&lt;td>重塑数组形状&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>resize&lt;/td>
+&lt;td>重塑数组形状&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>flatten&lt;/td>
+&lt;td>将多维数组降为一维数组&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>ravel&lt;/td>
+&lt;td>将多维数组降为一维数组&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>vstack、row_stack&lt;/td>
+&lt;td>数组的垂直堆叠函数&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>hstack、column_stack&lt;/td>
+&lt;td>数组的水平合并函数&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>where&lt;/td>
+&lt;td>类似于 Excel 的 if 函数&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table></description></item><item><title>pandas 常用函数与方法</title><link>https://wlynxg.github.io/blog/p/pandas-%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0%E4%B8%8E%E6%96%B9%E6%B3%95/</link><pubDate>Thu, 02 Mar 2023 09:55:21 +0800</pubDate><guid>https://wlynxg.github.io/blog/p/pandas-%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0%E4%B8%8E%E6%96%B9%E6%B3%95/</guid><description>&lt;h1 id="pandas-常用函数与方法">pandas 常用函数与方法
+&lt;/h1>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>函数或方法&lt;/th>
+&lt;th>说明&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;strong>Series&lt;/strong>&lt;/td>
+&lt;td>构造序列类型对象&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>DataFrame&lt;/strong>&lt;/td>
+&lt;td>构造数据框类型对象&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>read_table&lt;/td>
+&lt;td>读取文本文件的函数，支持txt、csv等格式&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>read_csv&lt;/td>
+&lt;td>读取文本文件的函数，支持txt、csv等格式&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>read_excel&lt;/td>
+&lt;td>读取电子表格&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>read_sql&lt;/td>
+&lt;td>读取数据库数据的函数&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>head/tail&lt;/td>
+&lt;td>显示数据框首/末几行数据&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>shape&lt;/td>
+&lt;td>返回数据框行列数&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>dtypes&lt;/td>
+&lt;td>返回数据框中各变量数据类型&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>to_datetime&lt;/td>
+&lt;td>将变量转换为日期时间类型&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>astype&lt;/td>
+&lt;td>将变量转换为其他类型&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>describe&lt;/td>
+&lt;td>统计性描述&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>colums&lt;/td>
+&lt;td>返回数据框变量名&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>index&lt;/td>
+&lt;td>返回数据框索引&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>apply&lt;/td>
+&lt;td>对序列或数据框进行映射&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>value_counts&lt;/td>
+&lt;td>统计序列值频次&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>reset_index&lt;/td>
+&lt;td>将行索引转换为变量&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>duplicated&lt;/td>
+&lt;td>检验观测是否重复&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>drop_duplicates&lt;/td>
+&lt;td>删除重复项&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>drop&lt;/td>
+&lt;td>删除变量名或观测&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>dropna&lt;/td>
+&lt;td>删除缺失值&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>fillna&lt;/td>
+&lt;td>填充缺失值&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>quantile&lt;/td>
+&lt;td>统计序列分位数&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>plot&lt;/td>
+&lt;td>对序列和数据框图进行绘图&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>iloc/loc/ix&lt;/td>
+&lt;td>数据框子集获取&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>pivot_table&lt;/td>
+&lt;td>构建透视表&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>concat&lt;/td>
+&lt;td>实现多表纵向合并&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>merge&lt;/td>
+&lt;td>实现两表水平拓展&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>groupby&lt;/td>
+&lt;td>分组聚合时，指定分组变量&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>aggregate&lt;/td>
+&lt;td>指定聚合统计&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>rename&lt;/td>
+&lt;td>修改数据框变量名&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table></description></item><item><title>电影评论分类：二分类问题</title><link>https://wlynxg.github.io/blog/p/%E7%94%B5%E5%BD%B1%E8%AF%84%E8%AE%BA%E5%88%86%E7%B1%BB%E4%BA%8C%E5%88%86%E7%B1%BB%E9%97%AE%E9%A2%98/</link><pubDate>Thu, 02 Mar 2023 09:55:21 +0800</pubDate><guid>https://wlynxg.github.io/blog/p/%E7%94%B5%E5%BD%B1%E8%AF%84%E8%AE%BA%E5%88%86%E7%B1%BB%E4%BA%8C%E5%88%86%E7%B1%BB%E9%97%AE%E9%A2%98/</guid><description>&lt;h1 id="电影评论分类二分类问题">电影评论分类：二分类问题
+&lt;/h1>&lt;h2 id="简介">简介
+&lt;/h2>&lt;blockquote>
+&lt;p>本例出自《Python 深度学习》，自己做了一个简单的总结归纳。&lt;/p>
+&lt;p>完整代码请参考：&lt;a class="link" href="https://github.com/fchollet/deep-learning-with-python-notebooks" target="_blank" rel="noopener"
+>https://github.com/fchollet/deep-learning-with-python-notebooks&lt;/a>&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="主要流程">主要流程
+&lt;/h2>&lt;h3 id="数据预处理">数据预处理
+&lt;/h3>&lt;pre tabindex="0">&lt;code class="language-mermaid" data-lang="mermaid">graph LR
+A[原始评论] --&amp;gt; |关键词分割|C[建立关键词索引]
+C --&amp;gt; |将关键词转索引|D[原始评论转向量]
+D --&amp;gt; 列表编码为二进制矩阵
+&lt;/code>&lt;/pre>&lt;pre tabindex="0">&lt;code class="language-mermaid" data-lang="mermaid">graph LR
+原始评论标签 --&amp;gt; 二制化标签
+&lt;/code>&lt;/pre>&lt;h3 id="训练模型">训练模型
+&lt;/h3>&lt;pre tabindex="0">&lt;code class="language-mermaid" data-lang="mermaid">graph LR
+A1(第一层:16个输出单元) --&amp;gt; A[构建模型]
+A2(第二层:16个输出单元) --&amp;gt; A
+A3(第三层:1个输出单元) --&amp;gt; A
+A ==&amp;gt; B[编译模型]
+B1(配置优化器和损失函数) --&amp;gt; B
+B ==&amp;gt; C[加入验证集训练模型]
+C ==&amp;gt; D[绘制图表观察模型最佳参数]
+D1[欠拟合与过拟合之间] --&amp;gt; D
+D ==&amp;gt; E[选择最佳参数训练模型]
+E ==&amp;gt; F[在新数据上使用模型]
+&lt;/code>&lt;/pre>&lt;h2 id="代码">代码
+&lt;/h2>&lt;h3 id="加载数据集">加载数据集
+&lt;/h3>&lt;p>注意：第一次加载会下载文件，速度较慢&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">keras.datasets&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">imdb&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 加载 IMDB 数据集&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">(&lt;/span>&lt;span class="n">train_data&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">train_labels&lt;/span>&lt;span class="p">),&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">test_data&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">test_labels&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">imdb&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">load_data&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">num_words&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">10000&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="c1"># 取一万个词&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="整数序列转二进制矩阵">整数序列转二进制矩阵
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">numpy&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="nn">np&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 将整数序列编码为二进制矩阵&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">vectorize_sequences&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">sequences&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">dimension&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">10000&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">((&lt;/span>&lt;span class="nb">len&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">sequences&lt;/span>&lt;span class="p">),&lt;/span> &lt;span class="n">dimension&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">results&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">np&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">zeros&lt;/span>&lt;span class="p">((&lt;/span>&lt;span class="nb">len&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">sequences&lt;/span>&lt;span class="p">),&lt;/span> &lt;span class="n">dimension&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="n">i&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">sequence&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="nb">enumerate&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">sequences&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">results&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">sequence&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mf">1.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">results&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">x_train&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">vectorize_sequences&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">train_data&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">x_test&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">vectorize_sequences&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">test_data&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="向量标签化">向量标签化
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 标签向量化&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">y_train&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">np&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">asarray&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">train_labels&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">astype&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;float32&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="c1"># int64转float32&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">y_test&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">np&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">asarray&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">test_labels&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">astype&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;float32&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="构建模型">构建模型
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 构建网络&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">keras&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">layers&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">keras&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">models&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">model&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">models&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Sequential&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 第一层，16个隐藏单元，激活函数为relu&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">model&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">add&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">layers&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Dense&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">16&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">activation&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;relu&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">input_shape&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">10000&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">)))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 第二层，16个隐藏单元，激活函数为relu&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">model&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">add&lt;/span>&lt;span class="p">((&lt;/span>&lt;span class="n">layers&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Dense&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">16&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">activation&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;relu&amp;#39;&lt;/span>&lt;span class="p">)))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 第三层，输出一个标量（预测结果），激活函数为sigmoid&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">model&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">add&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">layers&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Dense&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">activation&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;sigmoid&amp;#39;&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="编译模型">编译模型
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 编译模型&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 优化器：rmsprop&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 损失函数：binary_crossentropy（仅包含一个单元的模型可以采用，替代方案：mean_squared_error）&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 指标：精确&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">model&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">compile&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">optimizer&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;rmsprop&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">loss&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;binary_crossentropy&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">metrics&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;accuracy&amp;#39;&lt;/span>&lt;span class="p">])&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="加入验证集训练模型">加入验证集训练模型
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;span class="lnt">9
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 留出验证集&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">x_val&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">x_train&lt;/span>&lt;span class="p">[:&lt;/span>&lt;span class="mi">10000&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">partial_x_train&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">x_train&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">10000&lt;/span>&lt;span class="p">:]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">y_val&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">y_train&lt;/span>&lt;span class="p">[:&lt;/span>&lt;span class="mi">10000&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">partial_y_train&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">y_train&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">10000&lt;/span>&lt;span class="p">:]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 训练模型&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">history&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">model&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">fit&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">partial_x_train&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">partial_y_train&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">epochs&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">20&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">batch_size&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">512&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">validation_data&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">x_val&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">y_val&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="绘制图表观察训练过程">绘制图表观察训练过程
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="n">history_dict&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">history&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">history&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 绘制训练损失和验证损失&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">matplotlib.pyplot&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="nn">plt&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">loss&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">history&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">history&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;loss&amp;#39;&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">val_loss&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">history&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">history&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;val_loss&amp;#39;&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">epochs&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">range&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nb">len&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">loss&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">plot&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">epochs&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">loss&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;bo&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">label&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;Training loss&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">plot&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">epochs&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">val_loss&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;b&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">label&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;Validation&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">title&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;Training and validation loss&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">xlabel&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;Epochs&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">ylabel&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;Loss&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">legend&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">show&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 绘制训练精度和验证精度&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">clf&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="c1"># 清空图像&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">acc&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">history&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">history&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;accuracy&amp;#39;&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">val_acc&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">history&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">history&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;val_accuracy&amp;#39;&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">plot&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">epochs&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">acc&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;bo&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">label&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;Training acc&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">plot&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">epochs&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">val_acc&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;b&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">label&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;Validation acc&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">title&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;Training and validation accuracy&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">xlabel&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;Epochs&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">ylabel&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;Accuracy&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">legend&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">show&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;img src="https://pic.try-hard.cn/blog/20200819212009429.png"
+loading="lazy"
+alt="在这里插入图片描述"
+>&lt;/p>
+&lt;p>&lt;img src="https://pic.try-hard.cn/blog/20200819211900911.png"
+loading="lazy"
+alt="在这里插入图片描述"
+>&lt;/p>
+&lt;h3 id="训练模型-1">训练模型
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 通过上面的图表发现模型在第四轮之后出现过拟合现象，因此我们选择训练轮数为4&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">model&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">fit&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">x_train&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">y_train&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">epochs&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">4&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">batch_size&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">512&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="对新数据进行预测">对新数据进行预测
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="n">result&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">model&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">predict&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">x_test&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># [0.2930210903453827, 0.8831999897956848]&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="绘制图表">绘制图表
+&lt;/h3>&lt;p>&lt;strong>训练损失和验证损失&lt;/strong>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 绘制训练损失和验证损失&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">matplotlib.pyplot&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="nn">plt&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">loss&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">history&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">history&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;loss&amp;#39;&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">val_loss&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">history&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">history&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;val_loss&amp;#39;&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">epochs&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">range&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nb">len&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">loss&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">plot&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">epochs&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">loss&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;bo&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">label&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;Training loss&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">plot&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">epochs&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">val_loss&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;b&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">label&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;Validation&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">title&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;Training and validation loss&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">xlabel&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;Epochs&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">ylabel&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;Loss&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">legend&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">show&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;strong>训练精度和验证精度&lt;/strong>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 绘制训练精度和验证精度&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">clf&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="c1"># 清空图像&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">acc&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">history&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">history&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;binary_accuracy&amp;#39;&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">val_acc&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">history&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">history&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;val_binary_accuracy&amp;#39;&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">plot&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">epochs&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">acc&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;bo&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">label&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;Training acc&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">plot&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">epochs&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">val_acc&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;b&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">label&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;Validation acc&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">title&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;Training and validation accuracy&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">xlabel&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;Epochs&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">ylabel&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;Accuracy&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">legend&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">show&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="总结">总结
+&lt;/h2>&lt;ul>
+&lt;li>通常需要对原始数据进行大量预处理，以便将其转换为张量输入到神经网络中。单词序列可以编码为二进制向量，但也有其他编码方式。&lt;/li>
+&lt;li>带有&lt;code>relu&lt;/code>激活的&lt;code>Dense&lt;/code>层堆叠，可以解决很多种问题（包括情感分类），你可能会经常用到这种模型。&lt;/li>
+&lt;li>对于二分类问题（两个输出类别），网络的最后一层应该是只有一个单元并使用&lt;code>sigmoid&lt;/code>激活的&lt;code>Dense层&lt;/code>，网络输出应该是0~1范围内的标量，表示概率值。&lt;/li>
+&lt;li>对于二分类问题的&lt;code>sigmoid&lt;/code>标量输出，你应该使用&lt;code>binary_crossentropy&lt;/code>损失函数。&lt;/li>
+&lt;li>无论你的问题是什么，&lt;code>rmsprop&lt;/code>优化器通常都是足够好的选择。这一点你无须担心。&lt;/li>
+&lt;li>随着神经网络在训练数据上的表现越来越好，模型最终会过拟合，并在前所未见的数据上得到越来越差的结果。一定要一直监控模型在训练集之外的数据上的性能。&lt;/li>
+&lt;/ul></description></item><item><title>机器学习专有名词归纳</title><link>https://wlynxg.github.io/blog/p/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E4%B8%93%E6%9C%89%E5%90%8D%E8%AF%8D%E5%BD%92%E7%BA%B3/</link><pubDate>Thu, 02 Mar 2023 09:55:21 +0800</pubDate><guid>https://wlynxg.github.io/blog/p/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E4%B8%93%E6%9C%89%E5%90%8D%E8%AF%8D%E5%BD%92%E7%BA%B3/</guid><description>&lt;h3 id="归纳了一些在机器学习中经常遇到的专有名词">归纳了一些在机器学习中经常遇到的专有名词
+&lt;/h3>&lt;ul>
+&lt;li>&lt;strong>特征：&lt;/strong> 模型的输入&lt;/li>
+&lt;li>&lt;strong>样本：&lt;/strong> 用于训练流程的输入/输出对&lt;/li>
+&lt;li>&lt;strong>标签：&lt;/strong> 模型的输出&lt;/li>
+&lt;li>&lt;strong>层级：&lt;/strong> 神经网络中相互连接的节点集合。&lt;/li>
+&lt;li>&lt;strong>模型：&lt;/strong> 神经网络的表示法&lt;/li>
+&lt;li>&lt;strong>密集全连接层 (FC)：&lt;/strong> 一个层级中的每个节点都与上个层级中的每个节点相连。&lt;/li>
+&lt;li>&lt;strong>权重和偏差：&lt;/strong> 模型的内部变量&lt;/li>
+&lt;li>&lt;strong>损失：&lt;/strong> 期望输出和真实输出之间的差值&lt;/li>
+&lt;li>&lt;strong>MSE：&lt;/strong> 均方误差，一种损失函数，它会将一小部分很大的差值视作比大量很小的差值更糟糕&lt;/li>
+&lt;li>&lt;strong>梯度下降法：&lt;/strong> 每次小幅调整内部变量，从而逐渐降低损失函数的算法&lt;/li>
+&lt;li>&lt;strong>优化器：&lt;/strong> 梯度下降法的一种具体实现方法（“Adam”优化器是 ADAptive with Momentum 的简称，并且被视为最佳优化器）&lt;/li>
+&lt;li>&lt;strong>学习速率：&lt;/strong> 梯度下降过程中的损失改进“步长”&lt;/li>
+&lt;li>&lt;strong>批次：&lt;/strong> 在训练神经网络的过程中使用的一组样本。&lt;/li>
+&lt;li>&lt;strong>周期：&lt;/strong> 完全经过整个训练数据集一轮&lt;/li>
+&lt;li>&lt;strong>前向传播：&lt;/strong> 根据输入计算输出值&lt;/li>
+&lt;li>&lt;strong>反向传播：&lt;/strong> 根据优化器算法计算内部变量的调整幅度，从输出层级开始，并往回计算每个层级，直到抵达输入层&lt;/li>
+&lt;li>&lt;strong>训练集：&lt;/strong> 用于训练神经网络的数据。&lt;/li>
+&lt;li>&lt;strong>测试集：&lt;/strong> 用于测试神经网络最终效果的数据&lt;/li>
+&lt;li>&lt;strong>回归：&lt;/strong> 输出一个值的模型。例如，估算房屋价值。&lt;/li>
+&lt;li>&lt;strong>分类：&lt;/strong> 一种模型，能够输出多个类别的概率分布。例如在 Fashion MNIST 模型中，输出是 10 个概率，每种服饰对应一个概率。我们在最后的密集层中使用 Softmax 激活函数创建了这个概率分布。&lt;/li>
+&lt;li>&lt;strong>CNN：&lt;/strong> 卷积神经网络。即至少有一个卷积层的网络。典型的 CNN 还包括其他类型的层级，例如池化层和密集层&lt;/li>
+&lt;li>&lt;strong>卷积：&lt;/strong> 向图像应用核（滤波器）的过程&lt;/li>
+&lt;li>&lt;strong>核/滤波器：&lt;/strong> 小于输入的矩阵，用于将输入变成多个小区域&lt;/li>
+&lt;li>&lt;strong>填充：&lt;/strong> 在输入图像周围添加像素，像素值通常为 0&lt;/li>
+&lt;li>&lt;strong>池化：&lt;/strong> 通过下采样降低图像大小的过程。池化层有多种类型。例如，平均池化通过求平均值将多个值变成一个值。但是最大池化是最常见的池化类型。&lt;/li>
+&lt;li>&lt;strong>最大池化：&lt;/strong> 一种池化过程，通过获取多个值中的最大值，将多个值变成一个值。&lt;/li>
+&lt;li>&lt;strong>步长：&lt;/strong> 在图像上滑动核（滤波器）的间隔像素数量。&lt;/li>
+&lt;li>&lt;strong>下采样：&lt;/strong> 降低图像大小的操作&lt;/li>
+&lt;/ul></description></item><item><title>神经网络中的数据表示</title><link>https://wlynxg.github.io/blog/p/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%AD%E7%9A%84%E6%95%B0%E6%8D%AE%E8%A1%A8%E7%A4%BA/</link><pubDate>Thu, 02 Mar 2023 09:55:21 +0800</pubDate><guid>https://wlynxg.github.io/blog/p/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E4%B8%AD%E7%9A%84%E6%95%B0%E6%8D%AE%E8%A1%A8%E7%A4%BA/</guid><description>&lt;h1 id="神经网络中的数据表示">神经网络中的数据表示
+&lt;/h1>&lt;h2 id="引言">引言
+&lt;/h2>&lt;blockquote>
+&lt;p>当前所有机器学习系统都使用张量作为基本数据结构。张量对这个领域非常重要，重要到 Google 的 TensorFlow 都是以它来命名的。那么什么是张量？&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="1-标量0d张量">1. 标量（0D张量）
+&lt;/h2>&lt;blockquote>
+&lt;p>&lt;strong>标量&lt;/strong>（英语：&lt;strong>scalar&lt;/strong>），又称&lt;strong>纯量&lt;/strong>，是只有大小、没有方向、可用实数表示的一个量。实际上标量就是实数，“标量”这个称法只是为了区别于向量。标量可以是负数，例如温度低于冰点。与之相对，&lt;a class="link" href="https://zh.wikipedia.org/wiki/%e5%90%91%e9%87%8f" target="_blank" rel="noopener"
+>向量&lt;/a>（又称矢量）既有大小，又有方向。与此相对的矢量，其&lt;a class="link" href="https://zh.wikipedia.org/wiki/%e5%88%86%e9%87%8f" target="_blank" rel="noopener"
+>分量&lt;/a>在不同的&lt;a class="link" href="https://zh.wikipedia.org/wiki/%e5%9d%90%e6%a0%87%e7%b3%bb" target="_blank" rel="noopener"
+>坐标系&lt;/a>中有不同的值，例如&lt;a class="link" href="https://zh.wikipedia.org/wiki/%e9%80%9f%e5%ba%a6" target="_blank" rel="noopener"
+>速度&lt;/a>。标量可被用作定义向量空间。&lt;/p>
+&lt;p>——维基百科&lt;/p>
+&lt;/blockquote>
+&lt;p>仅包含一个数字的张量叫作标量（scalar，也叫标量张量、零维张量、0D张量）。在Numpy中，一个 float32 或 float64 的数字就是一个标量张量（或标量数组）。标量张量有0个轴（ndim == 0）。张量轴的个数也叫作阶（rank）。&lt;/p>
+&lt;p>下面是一个 Numpy 标量：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;gt;&amp;gt;&amp;gt;&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="nn">numpy&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="nn">np&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;gt;&amp;gt;&amp;gt;&lt;/span> &lt;span class="n">x&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">np&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">array&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">9&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;gt;&amp;gt;&amp;gt;&lt;/span> &lt;span class="n">x&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">array&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">9&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;gt;&amp;gt;&amp;gt;&lt;/span> &lt;span class="n">x&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">ndim&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="mi">0&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="2-向量1d张量">2. 向量（1D张量）
+&lt;/h2>&lt;blockquote>
+&lt;p>&lt;strong>向量&lt;/strong> （英语：euclidean vector，物理、工程等也称作&lt;strong>矢量&lt;/strong> 、&lt;strong>欧几里得向量&lt;/strong>）是数学、物理学和工程科学等多个自然科学中的基本概念。指一个同时具有大小和方向，且满足平行四边形法则的几何对象。理论数学中向量的定义为任何在向量空间中的元素。&lt;/p>
+&lt;/blockquote>
+&lt;p>数字组成的数组叫作向量（vector）或一维张量（1D张量）。一维张量只有一个轴。&lt;/p>
+&lt;p>下面是一个Numpy向量：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;gt;&amp;gt;&amp;gt;&lt;/span> &lt;span class="n">y&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">np&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">array&lt;/span>&lt;span class="p">([&lt;/span>&lt;span class="mi">12&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">5&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">4&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">11&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">9&lt;/span>&lt;span class="p">])&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;gt;&amp;gt;&amp;gt;&lt;/span> &lt;span class="n">y&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">array&lt;/span>&lt;span class="p">([&lt;/span>&lt;span class="mi">12&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">5&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">4&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">11&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">9&lt;/span>&lt;span class="p">])&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;gt;&amp;gt;&amp;gt;&lt;/span> &lt;span class="n">y&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">ndim&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="mi">1&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>上面代码中所写向量有5个元素，所以被称为 &lt;strong>5D向量&lt;/strong>。&lt;strong>不要把 5D向量 和 5D张量 弄混！&lt;/strong>&lt;/p>
+&lt;p>5D向量只有一个轴，沿着轴有5个维度；而5D张量有5个轴（沿着每个轴可能有任意个维度）。&lt;/p>
+&lt;p>&lt;strong>维度&lt;/strong>（dimensionality）可以表示&lt;strong>沿着某个轴上的元素个数&lt;/strong>（比如5D向量）；&lt;/p>
+&lt;p>&lt;strong>阶数&lt;/strong>（order）可以表示张量&lt;strong>轴的个数&lt;/strong>。&lt;/p>
+&lt;h2 id="3-矩阵2d张量">3. 矩阵（2D张量）
+&lt;/h2>&lt;blockquote>
+&lt;p>数学上，一个{\displaystyle m\times n}&lt;img src="A:%5c%e6%96%87%e6%a1%a3%5cblog%5c12b23d207d23dd430b93320539abbb0bde84870d"
+loading="lazy"
+alt="m\times n"
+>的&lt;strong>矩阵&lt;/strong>是一个由{\displaystyle m}&lt;img src="A:%5c%e6%96%87%e6%a1%a3%5cblog%5c0a07d98bb302f3856cbabc47b2b9016692e3f7bc"
+loading="lazy"
+alt="m"
+>行（row）{\displaystyle n}&lt;img src="A:%5c%e6%96%87%e6%a1%a3%5cblog%5ca601995d55609f2d9f5e233e36fbe9ea26011b3b"
+loading="lazy"
+alt="n"
+>列（column)元素排列成的矩形阵列。矩阵里的元素可以是数字、符号或数学式。以下是一个由6个数字元素构成的2行3列的矩阵：&lt;/p>
+&lt;p>&lt;img src="https://wikimedia.org/api/rest_v1/media/math/render/svg/61f786996bcfb75972dd77712c90122bc8765269"
+loading="lazy"
+alt="\begin{bmatrix}1 &amp; 9 &amp; -13 \\20 &amp; 5 &amp; -6 \end{bmatrix}"
+>&lt;/p>
+&lt;p>——维基百科&lt;/p>
+&lt;/blockquote>
+&lt;p>向量组成的数组叫作矩阵（matrix）或二维张量（2D张量），矩阵有2个轴（通常叫作行和列）。&lt;/p>
+&lt;p>我们可以将矩阵直观地理解为数字组成的矩形网格。&lt;/p>
+&lt;p>下面是一个Numpy矩阵：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;span class="lnt">9
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;gt;&amp;gt;&amp;gt;&lt;/span> &lt;span class="n">z&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">np&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">array&lt;/span>&lt;span class="p">([[&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">3&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>&lt;span class="mi">4&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">5&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">6&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>&lt;span class="mi">7&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">8&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">9&lt;/span>&lt;span class="p">]])&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;gt;&amp;gt;&amp;gt;&lt;/span> &lt;span class="n">z&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">array&lt;/span>&lt;span class="p">([[&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">3&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>&lt;span class="mi">4&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">5&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">6&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>&lt;span class="mi">7&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">8&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">9&lt;/span>&lt;span class="p">]])&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;gt;&amp;gt;&amp;gt;&lt;/span> &lt;span class="n">z&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">ndim&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="mi">2&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>矩阵上&lt;strong>第一个轴上的元素叫作行（row），第二个轴上的元素叫作列（column）&lt;/strong>。&lt;/p>
+&lt;p>在上面的例子中，&lt;strong>[1, 2, 3] 是x的第一行，[1, 4, 7]是第一列&lt;/strong>。&lt;/p>
+&lt;h2 id="4-3d张量与高阶张量">4. 3D张量与高阶张量
+&lt;/h2>&lt;p>将多个矩阵组合成一个新的数组，就可以得到一个3D张量，我们可以理解为由数字组成的立方体。&lt;/p>
+&lt;p>下面是一个Numpy的3D张量：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;gt;&amp;gt;&amp;gt;&lt;/span> &lt;span class="n">s&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">np&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">array&lt;/span>&lt;span class="p">([[[&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">3&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>&lt;span class="mi">4&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">5&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">6&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>&lt;span class="mi">7&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">8&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">9&lt;/span>&lt;span class="p">]],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[[&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">3&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>&lt;span class="mi">4&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">5&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">6&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>&lt;span class="mi">7&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">8&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">9&lt;/span>&lt;span class="p">]],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[[&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">3&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>&lt;span class="mi">4&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">5&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">6&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>&lt;span class="mi">7&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">8&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">9&lt;/span>&lt;span class="p">]]])&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;gt;&amp;gt;&amp;gt;&lt;/span> &lt;span class="n">s&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">array&lt;/span>&lt;span class="p">([[[&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">3&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>&lt;span class="mi">4&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">5&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">6&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>&lt;span class="mi">7&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">8&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">9&lt;/span>&lt;span class="p">]],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[[&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">3&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>&lt;span class="mi">4&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">5&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">6&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>&lt;span class="mi">7&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">8&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">9&lt;/span>&lt;span class="p">]],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[[&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">3&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>&lt;span class="mi">4&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">5&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">6&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>&lt;span class="mi">7&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">8&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">9&lt;/span>&lt;span class="p">]]])&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;gt;&amp;gt;&amp;gt;&lt;/span> &lt;span class="n">s&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">ndim&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="mi">3&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>以此类推，&lt;strong>4D张量便由3D张量堆叠而成&lt;/strong>，&lt;strong>5D张量由4D张量堆叠而成&amp;hellip;&amp;hellip;&lt;/strong>&lt;/p>
+&lt;h2 id="5-张量的关键属性">5. 张量的关键属性
+&lt;/h2>&lt;p>张量是由以下三个关键属性来定义的。&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>轴的个数（阶）&lt;/strong>，例如，3D张量有3个轴，矩阵有2个轴。在Numpy等Python库中也叫张量的ndim。&lt;/li>
+&lt;li>**形状：**形状是一个整数元组，它表示张量沿每个轴的维度大小（元素个数）。前面的示例中，矩阵的形状为(3, 3)，3D张量的形状为(3，3，3)，向量的形状为(5, )，而标量的形状为空，即()。&lt;/li>
+&lt;li>&lt;strong>数据类型（在Python库中通常叫作dtype）&lt;/strong>：这是张量中所包含数据的类型，例如，张量的类型可以是float32、uint8、float64等。在极少数情况下，你可能会遇到字符（char）张量。注意，Numpy（以及大多数其他库）中不存在字符串张量，因为张量存储在预先分配的连续内存段中，而字符串的长度是可变的，无法用这种方式存储。&lt;/li>
+&lt;/ul>
+&lt;h2 id="6-现实世界的常用张量">6. 现实世界的常用张量
+&lt;/h2>&lt;ul>
+&lt;li>**向量数据：**2D张量，形状为(samples, features)&lt;/li>
+&lt;li>**时间序列数据或序列数据：**3D张量，形状为(samples, timesteps,features)&lt;/li>
+&lt;li>**图像：**4D张量，形状为(samples, height, width, channels)或(samples, channels, height, width)&lt;/li>
+&lt;li>**视频：**5D张量，形状为(samples, frames, height, width, channels)或(samples, frames, channels, height, width)&lt;/li>
+&lt;/ul></description></item><item><title>新闻分类：多分类问题</title><link>https://wlynxg.github.io/blog/p/%E6%96%B0%E9%97%BB%E5%88%86%E7%B1%BB%E5%A4%9A%E5%88%86%E7%B1%BB%E9%97%AE%E9%A2%98/</link><pubDate>Thu, 02 Mar 2023 09:55:21 +0800</pubDate><guid>https://wlynxg.github.io/blog/p/%E6%96%B0%E9%97%BB%E5%88%86%E7%B1%BB%E5%A4%9A%E5%88%86%E7%B1%BB%E9%97%AE%E9%A2%98/</guid><description>&lt;h1 id="新闻分类多分类问题">新闻分类：多分类问题
+&lt;/h1>&lt;h2 id="简介">简介
+&lt;/h2>&lt;blockquote>
+&lt;p>本例出自《Python 深度学习》，自己做了一个简单的总结归纳。&lt;/p>
+&lt;p>完整代码请参考：[https://github.com/fchollet/deep-learning-with-python-notebooks](&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="数据预处理">数据预处理
+&lt;/h3>&lt;pre tabindex="0">&lt;code class="language-mermaid" data-lang="mermaid">graph LR
+A[原始新闻内容] --&amp;gt; |关键词分割|C[建立关键词索引]
+C --&amp;gt; |将关键词转索引|D[原始评论转向量]
+D --&amp;gt; 列表编码为二进制矩阵
+&lt;/code>&lt;/pre>&lt;pre tabindex="0">&lt;code class="language-mermaid" data-lang="mermaid">graph LR
+原始评论标签 --&amp;gt; one-hot编码将标签向量化
+&lt;/code>&lt;/pre>&lt;h3 id="训练模型">训练模型
+&lt;/h3>&lt;pre tabindex="0">&lt;code class="language-mermaid" data-lang="mermaid">graph LR
+A1(第一层:16个输出单元) --&amp;gt; A[构建模型]
+A2(第二层:16个输出单元) --&amp;gt; A
+A3(第三层:1个输出单元) --&amp;gt; A
+A ==&amp;gt; B[编译模型]
+B1(配置优化器和损失函数) --&amp;gt; B
+B ==&amp;gt; C[加入验证集训练模型]
+C ==&amp;gt; D[绘制图表观察模型最佳参数]
+D1[欠拟合与过拟合之间] --&amp;gt; D
+D ==&amp;gt; E[选择最佳参数训练模型]
+E ==&amp;gt; F[在新数据上使用模型]
+&lt;/code>&lt;/pre>&lt;h2 id="代码">代码
+&lt;/h2>&lt;h3 id="加载数据集">加载数据集
+&lt;/h3>&lt;p>注意：第一次运行会下载数据集，速度较慢。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">keras.datasets&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">reuters&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">(&lt;/span>&lt;span class="n">train_data&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">train_label&lt;/span>&lt;span class="p">),&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">test_data&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">test_label&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">reuters&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">load_data&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">num_words&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">10000&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="将向量还原为原始新闻非必须">将向量还原为原始新闻（非必须）
+&lt;/h3>&lt;p>执行这一步只是为了更直观的了解别人是怎么处理数据的。&lt;/p>
+&lt;p>这里同样会下载数据。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="n">word_index&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">reuters&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">get_word_index&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">reverse_word_index&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">dict&lt;/span>&lt;span class="p">([(&lt;/span>&lt;span class="n">value&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">key&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">key&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">value&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="n">word_index&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">items&lt;/span>&lt;span class="p">()])&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">decoded_newswire&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s1">&amp;#39; &amp;#39;&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">join&lt;/span>&lt;span class="p">([&lt;/span>&lt;span class="n">reverse_word_index&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">get&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">3&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;?&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">for&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="n">train_data&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">]])&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">decoded_newswire&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="将数据向量化">将数据向量化
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">numpy&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="nn">np&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 数据向量化&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">vectorize_sequences&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">sequences&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">dimension&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">10000&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">results&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">np&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">zeros&lt;/span>&lt;span class="p">((&lt;/span>&lt;span class="nb">len&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">sequences&lt;/span>&lt;span class="p">),&lt;/span> &lt;span class="n">dimension&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="n">i&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">sequence&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="nb">enumerate&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">sequences&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">results&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">sequence&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mf">1.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">results&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">x_train&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">vectorize_sequences&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">train_data&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">x_test&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">vectorize_sequences&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">test_data&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="使用-one-hot-编码将标签向量化">使用 one-hot 编码将标签向量化
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># one-hot编码方法实现&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># def to_one_hot(labels, dimension=10000):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># results = np.zeros((len(labels), dimension))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># for i, label in enumerate(labels):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># results[i, label] = 1.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># return results&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 使用keras内置方法将标签向量化&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">keras.utils.np_utils&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">to_categorical&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">one_hot_train_labels&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">to_categorical&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">train_label&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">one_hot_test_labels&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">to_categorical&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">test_label&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="构建模型">构建模型
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 定义模型&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">keras&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">models&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">keras&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">layers&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">model&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">models&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Sequential&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">&amp;#34;&amp;#34;&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">Q: 为什么此处输入单元数要使用64，为什么不使用电影评论分类时使用的16？
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">A：16维空间对于这个例子来说太小了，无法学会区分46个不同的类别。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> 这种维度较小的层可能成为信息瓶颈，永久地丢失相关信息。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> 如果是三分类，四分类问题你依然可以使用16个隐藏单元
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">Q：我能不能设置为640个单元？
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">A：单元数不是越大越好，网络容量越大，网络就越容易记住训练过的数据。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> 网络会在训练过的数据上表现优异，但是在没有见过的数据上的表现则不容乐观。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> 因此单元数不是越大越好，需要在欠拟合与过拟合之间找到一个平衡点。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">&amp;#34;&amp;#34;&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">model&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">add&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">layers&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Dense&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">64&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">activation&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;relu&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">input_shape&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">10000&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">)))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">model&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">add&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">layers&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Dense&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">64&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">activation&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;relu&amp;#39;&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">model&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">add&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">layers&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Dense&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">46&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">activation&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;softmax&amp;#39;&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 编译模型&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">model&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">compile&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">optimizer&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;rmsprop&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">loss&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;categorical_crossentropy&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">metrics&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;accuracy&amp;#39;&lt;/span>&lt;span class="p">])&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="验证模型">验证模型
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;span class="lnt">9
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 留出验证集&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">x_val&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">x_train&lt;/span>&lt;span class="p">[:&lt;/span>&lt;span class="mi">1000&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">partial_x_train&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">x_train&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">1000&lt;/span>&lt;span class="p">:]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">y_val&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">one_hot_train_labels&lt;/span>&lt;span class="p">[:&lt;/span>&lt;span class="mi">1000&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">partial_y_train&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">one_hot_train_labels&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">1000&lt;/span>&lt;span class="p">:]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 训练模型&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">history&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">model&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">fit&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">partial_x_train&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">partial_y_train&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">epochs&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">20&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">batch_size&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">512&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">validation_data&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">x_val&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">y_val&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="绘制训练情况图表">绘制训练情况图表
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 绘制训练损失和验证损失&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">matplotlib.pyplot&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="nn">plt&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">loss&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">history&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">history&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;loss&amp;#39;&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">val_loss&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">history&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">history&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;val_loss&amp;#39;&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">epochs&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">range&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nb">len&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">loss&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">+&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">plot&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">epochs&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">loss&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;bo&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">label&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;Training loss&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">plot&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">epochs&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">val_loss&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;b&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">label&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;Validation loss&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">title&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;Training and validation loss&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">xlabel&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;Epochs&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">ylabel&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;Loss&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">legend&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 绘制训练精度和验证精度&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">clf&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">acc&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">history&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">history&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;accuracy&amp;#39;&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">val_acc&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">history&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">history&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;val_accuracy&amp;#39;&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">plot&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">epochs&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">acc&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;bo&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">label&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;Training acc&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">plot&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">epochs&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">val_acc&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;b&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">label&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;Validation acc&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">title&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;Training and validation accuracy&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">xlabel&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;Epochs&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">ylabel&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;Accuracy&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">legend&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">show&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;img src="https://pic.try-hard.cn/blog/20200819231400573.png"
+loading="lazy"
+alt="在这里插入图片描述"
+>&lt;/p>
+&lt;p>&lt;img src="https://pic.try-hard.cn/blog/20200819231428125.png"
+loading="lazy"
+alt="在这里插入图片描述"
+>&lt;/p>
+&lt;h3 id="重新训练模型">重新训练模型
+&lt;/h3>&lt;p>观察图表，发现模型在第十轮附近出现过拟合现象。那么我们重新训练模型就训练九轮就行（可以尝试其它的）。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 重新训练模型&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">model&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">models&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Sequential&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">model&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">add&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">layers&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Dense&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">64&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">activation&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;relu&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">input_shape&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">10000&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">)))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">model&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">add&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">layers&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Dense&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">64&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">activation&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;relu&amp;#39;&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">model&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">add&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">layers&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Dense&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">46&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">activation&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;softmax&amp;#39;&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">model&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">compile&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">optimizer&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;rmsprop&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">loss&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;categorical_crossentropy&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">metrics&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;accuracy&amp;#39;&lt;/span>&lt;span class="p">])&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">history&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">model&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">fit&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">partial_x_train&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">partial_y_train&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">epochs&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">9&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">batch_size&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">512&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">validation_data&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">x_val&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">y_val&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 观察在测试集上表现&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">results&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">model&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">evaluate&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">x_test&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">one_hot_test_labels&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">results&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># [0.9868815943054715, 0.7862867116928101]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 80%左右的精度&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 采取随机预测的方式&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">copy&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">test_labels_copy&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">copy&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">copy&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">test_label&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">np&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">random&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">shuffle&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">test_labels_copy&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">hits_array&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">np&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">array&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">test_label&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="n">np&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">array&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">test_labels_copy&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nb">float&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">np&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">sum&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hits_array&lt;/span>&lt;span class="p">))&lt;/span> &lt;span class="o">/&lt;/span> &lt;span class="nb">len&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">test_label&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 0.18788958147818344&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 20%的精度，可以看出模型的预测效果好得多&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="绘制图表观察重新训练的模型各项指标--">绘制图表观察重新训练的模型各项指标 -
+&lt;/h3>&lt;p>&lt;img src="https://pic.try-hard.cn/blog/20200819231738916.png"
+loading="lazy"
+alt="在这里插入图片描述"
+>&lt;/p>
+&lt;p>&lt;img src="https://img-blog.csdnimg.cn/20200819231828400.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQzNTgwMTkz,size_16,color_FFFFFF,t_70#pic_center"
+loading="lazy"
+alt="在这里插入图片描述"
+>&lt;/p>
+&lt;h2 id="小结">小结
+&lt;/h2>&lt;ul>
+&lt;li>如果要对N个类别的数据点进行分类，&lt;strong>网络的最后一层应该是大小为N的Dense层&lt;/strong>。&lt;/li>
+&lt;li>对于单标签、多分类问题，&lt;strong>网络的最后一层应该使用 softmax 激活&lt;/strong>，这样可以输出在N个输出类别上的概率分布。&lt;/li>
+&lt;li>这种问题的损失函数几乎总是应该使用&lt;strong>分类交叉熵&lt;/strong>。它将网络输出的概率分布与目标的真实分布之间的距离最小化。&lt;/li>
+&lt;li>如果你需要将数据划分到许多类别中，应该&lt;strong>避免使用太小的中间层&lt;/strong>，以免在网络中造成信息瓶颈。&lt;/li>
+&lt;li>处理多分类问题的标签有两种方法。
+&lt;ul>
+&lt;li>通过分类编码（也叫one-hot编码）对标签进行编码，然后使用categorical_crossentropy 作为损失函数。&lt;/li>
+&lt;li>将标签编码为整数，然后使用 sparse_categorical_crossentropy 损失函数。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul></description></item><item><title>预测房价：回归问题</title><link>https://wlynxg.github.io/blog/p/%E9%A2%84%E6%B5%8B%E6%88%BF%E4%BB%B7%E5%9B%9E%E5%BD%92%E9%97%AE%E9%A2%98/</link><pubDate>Thu, 02 Mar 2023 09:55:21 +0800</pubDate><guid>https://wlynxg.github.io/blog/p/%E9%A2%84%E6%B5%8B%E6%88%BF%E4%BB%B7%E5%9B%9E%E5%BD%92%E9%97%AE%E9%A2%98/</guid><description>&lt;h1 id="预测房价回归问题">预测房价：回归问题
+&lt;/h1>&lt;h2 id="简介">简介
+&lt;/h2>&lt;blockquote>
+&lt;p>本例出自《Python 深度学习》，自己做了一个简单的总结归纳。&lt;/p>
+&lt;p>完整代码请参考：[https://github.com/fchollet/deep-learning-with-python-notebooks](&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="代码">代码
+&lt;/h2>&lt;h3 id="加载数据集">加载数据集
+&lt;/h3>&lt;p>注意：第一次运行时会下载数据集，速度较慢，请耐心等候。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">keras.datasets&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">boston_housing&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">(&lt;/span>&lt;span class="n">train_data&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">train_targets&lt;/span>&lt;span class="p">),&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">test_data&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">test_targets&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">boston_housing&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">load_data&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="数据标准化">数据标准化
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 数据标准化&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">&amp;#34;&amp;#34;&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">Q：为什么要对数据进行标准化处理？
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">A：因为不同指标之间的差值较大，很不利于神经网络进行学习。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> 因此我们需要手动对输入的特征值进行处理，将特征值先减去特征值的均值再处于标准差。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> 这样就可以将不同的特征值保留在一个差异较小的范围。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> 而且由于是线性处理，因此相同特征值之间的差异并没有被改变
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">&amp;#34;&amp;#34;&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">mean&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">train_data&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">mean&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">axis&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="c1"># 特征差&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">train_data&lt;/span> &lt;span class="o">-=&lt;/span> &lt;span class="n">mean&lt;/span> &lt;span class="c1"># 减去特征差&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">std&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">train_data&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">std&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">axis&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="c1"># 标准差&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">train_data&lt;/span> &lt;span class="o">/=&lt;/span> &lt;span class="n">std&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">train_data&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 对测试数据集也做同样操作&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">test_data&lt;/span> &lt;span class="o">-=&lt;/span> &lt;span class="n">mean&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">test_data&lt;/span> &lt;span class="o">/=&lt;/span> &lt;span class="n">std&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="构建网络">构建网络
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 构建网络&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">keras&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">models&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">keras&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">layers&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">build_model&lt;/span>&lt;span class="p">():&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">model&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">models&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Sequential&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">model&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">add&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">layers&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Dense&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">64&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">activation&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;relu&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">input_shape&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">train_data&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">shape&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="p">)))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">model&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">add&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">layers&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Dense&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">64&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">activation&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;relu&amp;#39;&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">model&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">add&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">layers&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Dense&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">model&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">compile&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">optimizer&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;rmsprop&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">loss&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;mse&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">metrics&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;mae&amp;#39;&lt;/span>&lt;span class="p">])&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;&amp;#34;&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> Q：为什么这个网络最后一层不使用激活函数？
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> A：不使用激活函数的话这就是一个线性层。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> 这是标量回归（标量回归是预测单一连续值的回归）的典型设置。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> 添加激活函数将会限制输出范围。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> 例如，如果向最后一层添加sigmoid激活函数，网络只能学会预测0~1范围内的值。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> 这里最后一层是纯线性的，所以网络可以学会预测任意范围内的值。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> &amp;#34;&amp;#34;&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">model&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="使用k折验证训练模型">使用K折验证训练模型
+&lt;/h3>&lt;p>**提示：**由于我们每次训练的训练轮数为500次，并且训练时开启了静默模式。如果输出结果长时间没有变化请耐心等候。不要误认为程序出错没有执行！&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># K折验证&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">&amp;#34;&amp;#34;&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">Q：为什么我们需要使用K折验证？
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">A：因为数据量太少。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> 如果选择只使用数据集一次，那么训练结果会和数据的分布情况有很大相关性。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> 数据集分布不同输出结果会有很大差异，即误差较大，这不符合泛化的理念。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> 使用K折验证可以减小这种误差。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">&amp;#34;&amp;#34;&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">numpy&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="nn">np&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">k&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">4&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">num_val_samples&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">len&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">train_data&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">//&lt;/span> &lt;span class="mi">4&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">num_epochs&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">500&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">all_source&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">all_mae_histories&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">for&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="nb">range&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">k&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;processing fold #&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">i&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">val_data&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">train_data&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">i&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="n">num_val_samples&lt;/span> &lt;span class="p">:&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">i&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="n">num_val_samples&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">val_targets&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">train_targets&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="o">*&lt;/span>&lt;span class="n">num_val_samples&lt;/span>&lt;span class="p">:(&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="o">+&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">*&lt;/span>&lt;span class="n">num_val_samples&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">partial_train_data&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">np&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">concatenate&lt;/span>&lt;span class="p">([&lt;/span>&lt;span class="n">train_data&lt;/span>&lt;span class="p">[:&lt;/span>&lt;span class="n">i&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="n">num_val_samples&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="n">train_data&lt;/span>&lt;span class="p">[(&lt;/span>&lt;span class="n">i&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">*&lt;/span>&lt;span class="n">num_val_samples&lt;/span>&lt;span class="p">:]],&lt;/span> &lt;span class="n">axis&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">partial_train_targets&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">np&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">concatenate&lt;/span>&lt;span class="p">([&lt;/span>&lt;span class="n">train_targets&lt;/span>&lt;span class="p">[:&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="o">*&lt;/span>&lt;span class="n">num_val_samples&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="n">train_targets&lt;/span>&lt;span class="p">[(&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="o">+&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">*&lt;/span>&lt;span class="n">num_val_samples&lt;/span>&lt;span class="p">:]],&lt;/span> &lt;span class="n">axis&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">model&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">build_model&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">history&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">model&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">fit&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">partial_train_data&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">partial_train_targets&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">validation_data&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">val_data&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">val_targets&lt;/span>&lt;span class="p">),&lt;/span> &lt;span class="n">epochs&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">num_epochs&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">batch_size&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">verbose&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1"># val_mse, val_mae = model.evaluate(val_data, val_targets, verbose=0)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1"># all_source.append(val_mae)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">history&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">history&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">keys&lt;/span>&lt;span class="p">())&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">mae_history&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">history&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">history&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;val_mae&amp;#39;&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">all_mae_histories&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">append&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">mae_history&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="绘制图表观测训练过程">绘制图表观测训练过程
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 计算所有轮次中的K折验证分数平均值&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">average_mae_history&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">np&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">mean&lt;/span>&lt;span class="p">([&lt;/span>&lt;span class="n">x&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="k">for&lt;/span> &lt;span class="n">x&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="n">all_mae_histories&lt;/span>&lt;span class="p">])&lt;/span> &lt;span class="k">for&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="nb">range&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">num_epochs&lt;/span>&lt;span class="p">)]&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 绘制验证分数&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">matplotlib.pyplot&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="nn">plt&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">plot&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nb">range&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nb">len&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">average_mae_history&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">+&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">),&lt;/span> &lt;span class="n">average_mae_history&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">xlabel&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;Epochs&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">ylabel&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;Validation MAE&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">show&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;img src="https://img-blog.csdnimg.cn/20200821001321523.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQzNTgwMTkz,size_16,color_FFFFFF,t_70#pic_center"
+loading="lazy"
+alt="在这里插入图片描述"
+>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 绘制验证分数，删除前十个点&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">&amp;#34;&amp;#34;&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">Q：为什么要重新绘制图表？
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">A：因为纵轴的范围较大，且数据方差相对较大，难以看清这张图的规律。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">Q：怎样优化图表？
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">A：删除前10个数据点，因为它们的取值范围与曲线上的其他点不同。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> 将每个数据点替换为前面数据点的指数移动平均值，以得到光滑的曲线。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">&amp;#34;&amp;#34;&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">smooth_curve&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">points&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">factor&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mf">0.9&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">smoothed_points&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="n">point&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="n">points&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="n">smoothed_points&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">previous&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">smoothed_points&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">smoothed_points&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">append&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">previous&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="n">factor&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="n">point&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="mi">1&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="n">factor&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">else&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">smoothed_points&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">append&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">point&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">smoothed_points&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">smooth_mae_history&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">smooth_curve&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">average_mae_history&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">10&lt;/span>&lt;span class="p">:])&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">plot&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nb">range&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nb">len&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">smooth_mae_history&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">),&lt;/span> &lt;span class="n">smooth_mae_history&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">xlabel&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;Epochs&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">ylabel&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;Validation MAE&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">plt&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">show&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;img src="https://img-blog.csdnimg.cn/2020082100135499.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQzNTgwMTkz,size_16,color_FFFFFF,t_70#pic_center"
+loading="lazy"
+alt="在这里插入图片描述"
+>&lt;/p>
+&lt;h3 id="训练最终模型">训练最终模型
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 训练最终模型&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">model&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">build_model&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">model&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">fit&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">train_data&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">train_targets&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">epochs&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">80&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">batch_size&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">16&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">verbose&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">test_mes_score&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">test_mae_score&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">model&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">evaluate&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">test_data&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">test_targets&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 输出最终结果&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">test_mae_score&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 2.509598970413208&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="小结">小结
+&lt;/h2>&lt;ul>
+&lt;li>回归问题使用的损失函数与分类问题不同，&lt;strong>回归常用的损失函数是均方误差（MSE）&lt;/strong>。&lt;/li>
+&lt;li>回归问题使用的评估指标也与分类问题不同，精度的概念不适用于回归问题。常见的回归指标是平均绝对误差（MAE）。&lt;/li>
+&lt;li>如果输入数据的特征具有不同的取值范围，应该先进行预处理，对每个特征单独进行缩放。&lt;/li>
+&lt;li>如果可用的数据很少，使用K折验证可以可靠地评估模型。&lt;/li>
+&lt;li>如果可用的训练数据很少，最好使用隐藏层较少（通常只有一到两个）的小型网络，以避免严重的过拟合。&lt;/li>
+&lt;/ul></description></item></channel></rss>

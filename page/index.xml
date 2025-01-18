@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><follow_challenge><feedId>77250260013802496</feedId><userId>42117541714060288</userId></follow_challenge><title>Pages on Wlynxg's Blog</title><link>https://wlynxg.github.io/blog/page/</link><description>Recent content in Pages on Wlynxg's Blog</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Thu, 07 Nov 2024 02:58:09 +0000</lastBuildDate><atom:link href="https://wlynxg.github.io/blog/page/index.xml" rel="self" type="application/rss+xml"/><item><title>Plan</title><link>https://wlynxg.github.io/blog/plan/</link><pubDate>Thu, 07 Nov 2024 02:58:09 +0000</pubDate><guid>https://wlynxg.github.io/blog/plan/</guid><description>&lt;h1 id="welcome-to-lynxs-blog">Welcome to Lynx&amp;rsquo;s Blog
+&lt;/h1>&lt;p>&lt;strong>留的一些坑：&lt;/strong>&lt;/p>
+&lt;ol>
+&lt;li>iptables 三表五链&lt;/li>
+&lt;li>sync.WaitGroup&lt;/li>
+&lt;li>BIRD 路由协议软件(参考：&lt;a class="link" href="https://soha.moe/post/bird-bgp-kickstart.html#1-%E4%BB%80%E4%B9%88%E6%98%AF-bird" target="_blank" rel="noopener"
+>url&lt;/a>)&lt;/li>
+&lt;li>gViso 了解，协议栈实现&lt;/li>
+&lt;li>NaCI 加密算法(参考：&lt;a class="link" href="https://segmentfault.com/a/1190000000476866" target="_blank" rel="noopener"
+>url&lt;/a>)&lt;/li>
+&lt;li>Noise 加密算法了解(参考：&lt;a class="link" href="http://www.noiseprotocol.org/noise.html" target="_blank" rel="noopener"
+>url&lt;/a>)&lt;/li>
+&lt;li>Disco 加密算法了解(参考：&lt;a class="link" href="https://www.discocrypto.com/#/" target="_blank" rel="noopener"
+>url&lt;/a>)&lt;/li>
+&lt;li>WebSocket 链接连接流程分析&lt;/li>
+&lt;li>UDP 流量伪装为 TCP&lt;/li>
+&lt;li>KCP 协议&lt;/li>
+&lt;li>bufio 包使用&lt;/li>
+&lt;li>netlink套接字&lt;/li>
+&lt;li>kcptun 项目&lt;/li>
+&lt;li>quic 协议&lt;/li>
+&lt;li>http3&lt;/li>
+&lt;li>chacha20算法&lt;/li>
+&lt;li>windows namedpipe&lt;/li>
+&lt;li>windows SDDL Syntax&lt;/li>
+&lt;li>webrtc 了解&lt;/li>
+&lt;li>webtransport 了解&lt;/li>
+&lt;li>死锁、活锁、饥饿、自旋锁&lt;/li>
+&lt;li>半虚拟化网卡&lt;/li>
+&lt;li>Forward Error Correction 算法&lt;/li>
+&lt;li>重放攻击&lt;/li>
+&lt;li>TCP重置报文段(RST)&lt;/li>
+&lt;li>Go 调用动态链接库&lt;/li>
+&lt;li>pcap 库学习&lt;/li>
+&lt;li>Go 条件编译&lt;/li>
+&lt;li>linux socket的 &lt;strong>sendmmsg&lt;/strong> 和 &lt;strong>recvmmsg&lt;/strong>&lt;/li>
+&lt;li>一致性哈希算法&lt;/li>
+&lt;li>MPC 安全多方计算&lt;/li>
+&lt;li>MPTCP 学习 &lt;a class="link" href="https://mp.weixin.qq.com/s/aC7omLYJ6Anm9f-8b4qYAg" target="_blank" rel="noopener"
+>url&lt;/a>&lt;/li>
+&lt;li>Groupcache 学习&lt;/li>
+&lt;li>BT Sync（Resilio Sync）自动同步&lt;/li>
+&lt;li>vpn gate使用&lt;/li>
+&lt;li>Go 使用不同编码&lt;/li>
+&lt;li>lock-free 编程&lt;/li>
+&lt;li>CAS 机制&lt;/li>
+&lt;li>hmac 了解&lt;/li>
+&lt;li>double-defer 机制&lt;/li>
+&lt;li>UEFI 和 BIOS&lt;/li>
+&lt;li>地址复用和端口复用&lt;/li>
+&lt;li>Go 泛型&lt;/li>
+&lt;li>TCP 状态机&lt;/li>
+&lt;li>Linux 常见虚拟网卡&lt;/li>
+&lt;li>libp2p 事件总线设计&lt;/li>
+&lt;li>ASN 自治系统&lt;/li>
+&lt;li>拓展原语和并发原语&lt;/li>
+&lt;li>errorgroups 学习&lt;/li>
+&lt;li>函数选项模式&lt;/li>
+&lt;li>go.uber.org/fx 依赖注入\&lt;/li>
+&lt;li>windows iphlpapi.dll&lt;/li>
+&lt;li>ioctl&lt;/li>
+&lt;li>go mod 原理&lt;/li>
+&lt;li>github.com/ulule/deepcopier&lt;/li>
+&lt;li>webkit&lt;/li>
+&lt;li>//go:linkname 、//go:nosplit 等Go编译器指令&lt;/li>
+&lt;li>runtime.procyield&lt;/li>
+&lt;li>gob&lt;/li>
+&lt;li>fsnotify&lt;/li>
+&lt;li>sync.Cond&lt;/li>
+&lt;li>sqlite wal模式&lt;/li>
+&lt;li>文件读写锁&lt;/li>
+&lt;li>geohash&lt;/li>
+&lt;li>geojson 使用&lt;/li>
+&lt;li>GraphQL&lt;/li>
+&lt;li>Temporal&lt;/li>
+&lt;li>actor 模型&lt;/li>
+&lt;li>扇入和扇出&lt;/li>
+&lt;li>linux attribute&lt;/li>
+&lt;li>epoll 机制原理&lt;/li>
+&lt;li>限流机制：计数器、滑动窗口、漏桶、令牌桶&lt;/li>
+&lt;li>unix socket抓包&lt;/li>
+&lt;li>Server Send Event&lt;/li>
+&lt;li>聚类算法&lt;/li>
+&lt;li>Happy Eyeballs 机制&lt;/li>
+&lt;li>过滤器：&lt;strong>BitMap&lt;/strong>、&lt;strong>布隆过滤器&lt;/strong>&lt;/li>
+&lt;li>分布式数据协议 - DDP&lt;/li>
+&lt;li>竞态检测：src\internal\race.Enabled&lt;/li>
+&lt;li>twamp&lt;/li>
+&lt;li>io_uring&lt;/li>
+&lt;li>liburing&lt;/li>
+&lt;li>webhook&lt;/li>
+&lt;li>false sharing: &lt;a class="link" href="https://medium.com/@genchilu/whats-false-sharing-and-how-to-solve-it-using-golang-as-example-ef978a305e10" target="_blank" rel="noopener"
+>What’s false sharing and how to solve it (using Golang as example)&lt;/a>&lt;/li>
+&lt;li>证书链&lt;/li>
+&lt;li>凤凰架构&lt;/li>
+&lt;li>go http 超时&lt;/li>
+&lt;li>go 单元测试 &lt;a class="link" href="https://books.studygolang.com/The-Golang-Standard-Library-by-Example/chapter09/09.0.html" target="_blank" rel="noopener"
+>https://books.studygolang.com/The-Golang-Standard-Library-by-Example/chapter09/09.0.html&lt;/a>&lt;/li>
+&lt;li>rust、erlang、go进程模型分析&lt;/li>
+&lt;li>Wake-on-LAN&lt;/li>
+&lt;li>XDP 技术&lt;/li>
+&lt;li>无root下进行ping&lt;/li>
+&lt;li>go unix socket 编程&lt;/li>
+&lt;li>CoAP 协议&lt;/li>
+&lt;li>SOCK_SEQPACKET&lt;/li>
+&lt;li>共享内存&lt;/li>
+&lt;li>VNC&lt;/li>
+&lt;li>Guacamole Protocol&lt;/li>
+&lt;li>ALPN&lt;/li>
+&lt;li>ECN&lt;/li>
+&lt;li>DMZ&lt;/li>
+&lt;li>errgroup&lt;/li>
+&lt;li>iperf3&lt;/li>
+&lt;li>粘包问题处理框架&lt;/li>
+&lt;li>安卓基于VPN抓包框架&lt;/li>
+&lt;li>HTTPS 原理&lt;/li>
+&lt;li>签名与加密&lt;/li>
+&lt;li>STUN server 实现&lt;/li>
+&lt;li>MDNS 原理&lt;/li>
+&lt;li>跨进程通信方案&lt;/li>
+&lt;li>Windows 虚拟网卡创建&lt;/li>
+&lt;li>惊群&lt;/li>
+&lt;li>Reactor 和 Proactor&lt;/li>
+&lt;li>webrtc得gcc 和pcc&lt;/li>
+&lt;li>华为fillp&lt;/li>
+&lt;li>tcp Brutal&lt;/li>
+&lt;li>dns fallback机制&lt;/li>
+&lt;li>jni 原理&lt;/li>
+&lt;li>网站更新订阅&lt;/li>
+&lt;li>双缓冲和Exchanger&lt;/li>
+&lt;li>端口映射客户端（NAP-PMP/PCP/UPnP）&lt;/li>
+&lt;li>p2p 工具箱&lt;/li>
+&lt;li>Windows 电脑双网卡设置优先级&lt;/li>
+&lt;li>terraform&lt;/li>
+&lt;li>dns 解析&lt;/li>
+&lt;li>tls 流程&lt;/li>
+&lt;li>DPLPMTUD&lt;/li>
+&lt;li>SCTP&lt;/li>
+&lt;li>Gossip&lt;/li>
+&lt;li>ALPNs&lt;/li>
+&lt;li>HTTP 100 Continue&lt;/li>
+&lt;li>service worker&lt;/li>
+&lt;li>arc 缓存&lt;/li>
+&lt;li>ipv6 zone id&lt;/li>
+&lt;li>未 listen 的 TCP socket能否接收新的连接&lt;/li>
+&lt;li>TCPdive go 重写 &lt;a class="link" href="https://github.com/fastos/tcpdive" target="_blank" rel="noopener"
+>https://github.com/fastos/tcpdive&lt;/a>&lt;/li>
+&lt;li>mdns服务&lt;/li>
+&lt;li>udplite&lt;/li>
+&lt;li>listen link-local IP 需要携带 zone index&lt;/li>
+&lt;li>go tag使用&lt;/li>
+&lt;li>tracert 原理&lt;/li>
+&lt;li>qpp &lt;a class="link" href="https://github.com/xtaci/qpp" target="_blank" rel="noopener"
+>https://github.com/xtaci/qpp&lt;/a> &lt;a class="link" href="https://link.springer.com/content/pdf/10.1140/epjqt/s40507-023-00164-3.pdf" target="_blank" rel="noopener"
+>https://link.springer.com/content/pdf/10.1140/epjqt/s40507-023-00164-3.pdf&lt;/a>&lt;/li>
+&lt;li>delve 原理&lt;/li>
+&lt;li>wireshark noise 插件开发&lt;/li>
+&lt;li>TLS 校验流程（时间不同步引发的校验失败问题）&lt;/li>
+&lt;li>tc 命令常用用法&lt;/li>
+&lt;li>Linux Advanced Routing &amp;amp; Traffic Control HOWTO&lt;/li>
+&lt;li>iptables hashlimit&lt;/li>
+&lt;li>ecaptures&lt;/li>
+&lt;li>keylog&lt;/li>
+&lt;/ol></description></item><item><title>Archives</title><link>https://wlynxg.github.io/blog/archives/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://wlynxg.github.io/blog/archives/</guid><description/></item><item><title>Links</title><link>https://wlynxg.github.io/blog/links/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://wlynxg.github.io/blog/links/</guid><description>&lt;p>To use this feature, add &lt;code>links&lt;/code> section to frontmatter.&lt;/p>
+&lt;p>This page&amp;rsquo;s frontmatter:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;span class="lnt">9
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">links&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">title&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">GitHub&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">description&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">GitHub is the world&amp;#39;s largest software development platform.&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">website&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">https://github.com&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">image&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">title&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">TypeScript&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">description&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">TypeScript is a typed superset of JavaScript that compiles to plain JavaScript.&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">website&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">https://www.typescriptlang.org&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">image&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">ts-logo-128.jpg&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;code>image&lt;/code> field accepts both local and external images.&lt;/p></description></item><item><title>Search</title><link>https://wlynxg.github.io/blog/search/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://wlynxg.github.io/blog/search/</guid><description/></item></channel></rss>

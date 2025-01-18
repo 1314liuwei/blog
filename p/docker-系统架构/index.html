@@ -1,0 +1,292 @@
+<!doctype html><html lang=zh-cn dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="Docker 系统架构与使用 一、整体架构 通过下图可以发现，Docker 系统主要包含客户端、服务端和仓库三大部分。\nDocker 在运行时分为 Docker 引擎（服务端守护进程） 和 客户端工具，我们日常使用各种 docker 命令，其实就是在使用 客户端工具 与 Docker 引擎 进行交互：\n二、Client Docker 是一个客户端-服务器（C/S）架构程序。Docker 客户端只需要向 Docker 服务器或者守护进程发出请求，服务器或者守护进程将完成所有工作并返回结果。\nClient 能够帮助我们使用命令行与 Docker 服务端进行交互，包括本地服务端和远程服务端：\n通过-H参数可以指定客户端连接的服务端。\n1 docker -H host 三、服务端（Docker 引擎） 服务端会启动一个守护进程，通过 socket 或者 RESTful API 接收来自客户端的请求，并且处理这些请求，实现对镜像和容器的操作。\n镜像 Docker 镜像 是一个特殊的文件系统，它除了提供容器运行时所需的程序、库、资源、配置等文件外，还包含了一些为运行时准备的一些配置参数（如匿名卷、环境变量、用户等）。\n镜像 不包含 任何动态数据，其内容在构建之后也不会被改变。\n因为镜像包含了完整的 root 文件系统，因此其体积往往是巨大的。为了解决这个问题，采用了 Union FS (opens new window)的技术，将其设计为分层存储的架构，由多层文件系统联合组成：\n容器 镜像Image和容器Container的关系，就像是面向对象程序设计中的 类 和 实例 一样，镜像是静态的定义，容器是镜像运行时的实体。容器可以被创建、启动、停止、删除、暂停等。\n容器的实质是进程，但与直接在宿主执行的进程不同，容器进程运行于属于自己的独立的命名空间。因此容器可以拥有自己的 root 文件系统、自己的网络配置、自己的进程空间，甚至自己的用户 ID 空间。容器内的进程是运行在一个隔离的环境里，使用起来，就好像是在一个独立于宿主的系统下操作一样。这种特性使得容器封装的应用比直接在宿主运行更加安全。\n"><title>Docker 系统架构</title>
+<link rel=canonical href=https://wlynxg.github.io/blog/p/docker-%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84/><link rel=stylesheet href=/blog/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css><meta property='og:title' content="Docker 系统架构"><meta property='og:description' content="Docker 系统架构与使用 一、整体架构 通过下图可以发现，Docker 系统主要包含客户端、服务端和仓库三大部分。\nDocker 在运行时分为 Docker 引擎（服务端守护进程） 和 客户端工具，我们日常使用各种 docker 命令，其实就是在使用 客户端工具 与 Docker 引擎 进行交互：\n二、Client Docker 是一个客户端-服务器（C/S）架构程序。Docker 客户端只需要向 Docker 服务器或者守护进程发出请求，服务器或者守护进程将完成所有工作并返回结果。\nClient 能够帮助我们使用命令行与 Docker 服务端进行交互，包括本地服务端和远程服务端：\n通过-H参数可以指定客户端连接的服务端。\n1 docker -H host 三、服务端（Docker 引擎） 服务端会启动一个守护进程，通过 socket 或者 RESTful API 接收来自客户端的请求，并且处理这些请求，实现对镜像和容器的操作。\n镜像 Docker 镜像 是一个特殊的文件系统，它除了提供容器运行时所需的程序、库、资源、配置等文件外，还包含了一些为运行时准备的一些配置参数（如匿名卷、环境变量、用户等）。\n镜像 不包含 任何动态数据，其内容在构建之后也不会被改变。\n因为镜像包含了完整的 root 文件系统，因此其体积往往是巨大的。为了解决这个问题，采用了 Union FS (opens new window)的技术，将其设计为分层存储的架构，由多层文件系统联合组成：\n容器 镜像Image和容器Container的关系，就像是面向对象程序设计中的 类 和 实例 一样，镜像是静态的定义，容器是镜像运行时的实体。容器可以被创建、启动、停止、删除、暂停等。\n容器的实质是进程，但与直接在宿主执行的进程不同，容器进程运行于属于自己的独立的命名空间。因此容器可以拥有自己的 root 文件系统、自己的网络配置、自己的进程空间，甚至自己的用户 ID 空间。容器内的进程是运行在一个隔离的环境里，使用起来，就好像是在一个独立于宿主的系统下操作一样。这种特性使得容器封装的应用比直接在宿主运行更加安全。\n"><meta property='og:url' content='https://wlynxg.github.io/blog/p/docker-%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84/'><meta property='og:site_name' content="Wlynxg's Blog"><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:published_time' content='2023-03-02T09:55:21+08:00'><meta property='article:modified_time' content='2024-05-16T11:09:11+08:00'><meta name=twitter:title content="Docker 系统架构"><meta name=twitter:description content="Docker 系统架构与使用 一、整体架构 通过下图可以发现，Docker 系统主要包含客户端、服务端和仓库三大部分。\nDocker 在运行时分为 Docker 引擎（服务端守护进程） 和 客户端工具，我们日常使用各种 docker 命令，其实就是在使用 客户端工具 与 Docker 引擎 进行交互：\n二、Client Docker 是一个客户端-服务器（C/S）架构程序。Docker 客户端只需要向 Docker 服务器或者守护进程发出请求，服务器或者守护进程将完成所有工作并返回结果。\nClient 能够帮助我们使用命令行与 Docker 服务端进行交互，包括本地服务端和远程服务端：\n通过-H参数可以指定客户端连接的服务端。\n1 docker -H host 三、服务端（Docker 引擎） 服务端会启动一个守护进程，通过 socket 或者 RESTful API 接收来自客户端的请求，并且处理这些请求，实现对镜像和容器的操作。\n镜像 Docker 镜像 是一个特殊的文件系统，它除了提供容器运行时所需的程序、库、资源、配置等文件外，还包含了一些为运行时准备的一些配置参数（如匿名卷、环境变量、用户等）。\n镜像 不包含 任何动态数据，其内容在构建之后也不会被改变。\n因为镜像包含了完整的 root 文件系统，因此其体积往往是巨大的。为了解决这个问题，采用了 Union FS (opens new window)的技术，将其设计为分层存储的架构，由多层文件系统联合组成：\n容器 镜像Image和容器Container的关系，就像是面向对象程序设计中的 类 和 实例 一样，镜像是静态的定义，容器是镜像运行时的实体。容器可以被创建、启动、停止、删除、暂停等。\n容器的实质是进程，但与直接在宿主执行的进程不同，容器进程运行于属于自己的独立的命名空间。因此容器可以拥有自己的 root 文件系统、自己的网络配置、自己的进程空间，甚至自己的用户 ID 空间。容器内的进程是运行在一个隔离的环境里，使用起来，就好像是在一个独立于宿主的系统下操作一样。这种特性使得容器封装的应用比直接在宿主运行更加安全。\n"><link rel="shortcut icon" href=/blog/favicon.ico></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label=切换菜单>
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/blog/><img src=/blog/img/file_hu6889846174828548036.png width=300 height=300 class=site-logo loading=lazy alt=Avatar>
+</a><span class=emoji>🐂</span></figure><div class=site-meta><h1 class=site-name><a href=/blog>Wlynxg's Blog</a></h1><h2 class=site-description>The harder, ther luckier!</h2></div></header><ol class=menu-social><li><a href=https://github.com/wlynxg target=_blank title=GitHub rel=me><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li><li><a href=mailto:liuauthor@foxmail.com target=_blank title=Mail rel=me><svg t="1730733819354" class="icon" viewBox="0 0 1024 1024" p-id="3570" width="24" height="24"><path d="M942.08 200.704s-1.024.0.0.0c-1.024-2.048-1.024-4.096-2.048-6.144-1.024-1.024-2.048-3.072-3.072-4.096l-1.024-1.024-1.024-1.024c-1.024-1.024-2.048-2.048-4.096-2.048h-1.024c-2.048-1.024-3.072-1.024-5.12-1.024h-1.024C788.48 163.84 649.216 153.6 512 153.6s-276.48 10.24-412.672 30.72h-1.024c-2.048.0-3.072 1.024-5.12 1.024H92.16c-1.024 1.024-3.072 1.024-4.096 2.048l-1.024 1.024-1.024 1.024c-1.024 1.024-2.048 2.048-3.072 4.096v1.024c-1.024 2.048-1.024 3.072-2.048 5.12C61.44 304.128 51.2 408.576 51.2 512s10.24 207.872 30.72 311.296c2.048 8.192 8.192 15.36 17.408 16.384C235.52 860.16 374.784 870.4 512 870.4s276.48-10.24 412.672-30.72c8.192-1.024 15.36-8.192 17.408-16.384C962.56 719.872 972.8 615.424 972.8 512s-10.24-207.872-30.72-311.296zm-60.416 19.456c-44.032 50.176-96.256 97.28-156.672 142.336C654.336 415.744 582.656 457.728 512 489.472c-77.824-36.864-148.48-78.848-212.992-126.976-56.32-41.984-108.544-90.112-156.672-142.336 122.88-17.408 246.784-25.6 369.664-25.6s246.784 8.192 369.664 25.6zm22.528 580.608C774.144 820.224 642.048 829.44 512 829.44s-262.144-9.216-392.192-28.672C101.376 705.536 92.16 608.256 92.16 512c0-87.04 8.192-175.104 22.528-262.144 48.128 53.248 102.4 102.4 159.744 145.408 69.632 52.224 144.384 96.256 229.376 135.168 3.072 1.024 6.144 2.048 8.192 2.048 3.072.0 5.12-1.024 8.192-2.048 76.8-32.768 153.6-78.848 229.376-135.168 60.416-46.08 114.688-94.208 159.744-144.384C924.672 337.92 931.84 424.96 931.84 512c0 96.256-9.216 193.536-27.648 288.768z" p-id="3571" fill="#707070"/></svg></a></li><li><a href=/blog/index.xml target=_blank title=RSS rel=me><svg t="1730718821658" class="icon" viewBox="0 0 1024 1024" p-id="21619" width="24" height="24"><path d="M554.666667 896C529.066667 896 512 878.933333 512 853.333333 512 665.6 358.4 512 170.666667 512 145.066667 512 128 494.933333 128 469.333333s17.066667-42.666667 42.666667-42.666666c234.666667.0 426.666667 192 426.666666 426.666666.0 25.6-17.066667 42.666667-42.666666 42.666667z" p-id="21620" fill="#707070"/><path d="M853.333333 896c-25.6.0-42.666667-17.066667-42.666666-42.666667.0-354.133333-285.866667-640-640-640-25.6.0-42.666667-17.066667-42.666667-42.666666S145.066667 128 170.666667 128C571.733334 128 896 452.266667 896 853.333333 896 878.933333 878.933333 896 853.333333 896z" p-id="21621" fill="#707070"/><path d="M213.333333 810.666667m-85.333333.0a85.333333 85.333333.0 10170.666667.0 85.333333 85.333333.0 10-170.666667.0z" p-id="21622" fill="#707070"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/blog/><svg class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>Home</span></a></li><li><a href=/blog/archives/><svg class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+<span>Archives</span></a></li><li><a href=/blog/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>Search</span></a></li><li><a href=/blog/links/><svg class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg>
+<span>Links</span></a></li><li><a href=/blog/plan/><svg t="1730733517435" class="icon" viewBox="0 0 1024 1024" p-id="1581" width="24" height="24"><path d="M874.24 1013.76H143.36a94.72 94.72.0 01-94.72-94.72V188.16a94.72 94.72.0 0194.72-94.72h730.88a95.36 95.36.0 0194.72 94.72v730.88a94.72 94.72.0 01-94.72 94.72zM143.36 156.8a31.36 31.36.0 00-32 31.36v730.88a32 32 0 0032 32h730.88a32 32 0 0031.36-32V188.16a31.36 31.36.0 00-31.36-31.36z" fill="#707070" p-id="1582"/><path d="M926.08 399.36h-832a32 32 0 010-64h832a32 32 0 110 64zM339.84 273.28a31.36 31.36.0 01-31.36-32V39.04a31.36 31.36.0 0131.36-32 32 32 0 0132 32v202.24a32 32 0 01-32 32zm337.28.0a31.36 31.36.0 01-31.36-32V39.04a31.36 31.36.0 1164 0v202.24a31.36 31.36.0 01-32.64 32zM444.16 841.6a33.92 33.92.0 01-23.04-9.6l-128-138.24a32 32 0 1146.08-43.52L448 768l280.32-279.68a30.72 30.72.0 0144.8.0 31.36 31.36.0 010 44.16L466.56 832a32 32 0 01-22.4 9.6z" fill="#707070" p-id="1583"/></svg>
+<span>Plan</span></a></li><li class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>暗色模式</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">目录</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#一整体架构>一、整体架构</a></li><li><a href=#二client>二、Client</a></li><li><a href=#三服务端docker-引擎>三、服务端（Docker 引擎）</a><ol><li><a href=#镜像>镜像</a></li><li><a href=#容器>容器</a></li><li><a href=#开放远程-api-接口>开放远程 API 接口</a></li><li><a href=#数据管理>数据管理</a></li><li><a href=#四registry-仓库>四、Registry 仓库</a></li></ol></li></ol></nav></div></section></aside><main class="main full-width"><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/blog/categories/linux/ style=background-color:#2e8b57;color:#fff>Linux</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/blog/p/docker-%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84/>Docker 系统架构</a></h2></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published>Mar 02, 2023</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>阅读时长: 3 分钟</time></div></footer></div></header><section class=article-content><h1 id=docker-系统架构与使用>Docker 系统架构与使用</h1><h2 id=一整体架构>一、整体架构</h2><p>通过下图可以发现，Docker 系统主要包含客户端、服务端和仓库三大部分。</p><p><code>Docker</code> 在运行时分为 <code>Docker 引擎（服务端守护进程）</code> 和 <code>客户端工具</code>，我们日常使用各种 <code>docker 命令</code>，其实就是在使用 <code>客户端工具</code> 与 <code>Docker 引擎</code> 进行交互：</p><p><img src=https://pic.try-hard.cn/blog/1631179825421890600.jpg loading=lazy alt=img></p><h2 id=二client>二、Client</h2><p>Docker 是一个客户端-服务器（C/S）架构程序。Docker 客户端只需要向 Docker 服务器或者守护进程发出请求，服务器或者守护进程将完成所有工作并返回结果。</p><p>Client 能够帮助我们使用命令行与 Docker 服务端进行交互，包括本地服务端和<strong>远程服务端</strong>：</p><p>通过<code>-H</code>参数可以指定客户端连接的服务端。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>docker -H host
+</span></span></code></pre></td></tr></table></div></div><h2 id=三服务端docker-引擎>三、服务端（Docker 引擎）</h2><p>服务端会启动一个守护进程，通过 <code>socket</code> 或者 <code>RESTful API</code> 接收来自客户端的请求，并且处理这些请求，实现对镜像和容器的操作。</p><h3 id=镜像>镜像</h3><p><strong>Docker 镜像</strong> 是一个特殊的文件系统，它除了提供容器运行时所需的程序、库、资源、配置等文件外，还包含了一些为运行时准备的一些配置参数（如匿名卷、环境变量、用户等）。</p><p>镜像 <strong>不包含</strong> 任何动态数据，其内容在构建之后也不会被改变。</p><p>因为镜像包含了完整的 root 文件系统，因此其体积往往是巨大的。为了解决这个问题，采用了 <a class=link href=https://en.wikipedia.org/wiki/Union_mount target=_blank rel=noopener>Union FS (opens new window)</a>的技术，将其设计为分层存储的架构，由多层文件系统联合组成：</p><p><img src=https://pic.try-hard.cn/blog/1631179816285823100.png loading=lazy alt=img></p><h3 id=容器>容器</h3><p>镜像<code>Image</code>和容器<code>Container</code>的关系，就像是面向对象程序设计中的 <code>类</code> 和 <code>实例</code> 一样，镜像是静态的定义，容器是镜像运行时的实体。容器可以被创建、启动、停止、删除、暂停等。</p><p>容器的实质是进程，但与直接在宿主执行的进程不同，容器进程运行于属于自己的独立的命名空间。因此容器可以拥有自己的 <code>root</code> 文件系统、自己的网络配置、自己的进程空间，甚至自己的用户 ID 空间。容器内的进程是运行在一个隔离的环境里，使用起来，就好像是在一个独立于宿主的系统下操作一样。这种特性使得容器封装的应用比直接在宿主运行更加安全。</p><p>容器与镜像层一样也是分层结构的。每一个容器运行时，都是是以镜像为基础层，在其上创建一个当前容器的存储层，我们可以称这个为容器运行时读写而准备的存储层为 <strong>容器存储层</strong>。</p><p>容器存储层的生存周期和容器一样，容器消亡时，容器存储层也随之消亡。因此，任何保存于容器存储层的信息都会随容器删除而丢失。容器不应该向其存储层内写入任何数据，容器存储层要保持无状态化。</p><p>所有的文件写入操作，都应该使用 <strong>数据卷（Volume）</strong>、或者 <strong>绑定宿主目录</strong>，在这些位置的读写会跳过容器存储层，直接对宿主（或网络存储）发生读写，其性能和稳定性更高。</p><h3 id=开放远程-api-接口>开放远程 API 接口</h3><p>我们知道客户端是调用服务端的 API 接口实现对镜像和容器的管理。Docker 可以监听并处理 3 种 socket 形式的 API 请求，分别是<code>unix</code>（unix 域协议）、<code>tcp</code>（tcp 协议）和<code>fd</code>。</p><p>一般来说，在安装好 docker 后，默认就已经开启了<code>unix</code> socket，并且我们在执行需要有<code>root</code>权限或者<code>docker</code>用户组成员才有权限访问。</p><p>下面是通过 socket 文件与服务端通信：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>curl --unix-socket /var/run/docker.sock  http://docker/version
+</span></span></code></pre></td></tr></table></div></div><p>输出：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;Platform&#34;</span><span class=p>:{</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&#34;Name&#34;</span><span class=p>:</span><span class=s2>&#34;Docker Engine - Community&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=p>},</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;Components&#34;</span><span class=p>:[</span>
+</span></span><span class=line><span class=cl>        <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;Name&#34;</span><span class=p>:</span><span class=s2>&#34;Engine&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;Version&#34;</span><span class=p>:</span><span class=s2>&#34;20.10.8&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;Details&#34;</span><span class=p>:{</span>
+</span></span><span class=line><span class=cl>                <span class=nt>&#34;ApiVersion&#34;</span><span class=p>:</span><span class=s2>&#34;1.41&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                <span class=nt>&#34;Arch&#34;</span><span class=p>:</span><span class=s2>&#34;amd64&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                <span class=nt>&#34;BuildTime&#34;</span><span class=p>:</span><span class=s2>&#34;2021-07-30T19:54:13.000000000+00:00&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                <span class=nt>&#34;Experimental&#34;</span><span class=p>:</span><span class=s2>&#34;true&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                <span class=nt>&#34;GitCommit&#34;</span><span class=p>:</span><span class=s2>&#34;75249d8&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                <span class=nt>&#34;GoVersion&#34;</span><span class=p>:</span><span class=s2>&#34;go1.16.6&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                <span class=nt>&#34;KernelVersion&#34;</span><span class=p>:</span><span class=s2>&#34;3.10.0-1160.41.1.el7.x86_64&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                <span class=nt>&#34;MinAPIVersion&#34;</span><span class=p>:</span><span class=s2>&#34;1.12&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                <span class=nt>&#34;Os&#34;</span><span class=p>:</span><span class=s2>&#34;linux&#34;</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>},</span>
+</span></span><span class=line><span class=cl>        <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;Name&#34;</span><span class=p>:</span><span class=s2>&#34;containerd&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;Version&#34;</span><span class=p>:</span><span class=s2>&#34;1.4.9&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;Details&#34;</span><span class=p>:{</span>
+</span></span><span class=line><span class=cl>                <span class=nt>&#34;GitCommit&#34;</span><span class=p>:</span><span class=s2>&#34;e25210fe30a0a703442421b0f60afac609f950a3&#34;</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>},</span>
+</span></span><span class=line><span class=cl>        <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;Name&#34;</span><span class=p>:</span><span class=s2>&#34;runc&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;Version&#34;</span><span class=p>:</span><span class=s2>&#34;1.0.1&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;Details&#34;</span><span class=p>:{</span>
+</span></span><span class=line><span class=cl>                <span class=nt>&#34;GitCommit&#34;</span><span class=p>:</span><span class=s2>&#34;v1.0.1-0-g4144b63&#34;</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>},</span>
+</span></span><span class=line><span class=cl>        <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;Name&#34;</span><span class=p>:</span><span class=s2>&#34;docker-init&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;Version&#34;</span><span class=p>:</span><span class=s2>&#34;0.19.0&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nt>&#34;Details&#34;</span><span class=p>:{</span>
+</span></span><span class=line><span class=cl>                <span class=nt>&#34;GitCommit&#34;</span><span class=p>:</span><span class=s2>&#34;de40ad0&#34;</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>],</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;Version&#34;</span><span class=p>:</span><span class=s2>&#34;20.10.8&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;ApiVersion&#34;</span><span class=p>:</span><span class=s2>&#34;1.41&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;MinAPIVersion&#34;</span><span class=p>:</span><span class=s2>&#34;1.12&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;GitCommit&#34;</span><span class=p>:</span><span class=s2>&#34;75249d8&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;GoVersion&#34;</span><span class=p>:</span><span class=s2>&#34;go1.16.6&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;Os&#34;</span><span class=p>:</span><span class=s2>&#34;linux&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;Arch&#34;</span><span class=p>:</span><span class=s2>&#34;amd64&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;KernelVersion&#34;</span><span class=p>:</span><span class=s2>&#34;3.10.0-1160.41.1.el7.x86_64&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;Experimental&#34;</span><span class=p>:</span><span class=kc>true</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;BuildTime&#34;</span><span class=p>:</span><span class=s2>&#34;2021-07-30T19:54:13.000000000+00:00&#34;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p><strong>开放远程 API</strong></p><p>修改 docker 守护进程的配置文件<code>/lib/systemd/system/docker.service</code></p><p>对下面这行进行修改：</p><pre tabindex=0><code>ExecStart=/usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
+</code></pre><p>修改为：</p><pre tabindex=0><code>ExecStart=/usr/bin/dockerd -H unix://var/run/docker.sock -H tcp://0.0.0.0:2375
+</code></pre><p>修改完成后重新加载：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># 重载 docker 服务</span>
+</span></span><span class=line><span class=cl>systemctl daemon-reload           <span class=c1># 重新加载守护进程配置</span>
+</span></span><span class=line><span class=cl>systemctl restart docker.service  <span class=c1># 重启 docker 服务</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 查看 docker 进程</span>
+</span></span><span class=line><span class=cl>ps -ef<span class=p>|</span>grep docker
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>output:
+</span></span><span class=line><span class=cl>root       <span class=m>3701</span>      <span class=m>1</span>  <span class=m>0</span> 01:07 ?        00:00:00 /usr/bin/dockerd -H fd:// -H tcp://0.0.0.0:2375 --containerd<span class=o>=</span>/run/containerd/containerd.sock
+</span></span><span class=line><span class=cl>root       <span class=m>3834</span>   <span class=m>2449</span>  <span class=m>0</span> 01:11 pts/0    00:00:00 grep --color<span class=o>=</span>auto docker
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 开放防火墙2375端口</span>
+</span></span><span class=line><span class=cl>firewall-cmd --zone<span class=o>=</span>public --add-port<span class=o>=</span>2375/tcp --permanent	<span class=c1># 开放2375端口</span>
+</span></span><span class=line><span class=cl>firewall-cmd --reload	<span class=c1># 重载防火墙</span>
+</span></span><span class=line><span class=cl>firewall-cmd --list-all	<span class=c1># 查看开放端口</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 访问</span>
+</span></span><span class=line><span class=cl>curl http://<span class=o>{{</span>ip<span class=o>}}</span>:2375/version
+</span></span></code></pre></td></tr></table></div></div><h3 id=数据管理>数据管理</h3><p>在上面的学习中我们了解到容器中的数据会随着容器生命周期的结束而消失。如果我们希望保存数据，那么就需要使用 <strong>数据卷（Volume）</strong>、或者 <strong>绑定宿主目录</strong>，在这些位置的读写会跳过容器存储层，直接对宿主（或网络存储）发生读写，其性能和稳定性更高。</p><p><strong>数据卷（Volume）</strong></p><p>数据卷是一个可供一个或多个容器使用的特殊目录，它绕过 UFS，可以提供很多有用的特性：</p><ul><li>数据卷可以在容器之间共享和重用；</li><li>对数据卷的修改会立马生效；</li><li>对数据卷的更新，不会影响镜像；</li><li>数据卷默认会一直存在，即使容器被删除。</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># 创建一个数据卷</span>
+</span></span><span class=line><span class=cl>docker volume create my-vol
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 查看所有数据卷</span>
+</span></span><span class=line><span class=cl>docker volume ls
+</span></span><span class=line><span class=cl>DRIVER    VOLUME NAME
+</span></span><span class=line><span class=cl><span class=nb>local</span>     my-vol
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 查看数据卷的详细信息</span>
+</span></span><span class=line><span class=cl>docker volume inspect my-vol
+</span></span><span class=line><span class=cl><span class=o>[</span>
+</span></span><span class=line><span class=cl>    <span class=o>{</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;CreatedAt&#34;</span>: <span class=s2>&#34;2021-09-09T02:04:14+08:00&#34;</span>,
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;Driver&#34;</span>: <span class=s2>&#34;local&#34;</span>,
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;Labels&#34;</span>: <span class=o>{}</span>,
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;Mountpoint&#34;</span>: <span class=s2>&#34;/var/lib/docker/volumes/my-vol/_data&#34;</span>,
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;Name&#34;</span>: <span class=s2>&#34;my-vol&#34;</span>,
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;Options&#34;</span>: <span class=o>{}</span>,
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;Scope&#34;</span>: <span class=s2>&#34;local&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=o>}</span>
+</span></span><span class=line><span class=cl><span class=o>]</span>
+</span></span></code></pre></td></tr></table></div></div><p>在用 <code>docker run</code> 命令的时候，使用 <code>--mount</code> 标记来将 <code>数据卷</code> 挂载到容器里。在一次 <code>docker run</code> 中可以挂载多个 <code>数据卷</code>。下面创建一个名为 <code>web</code> 的容器，并加载一个 <code>数据卷</code> 到容器的 <code>/usr/share/nginx/html</code> 目录：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># 拉取nginx的镜像</span>
+</span></span><span class=line><span class=cl>docker pull nginx
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 启动容器加载数据卷</span>
+</span></span><span class=line><span class=cl>docker run -d -p 80:80  --name web --mount <span class=nv>source</span><span class=o>=</span>my-vol,target<span class=o>=</span>/usr/share/nginx/html nginx
+</span></span></code></pre></td></tr></table></div></div><p>在主机里使用以下命令可以查看 <code>web</code> 容器的信息：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>docker inspect web
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>...
+</span></span><span class=line><span class=cl><span class=s2>&#34;Mounts&#34;</span>: <span class=o>[</span>
+</span></span><span class=line><span class=cl>	<span class=o>{</span>
+</span></span><span class=line><span class=cl>		<span class=s2>&#34;Type&#34;</span>: <span class=s2>&#34;volume&#34;</span>,
+</span></span><span class=line><span class=cl>		<span class=s2>&#34;Name&#34;</span>: <span class=s2>&#34;my-vol&#34;</span>,
+</span></span><span class=line><span class=cl>		<span class=s2>&#34;Source&#34;</span>: <span class=s2>&#34;/var/lib/docker/volumes/my-vol/_data&#34;</span>,
+</span></span><span class=line><span class=cl>		<span class=s2>&#34;Destination&#34;</span>: <span class=s2>&#34;/usr/share/nginx/html&#34;</span>,
+</span></span><span class=line><span class=cl>		<span class=s2>&#34;Driver&#34;</span>: <span class=s2>&#34;local&#34;</span>,
+</span></span><span class=line><span class=cl>		<span class=s2>&#34;Mode&#34;</span>: <span class=s2>&#34;z&#34;</span>,
+</span></span><span class=line><span class=cl>		<span class=s2>&#34;RW&#34;</span>: true,
+</span></span><span class=line><span class=cl>		<span class=s2>&#34;Propagation&#34;</span>: <span class=s2>&#34;&#34;</span>
+</span></span><span class=line><span class=cl>	<span class=o>}</span>
+</span></span><span class=line><span class=cl><span class=o>]</span>,
+</span></span><span class=line><span class=cl>...
+</span></span></code></pre></td></tr></table></div></div><p>对容器内指定目录进行文件写入操作：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># 查看容器</span>
+</span></span><span class=line><span class=cl>docker container ls
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 进入容器</span>
+</span></span><span class=line><span class=cl>docker <span class=nb>exec</span> -it <span class=o>{{</span>ID<span class=o>}}</span> bash
+</span></span><span class=line><span class=cl><span class=c1># 写入文件</span>
+</span></span><span class=line><span class=cl><span class=nb>echo</span> Hello World!&gt;/usr/share/nginx/html/testFile
+</span></span><span class=line><span class=cl><span class=c1># 退出容器</span>
+</span></span><span class=line><span class=cl><span class=nb>exit</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 根据docker inspect web查询到的路径在主机查看文件</span>
+</span></span><span class=line><span class=cl>cat /var/lib/docker/volumes/my-vol/_data/testFile
+</span></span><span class=line><span class=cl>Hello World
+</span></span></code></pre></td></tr></table></div></div><p>由于数据卷是被设计用来持久化数据的，它的生命周期独立于容器，因此 Docker 不会在容器被删除后自动删除数据卷，并且也不存在垃圾回收这样的机制来处理没有任何容器引用的数据。</p><p>使用下面命令删除数据卷：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># 删除指定数据卷</span>
+</span></span><span class=line><span class=cl>docker volume rm my-vol
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 清理无主数据卷</span>
+</span></span><span class=line><span class=cl>docker volume prune
+</span></span></code></pre></td></tr></table></div></div><p><strong>挂载主机目录</strong></p><p>为了使数据持久化，我们也可以选择将主机目录挂载到容器内。使用 <code>--mount</code> 标记可以指定挂载一个本地主机的目录到容器中去。</p><p>Docker 挂载主机目录的默认权限是 <code>读写</code>，用户也可以通过增加 <code>readonly</code> 指定为 <code>只读</code>，加了 <code>readonly</code> 之后，就挂载为 <code>只读</code> 了：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>docker run -d -P --name web --mount <span class=nv>type</span><span class=o>=</span>bind,source<span class=o>=</span>/src/webapp,target<span class=o>=</span>/usr/share/nginx/html,readonly nginx
+</span></span></code></pre></td></tr></table></div></div><p><code>--mount</code> 标记也可以从主机挂载单个文件到容器中。</p><h3 id=四registry-仓库>四、Registry 仓库</h3><p>镜像构建完成后，可以很容易的在当前宿主机上运行，但是，如果需要在其它服务器上使用这个镜像，我们就需要一个集中的存储、分发镜像的服务，Docker Registry 就是这样的服务。</p><p>Docker 用 Registry 来保存用户构建的镜像。Registry 分为<strong>公共</strong>和<strong>私有</strong>两种。一个 <strong>Docker Registry</strong> 中可以包含多个 <strong>仓库</strong>（<code>Repository</code>）；每个仓库可以包含多个 <strong>标签</strong>（<code>Tag</code>）；每个标签对应一个镜像。Docker 公司运营公共的 Registry 叫做 Docker Hub。用户可以在 Docker Hub 注册账号，分享并保存自己的镜像。</p><blockquote><p>参考资料：</p><ul><li>[Docker 架构及工作原理 - 哈喽沃德先生 - 博客园 (cnblogs.com)](<a class=link href="https://www.cnblogs.com/mrhelloworld/p/docker2.html#:~:text=Docker" target=_blank rel=noopener>https://www.cnblogs.com/mrhelloworld/p/docker2.html#:~:text=Docker</a> 是一个客户端-服务器（C%2FS）架构程序。. Docker 客户端只需要向 Docker 服务器或者守护进程发出请求，服务器或者守护进程将完成所有工作并返回结果。. Docker 提供了一个命令行工具,API。. 你可以在同一台宿主机上运行 Docker 守护进程和客户端，也可以从本地的 Docker 客户端连接到运行在另一台宿主机上的远程 Docker 守护进程。.)</li><li><a class=link href=https://vuepress.mirror.docker-practice.com/ target=_blank rel=noopener>Docker — 从入门到实践 | Docker 从入门到实践 (docker-practice.com)</a></li></ul></blockquote></section><script src=https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js></script><script>mermaid.initialize({startOnLoad:!0}),document.addEventListener("DOMContentLoaded",function(){var e=document.querySelectorAll("pre code.language-mermaid");e.forEach(function(e){var n,t=document.createElement("div");t.className="mermaid",t.innerHTML=e.textContent,n=e.parentElement,n.parentNode.replaceChild(t,n)})})</script><footer class=article-footer><section class=article-copyright><svg class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg>
+<span>Licensed under CC BY-NC-SA 4.0</span></section><section class=article-lastmod><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<span>最后更新于 May 16, 2024 11:09 +0800</span></section></footer><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css integrity=sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV crossorigin=anonymous><script src=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js integrity=sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8 crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js integrity=sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05 crossorigin=anonymous defer></script><script>window.addEventListener("DOMContentLoaded",()=>{renderMathInElement(document.body,{delimiters:[{left:"$$",right:"$$",display:!0},{left:"$",right:"$",display:!1},{left:"\\(",right:"\\)",display:!1},{left:"\\[",right:"\\]",display:!0}],ignoredClasses:["gist"]})})</script></article><aside class=related-content--wrapper><h2 class=section-title>相关文章</h2><div class=related-content><div class="flex article-list--tile"><article><a href=/blog/p/docker%E4%B8%ADapt-get-update%E5%87%BA%E9%94%99hash-sum-mismatch/><div class=article-details><h2 class=article-title>docker中apt-get update出错hash sum mismatch</h2></div></a></article><article><a href=/blog/p/%E8%A7%A3%E5%86%B3-make-warning-clock-skew-detected.-your-build-may-be-incomplete.-%E9%97%AE%E9%A2%98/><div class=article-details><h2 class=article-title>解决 make warning Clock skew detected. Your build may be incomplete. 问题</h2></div></a></article><article><a href=/blog/p/%E8%87%AA%E5%8A%A8%E7%A6%81%E7%94%A8%E7%99%BB%E5%BD%95%E5%A4%B1%E8%B4%A5%E7%9A%84-ssh-ip/><div class=article-details><h2 class=article-title>自动禁用登录失败的 ssh IP</h2></div></a></article><article><a href=/blog/p/%E5%B8%B8%E8%A7%81%E8%99%9A%E6%8B%9F%E7%BD%91%E5%8D%A1/><div class=article-details><h2 class=article-title>常见虚拟网卡</h2></div></a></article><article><a href=/blog/p/kali-%E6%97%A0%E6%B3%95%E8%BF%9E%E6%8E%A5%E5%88%B0%E7%BD%91%E7%BB%9C/><div class=article-details><h2 class=article-title>Kali 无法连接到网络</h2></div></a></article></div></div></aside><footer class=site-footer><section class=copyright>&copy;
+2020 -
+2025 Wlynxg's Blog</section><section class=powerby>使用 <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> 构建<br>主题 <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.29.0>Stack</a></b> 由 <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a> 设计</section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/blog/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>

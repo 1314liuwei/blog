@@ -1,0 +1,666 @@
+<!doctype html><html lang=zh-cn dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="2.3 进程同步 思维导图 一、进程同步的基本概念 在多道程序环境下，进程是并发执行的，不同进程之间存在着不同的制约关系。为了协调进程之间的相互制约的关系，引入进程同步的概念。\n1. 临界资源 多个进程可以共享的各种资源，但是有的资源只能同时为一个进程服务，这样的资源就被称为临界资源。\n对于临界资源的访问必须互斥地进行。在每个进程中，访问临界资源的代码称为临界区。为了确保临界资源的正确使用，可以将临界资源的访问分为四个过程：\n进入区：为了进入临界区使用临界资源，在进入区要检查能否进入临界区。若能进入临界区，则应设置正在访问临界区的标志，以阻止其它进程同时进入临界区； 临界区：进程中访问临界资源的那段代码，又称临界段； 退出区：将正在访问临界区的标志清除； 剩余区：代码中的其余部分。 2. 同步 同步亦称直接制约关系。是指为完成某种任务而建立的两个或多个进程，这些进程因为需要在某些位置上协调它们的工作次序而等待、传递消息所产生的制约关系。进程间的直接制约关系源于它们之间的相互合作。\n例如输入进程 A 通过单缓冲向进程 B 提供数据。当该缓冲区为空时，进程 B 不能获得所需要的数据而阻塞，当进程 A 将数据输入缓冲区时，进程 B 被唤醒；当缓冲区为满时，进程 A 被阻塞，当 B 从缓冲区取走数据后，进程 A 被唤醒。\n3. 互斥 互斥也称间接制约关系。当一个进程进入临界资源区使用临界资源时，另一个进程必须等待，当占用临界资源的进程退出临界区后，另一个进程才允许去访问此资源。\n为禁止两个进程同时进入临界区，同步机制应遵循以下准则：\n空闲让进：临界区空闲时，可以允许一个请求进入临界区的进程立即进入临界区； 忙则等待：当已有进程进入临界区时，其它试图进入临界区的进程必须等待； 有限等待：对请求访问的资源，应保证能在有限时间内进入临界区； 让权等待：当进程不能进入临界区时，应立即释放处理器，防止进程忙等待。 二、实现临界区互斥的基本方法 1. 软件实现方法 在进入区设置一些标志来标明是否有进程在临界区中，若已有进程在临界区，则在进入区通过循环检查进行等待，进程离开临界区后则在退出区修改标志。\n算法一：单标志法 该算法设置一个公用整型变量 turn，用于指示被允许进入临界区的进程编号。若 turn = 0，则允许 P0 进程进入临界区。那么谁来改变 turn 的值？如果是公共区域控制turn这个变量，那么 P0 不想进的时候，即使是 turn = 0 ,对于进程 P0 也是没有价值的。公共区域无法预测谁想要，所以这个控制权还是分权给进程来管理比较好一些。\nPi想进入时检测 turn 值是否是自己的 turn，如果不是，就需要等待，该算法可确保每次只允许一个进程进入临界区。两个进程必须交替进入临界区，一个进程进入临界区，使用完成后将 turn的值设置为另外一个进程。若某个进程不再进入临界区，则另一个进程也将无法进入临界区（违背“空闲让进”）。若 P0 顺利进入临界区并从临界区离开，则此时临界区是空闲的，但 P1 并没有进入临界区的打算，turn = 1一直成立，P0 就无法再次进入临界区（一直被 while 死循环困住）。\n"><title>2.3 进程同步</title>
+<link rel=canonical href=https://wlynxg.github.io/blog/p/2.3-%E8%BF%9B%E7%A8%8B%E5%90%8C%E6%AD%A5/><link rel=stylesheet href=/blog/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css><meta property='og:title' content="2.3 进程同步"><meta property='og:description' content="2.3 进程同步 思维导图 一、进程同步的基本概念 在多道程序环境下，进程是并发执行的，不同进程之间存在着不同的制约关系。为了协调进程之间的相互制约的关系，引入进程同步的概念。\n1. 临界资源 多个进程可以共享的各种资源，但是有的资源只能同时为一个进程服务，这样的资源就被称为临界资源。\n对于临界资源的访问必须互斥地进行。在每个进程中，访问临界资源的代码称为临界区。为了确保临界资源的正确使用，可以将临界资源的访问分为四个过程：\n进入区：为了进入临界区使用临界资源，在进入区要检查能否进入临界区。若能进入临界区，则应设置正在访问临界区的标志，以阻止其它进程同时进入临界区； 临界区：进程中访问临界资源的那段代码，又称临界段； 退出区：将正在访问临界区的标志清除； 剩余区：代码中的其余部分。 2. 同步 同步亦称直接制约关系。是指为完成某种任务而建立的两个或多个进程，这些进程因为需要在某些位置上协调它们的工作次序而等待、传递消息所产生的制约关系。进程间的直接制约关系源于它们之间的相互合作。\n例如输入进程 A 通过单缓冲向进程 B 提供数据。当该缓冲区为空时，进程 B 不能获得所需要的数据而阻塞，当进程 A 将数据输入缓冲区时，进程 B 被唤醒；当缓冲区为满时，进程 A 被阻塞，当 B 从缓冲区取走数据后，进程 A 被唤醒。\n3. 互斥 互斥也称间接制约关系。当一个进程进入临界资源区使用临界资源时，另一个进程必须等待，当占用临界资源的进程退出临界区后，另一个进程才允许去访问此资源。\n为禁止两个进程同时进入临界区，同步机制应遵循以下准则：\n空闲让进：临界区空闲时，可以允许一个请求进入临界区的进程立即进入临界区； 忙则等待：当已有进程进入临界区时，其它试图进入临界区的进程必须等待； 有限等待：对请求访问的资源，应保证能在有限时间内进入临界区； 让权等待：当进程不能进入临界区时，应立即释放处理器，防止进程忙等待。 二、实现临界区互斥的基本方法 1. 软件实现方法 在进入区设置一些标志来标明是否有进程在临界区中，若已有进程在临界区，则在进入区通过循环检查进行等待，进程离开临界区后则在退出区修改标志。\n算法一：单标志法 该算法设置一个公用整型变量 turn，用于指示被允许进入临界区的进程编号。若 turn = 0，则允许 P0 进程进入临界区。那么谁来改变 turn 的值？如果是公共区域控制turn这个变量，那么 P0 不想进的时候，即使是 turn = 0 ,对于进程 P0 也是没有价值的。公共区域无法预测谁想要，所以这个控制权还是分权给进程来管理比较好一些。\nPi想进入时检测 turn 值是否是自己的 turn，如果不是，就需要等待，该算法可确保每次只允许一个进程进入临界区。两个进程必须交替进入临界区，一个进程进入临界区，使用完成后将 turn的值设置为另外一个进程。若某个进程不再进入临界区，则另一个进程也将无法进入临界区（违背“空闲让进”）。若 P0 顺利进入临界区并从临界区离开，则此时临界区是空闲的，但 P1 并没有进入临界区的打算，turn = 1一直成立，P0 就无法再次进入临界区（一直被 while 死循环困住）。\n"><meta property='og:url' content='https://wlynxg.github.io/blog/p/2.3-%E8%BF%9B%E7%A8%8B%E5%90%8C%E6%AD%A5/'><meta property='og:site_name' content="Wlynxg's Blog"><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:published_time' content='2023-03-02T09:55:21+08:00'><meta property='article:modified_time' content='2024-05-16T11:09:11+08:00'><meta name=twitter:title content="2.3 进程同步"><meta name=twitter:description content="2.3 进程同步 思维导图 一、进程同步的基本概念 在多道程序环境下，进程是并发执行的，不同进程之间存在着不同的制约关系。为了协调进程之间的相互制约的关系，引入进程同步的概念。\n1. 临界资源 多个进程可以共享的各种资源，但是有的资源只能同时为一个进程服务，这样的资源就被称为临界资源。\n对于临界资源的访问必须互斥地进行。在每个进程中，访问临界资源的代码称为临界区。为了确保临界资源的正确使用，可以将临界资源的访问分为四个过程：\n进入区：为了进入临界区使用临界资源，在进入区要检查能否进入临界区。若能进入临界区，则应设置正在访问临界区的标志，以阻止其它进程同时进入临界区； 临界区：进程中访问临界资源的那段代码，又称临界段； 退出区：将正在访问临界区的标志清除； 剩余区：代码中的其余部分。 2. 同步 同步亦称直接制约关系。是指为完成某种任务而建立的两个或多个进程，这些进程因为需要在某些位置上协调它们的工作次序而等待、传递消息所产生的制约关系。进程间的直接制约关系源于它们之间的相互合作。\n例如输入进程 A 通过单缓冲向进程 B 提供数据。当该缓冲区为空时，进程 B 不能获得所需要的数据而阻塞，当进程 A 将数据输入缓冲区时，进程 B 被唤醒；当缓冲区为满时，进程 A 被阻塞，当 B 从缓冲区取走数据后，进程 A 被唤醒。\n3. 互斥 互斥也称间接制约关系。当一个进程进入临界资源区使用临界资源时，另一个进程必须等待，当占用临界资源的进程退出临界区后，另一个进程才允许去访问此资源。\n为禁止两个进程同时进入临界区，同步机制应遵循以下准则：\n空闲让进：临界区空闲时，可以允许一个请求进入临界区的进程立即进入临界区； 忙则等待：当已有进程进入临界区时，其它试图进入临界区的进程必须等待； 有限等待：对请求访问的资源，应保证能在有限时间内进入临界区； 让权等待：当进程不能进入临界区时，应立即释放处理器，防止进程忙等待。 二、实现临界区互斥的基本方法 1. 软件实现方法 在进入区设置一些标志来标明是否有进程在临界区中，若已有进程在临界区，则在进入区通过循环检查进行等待，进程离开临界区后则在退出区修改标志。\n算法一：单标志法 该算法设置一个公用整型变量 turn，用于指示被允许进入临界区的进程编号。若 turn = 0，则允许 P0 进程进入临界区。那么谁来改变 turn 的值？如果是公共区域控制turn这个变量，那么 P0 不想进的时候，即使是 turn = 0 ,对于进程 P0 也是没有价值的。公共区域无法预测谁想要，所以这个控制权还是分权给进程来管理比较好一些。\nPi想进入时检测 turn 值是否是自己的 turn，如果不是，就需要等待，该算法可确保每次只允许一个进程进入临界区。两个进程必须交替进入临界区，一个进程进入临界区，使用完成后将 turn的值设置为另外一个进程。若某个进程不再进入临界区，则另一个进程也将无法进入临界区（违背“空闲让进”）。若 P0 顺利进入临界区并从临界区离开，则此时临界区是空闲的，但 P1 并没有进入临界区的打算，turn = 1一直成立，P0 就无法再次进入临界区（一直被 while 死循环困住）。\n"><link rel="shortcut icon" href=/blog/favicon.ico></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label=切换菜单>
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/blog/><img src=/blog/img/file_hu6889846174828548036.png width=300 height=300 class=site-logo loading=lazy alt=Avatar>
+</a><span class=emoji>🐂</span></figure><div class=site-meta><h1 class=site-name><a href=/blog>Wlynxg's Blog</a></h1><h2 class=site-description>The harder, ther luckier!</h2></div></header><ol class=menu-social><li><a href=https://github.com/wlynxg target=_blank title=GitHub rel=me><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li><li><a href=mailto:liuauthor@foxmail.com target=_blank title=Mail rel=me><svg t="1730733819354" class="icon" viewBox="0 0 1024 1024" p-id="3570" width="24" height="24"><path d="M942.08 200.704s-1.024.0.0.0c-1.024-2.048-1.024-4.096-2.048-6.144-1.024-1.024-2.048-3.072-3.072-4.096l-1.024-1.024-1.024-1.024c-1.024-1.024-2.048-2.048-4.096-2.048h-1.024c-2.048-1.024-3.072-1.024-5.12-1.024h-1.024C788.48 163.84 649.216 153.6 512 153.6s-276.48 10.24-412.672 30.72h-1.024c-2.048.0-3.072 1.024-5.12 1.024H92.16c-1.024 1.024-3.072 1.024-4.096 2.048l-1.024 1.024-1.024 1.024c-1.024 1.024-2.048 2.048-3.072 4.096v1.024c-1.024 2.048-1.024 3.072-2.048 5.12C61.44 304.128 51.2 408.576 51.2 512s10.24 207.872 30.72 311.296c2.048 8.192 8.192 15.36 17.408 16.384C235.52 860.16 374.784 870.4 512 870.4s276.48-10.24 412.672-30.72c8.192-1.024 15.36-8.192 17.408-16.384C962.56 719.872 972.8 615.424 972.8 512s-10.24-207.872-30.72-311.296zm-60.416 19.456c-44.032 50.176-96.256 97.28-156.672 142.336C654.336 415.744 582.656 457.728 512 489.472c-77.824-36.864-148.48-78.848-212.992-126.976-56.32-41.984-108.544-90.112-156.672-142.336 122.88-17.408 246.784-25.6 369.664-25.6s246.784 8.192 369.664 25.6zm22.528 580.608C774.144 820.224 642.048 829.44 512 829.44s-262.144-9.216-392.192-28.672C101.376 705.536 92.16 608.256 92.16 512c0-87.04 8.192-175.104 22.528-262.144 48.128 53.248 102.4 102.4 159.744 145.408 69.632 52.224 144.384 96.256 229.376 135.168 3.072 1.024 6.144 2.048 8.192 2.048 3.072.0 5.12-1.024 8.192-2.048 76.8-32.768 153.6-78.848 229.376-135.168 60.416-46.08 114.688-94.208 159.744-144.384C924.672 337.92 931.84 424.96 931.84 512c0 96.256-9.216 193.536-27.648 288.768z" p-id="3571" fill="#707070"/></svg></a></li><li><a href=/blog/index.xml target=_blank title=RSS rel=me><svg t="1730718821658" class="icon" viewBox="0 0 1024 1024" p-id="21619" width="24" height="24"><path d="M554.666667 896C529.066667 896 512 878.933333 512 853.333333 512 665.6 358.4 512 170.666667 512 145.066667 512 128 494.933333 128 469.333333s17.066667-42.666667 42.666667-42.666666c234.666667.0 426.666667 192 426.666666 426.666666.0 25.6-17.066667 42.666667-42.666666 42.666667z" p-id="21620" fill="#707070"/><path d="M853.333333 896c-25.6.0-42.666667-17.066667-42.666666-42.666667.0-354.133333-285.866667-640-640-640-25.6.0-42.666667-17.066667-42.666667-42.666666S145.066667 128 170.666667 128C571.733334 128 896 452.266667 896 853.333333 896 878.933333 878.933333 896 853.333333 896z" p-id="21621" fill="#707070"/><path d="M213.333333 810.666667m-85.333333.0a85.333333 85.333333.0 10170.666667.0 85.333333 85.333333.0 10-170.666667.0z" p-id="21622" fill="#707070"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/blog/><svg class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>Home</span></a></li><li><a href=/blog/archives/><svg class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+<span>Archives</span></a></li><li><a href=/blog/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>Search</span></a></li><li><a href=/blog/links/><svg class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg>
+<span>Links</span></a></li><li><a href=/blog/plan/><svg t="1730733517435" class="icon" viewBox="0 0 1024 1024" p-id="1581" width="24" height="24"><path d="M874.24 1013.76H143.36a94.72 94.72.0 01-94.72-94.72V188.16a94.72 94.72.0 0194.72-94.72h730.88a95.36 95.36.0 0194.72 94.72v730.88a94.72 94.72.0 01-94.72 94.72zM143.36 156.8a31.36 31.36.0 00-32 31.36v730.88a32 32 0 0032 32h730.88a32 32 0 0031.36-32V188.16a31.36 31.36.0 00-31.36-31.36z" fill="#707070" p-id="1582"/><path d="M926.08 399.36h-832a32 32 0 010-64h832a32 32 0 110 64zM339.84 273.28a31.36 31.36.0 01-31.36-32V39.04a31.36 31.36.0 0131.36-32 32 32 0 0132 32v202.24a32 32 0 01-32 32zm337.28.0a31.36 31.36.0 01-31.36-32V39.04a31.36 31.36.0 1164 0v202.24a31.36 31.36.0 01-32.64 32zM444.16 841.6a33.92 33.92.0 01-23.04-9.6l-128-138.24a32 32 0 1146.08-43.52L448 768l280.32-279.68a30.72 30.72.0 0144.8.0 31.36 31.36.0 010 44.16L466.56 832a32 32 0 01-22.4 9.6z" fill="#707070" p-id="1583"/></svg>
+<span>Plan</span></a></li><li class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>暗色模式</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">目录</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#思维导图>思维导图</a></li><li><a href=#一进程同步的基本概念>一、进程同步的基本概念</a><ol><li><a href=#1-临界资源>1. 临界资源</a></li><li><a href=#2-同步>2. 同步</a></li><li><a href=#3-互斥>3. 互斥</a></li></ol></li><li><a href=#二实现临界区互斥的基本方法>二、实现临界区互斥的基本方法</a><ol><li><a href=#1-软件实现方法>1. 软件实现方法</a><ol><li><a href=#算法一单标志法>算法一：单标志法</a></li><li><a href=#算法二双标志法先检查>算法二：双标志法先检查</a></li><li><a href=#算法三双标志法后检查>算法三：双标志法后检查</a></li><li><a href=#算法四petersons-algorithm>算法四：Peterson’s Algorithm</a></li></ol></li><li><a href=#2-硬件实现方法>2. 硬件实现方法</a><ol><li><a href=#1中断屏蔽方法>（1）中断屏蔽方法</a></li><li><a href=#2硬件指令方法>（2）硬件指令方法</a></li></ol></li></ol></li><li><a href=#三信号量>三、信号量</a><ol><li><a href=#1-整型信号量>1. 整型信号量</a></li><li><a href=#2-记录型信号量>2. 记录型信号量</a></li><li><a href=#3-利用信号量实现同步>3. 利用信号量实现同步</a></li><li><a href=#4-利用信号量实现进程互斥>4. 利用信号量实现进程互斥</a></li><li><a href=#5-利用信号量实现前驱关系>5. 利用信号量实现前驱关系</a></li><li><a href=#6-分析进程同步和互斥问题的方法步骤>6. 分析进程同步和互斥问题的方法步骤</a></li></ol></li><li><a href=#四管程>四、管程</a><ol><li><a href=#1-管程的定义>1. 管程的定义</a></li><li><a href=#2-管程的组成>2. 管程的组成</a></li><li><a href=#3-管程的基本特性>3. 管程的基本特性</a></li><li><a href=#4-管程的属性>4. 管程的属性</a></li></ol></li><li><a href=#五经典同步问题>五、经典同步问题</a><ol><li><a href=#1-生产者-消费者问题>1. 生产者-消费者问题</a></li><li><a href=#2-读者-写者问题>2. 读者-写者问题</a></li><li><a href=#3-哲学家进餐问题>3. 哲学家进餐问题</a></li><li><a href=#4-吸烟者问题>4. 吸烟者问题</a></li></ol></li></ol></nav></div></section></aside><main class="main full-width"><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/blog/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/ style=background-color:#ffe6e6;color:#fff>操作系统</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/blog/p/2.3-%E8%BF%9B%E7%A8%8B%E5%90%8C%E6%AD%A5/>2.3 进程同步</a></h2></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published>Mar 02, 2023</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>阅读时长: 8 分钟</time></div></footer></div></header><section class=article-content><h1 id=23-进程同步>2.3 进程同步</h1><h2 id=思维导图>思维导图</h2><p><img src=https://pic.try-hard.cn/blog/%e8%bf%9b%e7%a8%8b%e5%90%8c%e6%ad%a5.png loading=lazy alt=进程同步></p><h2 id=一进程同步的基本概念>一、进程同步的基本概念</h2><p>在多道程序环境下，进程是并发执行的，不同进程之间存在着不同的制约关系。为了协调进程之间的相互制约的关系，引入进程同步的概念。</p><h3 id=1-临界资源>1. 临界资源</h3><p>多个进程可以共享的各种资源，但是有的资源只能<strong>同时为一个进程服务</strong>，这样的资源就被称为临界资源。</p><p>对于临界资源的访问必须互斥地进行。在每个进程中，访问临界资源的代码称为<strong>临界区</strong>。为了确保临界资源的正确使用，可以将临界资源的访问分为四个过程：</p><ul><li><strong>进入区</strong>：为了进入临界区使用临界资源，在进入区要检查能否进入临界区。若能进入临界区，则应设置正在访问临界区的标志，以阻止其它进程同时进入临界区；</li><li><strong>临界区</strong>：进程中访问临界资源的那段代码，又称临界段；</li><li><strong>退出区</strong>：将正在访问临界区的标志清除；</li><li><strong>剩余区</strong>：代码中的其余部分。</li></ul><h3 id=2-同步>2. 同步</h3><p>同步亦称<strong>直接制约关系</strong>。是指为完成某种任务而建立的两个或多个进程，这些进程因为需要在某些位置上协调它们的工作次序而等待、传递消息所产生的制约关系。进程间的直接制约关系源于它们之间的相互合作。</p><p>例如输入进程 A 通过单缓冲向进程 B 提供数据。当该缓冲区为空时，进程 B 不能获得所需要的数据而阻塞，当进程 A 将数据输入缓冲区时，进程 B 被唤醒；当缓冲区为满时，进程 A 被阻塞，当 B 从缓冲区取走数据后，进程 A 被唤醒。</p><h3 id=3-互斥>3. 互斥</h3><p>互斥也称<strong>间接制约关系</strong>。当一个进程进入临界资源区使用临界资源时，另一个进程必须等待，当占用临界资源的进程退出临界区后，另一个进程才允许去访问此资源。</p><p>为禁止两个进程同时进入临界区，同步机制应遵循以下准则：</p><ul><li><strong>空闲让进</strong>：临界区空闲时，可以允许一个请求进入临界区的进程立即进入临界区；</li><li><strong>忙则等待</strong>：当已有进程进入临界区时，其它试图进入临界区的进程必须等待；</li><li><strong>有限等待</strong>：对请求访问的资源，应保证能在有限时间内进入临界区；</li><li><strong>让权等待</strong>：当进程不能进入临界区时，应立即释放处理器，防止进程忙等待。</li></ul><h2 id=二实现临界区互斥的基本方法>二、实现临界区互斥的基本方法</h2><h3 id=1-软件实现方法>1. 软件实现方法</h3><p>在进入区设置一些标志来标明是否有进程在临界区中，若已有进程在临界区，则在进入区通过循环检查进行等待，进程离开临界区后则在退出区修改标志。</p><h4 id=算法一单标志法>算法一：单标志法</h4><p>该算法设置一个公用整型变量 <code>turn</code>，用于指示被允许进入临界区的进程编号。若 <code>turn = 0</code>，则允许 P0 进程进入临界区。那么谁来改变 <code>turn</code> 的值？如果是公共区域控制<code>turn</code>这个变量，那么 P0 不想进的时候，即使是 <code>turn = 0</code> ,对于进程 P0 也是没有价值的。公共区域无法预测谁想要，所以这个控制权还是分权给进程来管理比较好一些。</p><p>Pi想进入时检测 <code>turn</code> 值是否是自己的 <code>turn</code>，如果不是，就需要等待，该算法可确保每次只允许一个进程进入临界区。两个进程必须交替进入临界区，一个进程进入临界区，使用完成后将 <code>turn</code>的值设置为另外一个进程。若某个进程不再进入临界区，则另一个进程也将无法进入临界区（违背“空闲让进”）。若 P0 顺利进入临界区并从临界区离开，则此时临界区是空闲的，但 P1 并没有进入临界区的打算，<code>turn = 1</code>一直成立，P0 就无法再次进入临界区（一直被 while 死循环困住）。</p><p><strong>算法描述：</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=n>P0</span> <span class=err>进程：</span>									<span class=n>P1</span> <span class=err>进程：</span>
+</span></span><span class=line><span class=cl><span class=k>while</span> <span class=p>(</span><span class=n>turn</span> <span class=o>!=</span> <span class=mi>0</span><span class=p>);</span>						  <span class=k>while</span> <span class=p>(</span><span class=n>turn</span> <span class=o>!=</span> <span class=mi>1</span><span class=p>);</span>  <span class=c1>// entry section
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=n>critical</span> <span class=n>section</span><span class=p>;</span>					  	  <span class=n>critical</span> <span class=n>section</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=n>turn</span>  <span class=o>=</span> <span class=mi>1</span><span class=p>;</span>  				 			  <span class=n>turn</span>  <span class=o>=</span> <span class=mi>0</span><span class=p>;</span>  <span class=c1>// exit section
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=n>remainder</span> <span class=n>section</span><span class=p>;</span>						  <span class=n>remainder</span> <span class=n>section</span><span class=p>;</span>
+</span></span></code></pre></td></tr></table></div></div><h4 id=算法二双标志法先检查>算法二：双标志法先检查</h4><p>该算法的基本思想是在每个进程访问临界区之前，先检查临界区资源是否正在访问。若正在被访问，则该进程需等待；否则进程进入自己的临界区。为此设置一个数据 <code>flag[i]</code>， 如第 i 个元素为 <code>FALSE</code>，则表示 Pi 进程未进入临界区；值为 <code>TRUE</code>，表示 Pi 进程进入临界区。</p><p><strong>优点</strong>：不要交替进入，可连续使用；</p><p><strong>缺点</strong>：按 ①②③④ 执行时，Pi 和 Pj 会同时进入临界区（违背“忙则等待”）。这里问题出在检查和修改操作不能一次进行。</p><p><strong>算法描述：</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=n>Pi</span> <span class=err>进程：</span>									<span class=n>Pj</span> <span class=err>进程：</span>
+</span></span><span class=line><span class=cl><span class=k>while</span> <span class=p>(</span><span class=n>flag</span><span class=p>[</span><span class=n>j</span><span class=p>]);</span>	<span class=err>①</span> 					  <span class=k>while</span> <span class=p>(</span><span class=n>flag</span><span class=p>[</span><span class=n>i</span><span class=p>]);</span> <span class=err>②</span> <span class=c1>// entry section
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=n>flag</span><span class=p>[</span><span class=n>i</span><span class=p>]</span> <span class=o>=</span> <span class=n>TRUE</span><span class=p>;</span>	<span class=err>③</span>  						  <span class=n>flag</span><span class=p>[</span><span class=n>j</span><span class=p>]</span> <span class=o>=</span> <span class=n>TRUE</span><span class=p>;</span> <span class=err>④</span> <span class=c1>// entry section
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=n>critical</span> <span class=n>section</span><span class=p>;</span>  						  <span class=n>critical</span> <span class=n>section</span><span class=p>;</span> 
+</span></span><span class=line><span class=cl><span class=n>flag</span><span class=p>[</span><span class=n>i</span><span class=p>]</span> <span class=o>=</span> <span class=n>FALSE</span><span class=p>;</span>   						  <span class=n>flag</span><span class=p>[</span><span class=n>j</span><span class=p>]</span> <span class=o>=</span> <span class=n>FALSE</span><span class=p>;</span>  <span class=c1>// exit section
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=n>remainder</span> <span class=n>section</span><span class=p>;</span>						  <span class=n>remainder</span> <span class=n>section</span><span class=p>;</span> 
+</span></span></code></pre></td></tr></table></div></div><h4 id=算法三双标志法后检查>算法三：双标志法后检查</h4><p>该算法先将自己的标志设置为 <code>TRUE</code>，再检测对方的状态标志，若对方标志为 <code>TRUE</code> 则进入等待；否则进入临界区。</p><p><strong>缺点</strong>：两个进程同时想进入等待区时，它们分别将自己的标志 <code>flag</code> 设置为 <code>TRUE</code>，然后再进行检测时就会发生“饥饿”现象，双方都无法进入临界区。</p><p><strong>算法描述：</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=n>Pi</span> <span class=err>进程：</span>									<span class=n>Pj</span> <span class=err>进程：</span>
+</span></span><span class=line><span class=cl><span class=n>flag</span><span class=p>[</span><span class=n>i</span><span class=p>]</span> <span class=o>=</span> <span class=n>TRUE</span><span class=p>;</span>							  <span class=n>flag</span><span class=p>[</span><span class=n>j</span><span class=p>]</span> <span class=o>=</span> <span class=n>TRUE</span><span class=p>;</span>  <span class=c1>// entry section
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>while</span> <span class=p>(</span><span class=n>flag</span><span class=p>[</span><span class=n>j</span><span class=p>]);</span>						  <span class=k>while</span> <span class=p>(</span><span class=n>flag</span><span class=p>[</span><span class=n>i</span><span class=p>]);</span>  <span class=c1>// entry section
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=n>critical</span> <span class=n>section</span><span class=p>;</span>						  <span class=n>critical</span> <span class=n>section</span><span class=p>;</span> 
+</span></span><span class=line><span class=cl><span class=n>flag</span><span class=p>[</span><span class=n>i</span><span class=p>]</span> <span class=o>=</span><span class=n>FLASE</span><span class=p>;</span>							  <span class=n>flag</span> <span class=p>[</span><span class=n>j</span><span class=p>]</span> <span class=o>=</span> <span class=n>FLASE</span><span class=p>;</span>  <span class=c1>// exit section
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=n>remainder</span> <span class=n>section</span><span class=p>;</span>						  <span class=n>remainder</span> <span class=n>section</span><span class=p>;</span>
+</span></span></code></pre></td></tr></table></div></div><h4 id=算法四petersons-algorithm>算法四：Peterson’s Algorithm</h4><p>为了防止两个进程为进入临界区而无限期等待，又设置了变量 <code>turn</code>，每个进程在先设置自己的标志后再设置 <code>turn</code> 标志。这是，再同时检测另一个进程状态标志和不允许进入标志，以便保证两个进程同时要求进入临界区时，只允许一个进程进入临界区。</p><p><strong>优点</strong>：利用 <code>flag</code> 解决临界资源互斥访问，利用 <code>turn</code> 解决“饥饿”现象；</p><p><strong>缺点</strong>：未遵循“让权等待”。</p><p><strong>算法描述：</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=n>Pi</span> <span class=err>进程：</span>									<span class=n>Pj</span> <span class=err>进程：</span>
+</span></span><span class=line><span class=cl><span class=n>flag</span><span class=p>[</span><span class=n>i</span><span class=p>]</span> <span class=o>=</span> <span class=n>TURE</span><span class=p>;</span> <span class=n>turn</span> <span class=o>=</span> <span class=n>j</span><span class=p>;</span>				  <span class=n>flag</span><span class=p>[</span><span class=n>j</span><span class=p>]</span> <span class=o>=</span> <span class=n>TRUE</span><span class=p>;</span> <span class=n>turn</span> <span class=o>=</span> <span class=n>i</span><span class=p>;</span>  <span class=c1>// entry section
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>while</span> <span class=p>(</span><span class=n>flag</span><span class=p>[</span><span class=n>j</span><span class=p>]</span> <span class=o>&amp;&amp;</span> <span class=n>turn</span> <span class=o>==</span> <span class=n>j</span><span class=p>);</span> 			  <span class=k>while</span> <span class=p>(</span><span class=n>flag</span><span class=p>[</span><span class=n>i</span><span class=p>]</span> <span class=o>&amp;&amp;</span> <span class=n>turn</span> <span class=o>==</span> <span class=n>i</span><span class=p>);</span>  <span class=c1>// entry section
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=n>critical</span> <span class=n>section</span><span class=p>;</span>						  <span class=n>critical</span> <span class=n>section</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=n>flag</span><span class=p>[</span><span class=n>i</span><span class=p>]</span><span class=o>=</span><span class=n>FLASE</span><span class=p>;</span>  						  <span class=n>flag</span><span class=p>[</span><span class=n>j</span><span class=p>]</span> <span class=o>=</span> <span class=n>FLASE</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=n>remainder</span> <span class=n>section</span><span class=p>;</span>						  <span class=n>remainder</span> <span class=n>section</span><span class=p>;</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=2-硬件实现方法>2. 硬件实现方法</h3><p>计算机提供了特殊的硬件指令，允许对一个字中的内容进行检测和修正，或对两个字中的内容进行交换等。通过硬件支持实现临界段问题的方法称为<strong>低级方法或元方法</strong>。</p><h4 id=1中断屏蔽方法>（1）中断屏蔽方法</h4><p>当一个进程正在使用处理机执行它的临界区代码时，防止其他进程进入临界区进行访问的最简方法就是禁止一切中断发生，或称为屏蔽中断、关闭中断。其原理为 CPU 在发生中断时切换进程，因此关闭中断就能让临界区代码顺利执行完成。其典型模式为：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=p>...</span>
+</span></span><span class=line><span class=cl><span class=err>关中断；</span>
+</span></span><span class=line><span class=cl><span class=err>临界区代码；</span>
+</span></span><span class=line><span class=cl><span class=err>开中断；</span>
+</span></span><span class=line><span class=cl><span class=p>...</span>
+</span></span></code></pre></td></tr></table></div></div><p>此种方法限制了处理机交替执行程序的能力，因此执行效率会明显降低。对内核而言，在它执行更新变量或列表的几条指令期间，关中断是很方便的。但是将关中断的权力移交给用户是很不明智的，若进程关中断后不再打开，很可能会让系统终止。</p><h4 id=2硬件指令方法>（2）硬件指令方法</h4><blockquote><p><strong>TestAndSet 指令</strong>：该指令为原子操作，执行该代码时不允许被中断。其功能为读出指定标志后把该标志设置为真。</p></blockquote><p>指令的功能描述如下：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c++ data-lang=c++><span class=line><span class=cl><span class=n>boolean</span> <span class=nf>TestAndSet</span> <span class=p>(</span><span class=n>boolean</span> <span class=o>*</span><span class=n>lock</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>boolean</span> <span class=n>old</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=n>old</span> <span class=o>=</span> <span class=o>*</span><span class=n>lock</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>old</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>可以为每个临界资源设置一个共享布尔型变量 <code>lock</code>，表示资源的两种状态：<code>true</code>表示正被占用，初始值为<code>false</code>。在进程访问临界资源之前，利用 <code>TestAndSet</code>检查和修改标志 <code>lock</code>；若有进程在临界区，则反复检查，直到进程退出。利用该指令实现进程互斥的算法描述如下：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=k>while</span> <span class=nf>TestAndSet</span><span class=p>(</span><span class=o>&amp;</span><span class=n>lock</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=n>critical</span> <span class=n>section</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=n>lock</span> <span class=o>=</span> <span class=nb>false</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=n>remainder</span> <span class=n>section</span><span class=p>;</span>
+</span></span></code></pre></td></tr></table></div></div><blockquote><p>Swap 指令：该指令的功能是交换两个字节的内容。</p></blockquote><p>其功能描述如下：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=nf>Swap</span><span class=p>(</span><span class=n>boolean</span> <span class=o>*</span><span class=n>a</span><span class=p>,</span> <span class=n>boolean</span> <span class=o>*</span><span class=n>b</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>boolean</span> <span class=n>temp</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=n>Temp</span> <span class=o>=</span> <span class=o>*</span><span class=n>a</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=o>*</span><span class=n>a</span> <span class=o>=</span> <span class=o>*</span><span class=n>b</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=o>*</span><span class=n>b</span> <span class=o>=</span> <span class=n>temp</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>应为每个临界资源设置一个共享布尔型变量 <code>lock</code>，初值为 <code>false</code>；在每个进程中再设置一个局部布尔型变量 <code>key</code>，用于与 <code>lock</code>交换信息。在进入临界区前，先利用 <code>Swap</code>指令交换 <code>lock</code> 与 <code>key</code> 的内容，再检查 key 的状态；有进程在临界区时，重复交换和检查过程，直到进程退出。利用 <code>Swap</code> 指令实现进程互斥的算法描述如下：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=n>key</span> <span class=o>=</span> <span class=nb>true</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=k>while</span><span class=p>(</span><span class=n>key</span> <span class=o>!=</span> <span class=nb>false</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=nf>Swap</span><span class=p>(</span><span class=o>&amp;</span><span class=n>lock</span><span class=p>,</span> <span class=o>&amp;</span><span class=n>key</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=n>critical</span> <span class=n>section</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=n>lock</span> <span class=o>=</span> <span class=nb>false</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=n>remainder</span> <span class=n>section</span><span class=p>;</span>
+</span></span></code></pre></td></tr></table></div></div><p><strong>优点</strong>：适用于任意数目的进程，并且不管是单处理机还是多处理机都适用；简单、容易验证其正确性。可以支持进程内有多个临界区，只需要为每个临界区设立一个布尔型变量。</p><p><strong>缺点</strong>：进程等待进入临界区时要耗费处理机时间，不能实现让权等待。从等待队列中随机选择一个进入临界区，有的进程可能一直选不上，从而导致“饥饿”现象。</p><h2 id=三信号量>三、信号量</h2><blockquote><p>信号量机制是一种功能较强的机制，可用来解决互斥与同步问题，它只能被两个标准的原语<code>wait(S)</code>和<code>signal(S)</code>访问，也可记作“P操作”和“V操作”。</p></blockquote><p>原语是指完成某种功能且不被分割、不被中断执行的操作序列。原语之所以不能被中断执行，是因为原语对变量的操作若被打断，可能会去运行另一个对同一变量的操作过程，从而出现临界问题。</p><h3 id=1-整型信号量>1. 整型信号量</h3><p>整型信号量被定义为一个用于表示资源数目的整型量 <code>S</code>，<code>wait</code> 和 <code>signal</code> 操作可描述为：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=nf>wait</span><span class=p>(</span><span class=n>S</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>while</span><span class=p>(</span><span class=n>S</span> <span class=o>&lt;=</span> <span class=mi>0</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=n>S</span> <span class=o>=</span> <span class=n>S</span> <span class=o>-</span> <span class=mi>1</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nf>signal</span><span class=p>(</span><span class=n>S</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>S</span> <span class=o>=</span> <span class=n>S</span> <span class=o>+</span> <span class=mi>1</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p><code>wait</code> 操作中，只要信号量 <code>S &lt;= 0</code>，就会不断测试。因此该机制未遵循“让权等待”，而是使进程处于“忙等”的状态。</p><h3 id=2-记录型信号量>2. 记录型信号量</h3><p>记录型信号量是不存在“忙等”现象的进程同步机制。除需要一个用于代表资源数目的整型变量 <code>value</code> 外，再增加一个进程链表 <code>L</code>，用于链接所有等待资源的进程。记录型信号量得名于采用了记录型的数据结构。记录型信号量可描述为：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=k>typedef</span> <span class=k>struct</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=kt>int</span> <span class=n>value</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=k>struct</span> <span class=n>process</span> <span class=o>*</span><span class=n>L</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span> <span class=n>semaphore</span><span class=p>;</span>
+</span></span></code></pre></td></tr></table></div></div><p>相应的 <code>wait</code> 和 <code>signal</code> 的操作如下：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=kt>void</span> <span class=nf>wait</span><span class=p>(</span><span class=n>semaphore</span> <span class=n>S</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>S</span><span class=p>.</span><span class=n>value</span><span class=o>--</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=n>S</span><span class=p>.</span><span class=n>value</span> <span class=o>&lt;</span> <span class=mi>0</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>add</span> <span class=n>this</span> <span class=n>process</span> <span class=n>to</span> <span class=n>S</span><span class=p>.</span><span class=n>L</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=nf>blcok</span><span class=p>(</span><span class=n>S</span><span class=p>.</span><span class=n>L</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p><code>wait</code>操作，<code>S.value--</code>表示进程请求一个该类资源，当<code>S.value &lt; 0</code>时，表示该类资源已经分配完毕，因此进程应调用<code>block</code>原语，进行自我阻塞，放弃处理机，并插入该类资源的等待队列S.L，可见该机制遵循了“让权等待”。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=kt>void</span> <span class=nf>signal</span><span class=p>(</span><span class=n>semaphore</span> <span class=n>S</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>S</span><span class=p>.</span><span class=n>value</span><span class=o>++</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=n>S</span><span class=p>.</span><span class=n>value</span> <span class=o>&lt;=</span> <span class=mi>0</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>remove</span> <span class=n>a</span> <span class=n>process</span> <span class=n>P</span> <span class=n>from</span> <span class=n>S</span><span class=p>.</span><span class=n>L</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=nf>wakeup</span><span class=p>(</span><span class=n>P</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p><code>signal</code>操作，表示进程释放一个资源，使进程中可分配的该类资源数加一，故有<code>S.value++</code>。若加一后<code>S.value &lt;= 0</code>，则表示<code>S.L</code>中仍有等待该资源的进程被阻塞，故还应该调用<code>wakeup</code>原语，将<code>S.L</code>中的第一个等待进程唤醒。</p><h3 id=3-利用信号量实现同步>3. 利用信号量实现同步</h3><p>信号量机制能用于解决进程间的各种同步问题。设 S 为实现进程 P1、P2 同步的公共信号量，初始值为 0。进程 P2 中的语句 y 要使用进程 P1 中语句 x 的运行结果，所以只有当语句 x 执行完成之后语句 y 才可以执行。</p><p>其实现同步的算法如下：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=n>semaphore</span> <span class=n>S</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span>  <span class=c1>// 初始化信号量
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=nf>P1</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=p>...</span>
+</span></span><span class=line><span class=cl>    <span class=n>x</span><span class=p>;</span>  <span class=c1>// 语句 x
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=nf>V</span><span class=p>(</span><span class=n>S</span><span class=p>);</span>  <span class=c1>// 告诉进程 P2，语句 x 已经完成
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=p>...</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nf>P2</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=p>...</span>
+</span></span><span class=line><span class=cl>    <span class=nf>P</span><span class=p>(</span><span class=n>S</span><span class=p>);</span>  <span class=c1>// 检查语句 x 是否完成
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=n>y</span><span class=p>;</span>  <span class=c1>// 语句 y
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=p>...</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>若 P2 先执行到<code>P(S)</code>时，<code>S = 0</code>，执行 P 操作就会阻塞进程，并放入阻塞队列；当 P1 中 x 执行完后，执行 V 操作，把 P2 从阻塞队列放回就绪队列，当 P2 得到处理机时，就可以继续运行。</p><h3 id=4-利用信号量实现进程互斥>4. 利用信号量实现进程互斥</h3><p>信号量机制也能很方便的解决进程互斥的问题。设 S 为实现进程 P1、P2 互斥的信号量，由于每次只允许一个进程进而临界区，所以 S 的初值为 1（即可用资源数为 1）。只需要把临界区置于 P(S) 和 V(S) 之间，即可实现两个进程对临界资源的互斥访问。其算法如下：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=n>semaphore</span> <span class=n>S</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span>  <span class=c1>// 初始化信号量
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=nf>P1</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=p>...</span>
+</span></span><span class=line><span class=cl>    <span class=nf>P</span><span class=p>(</span><span class=n>S</span><span class=p>);</span>  <span class=c1>// 准备开始访问临界资源，加锁
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=err>进程</span> <span class=n>P1</span> <span class=err>的临界区</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=nf>V</span><span class=p>(</span><span class=n>S</span><span class=p>);</span>  <span class=c1>// 访问结束，解锁
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=p>...</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nf>P2</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=p>...</span>
+</span></span><span class=line><span class=cl>    <span class=nf>P</span><span class=p>(</span><span class=n>S</span><span class=p>);</span>  <span class=c1>// 准备开始访问临界资源，加锁
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=err>进程</span> <span class=n>P2</span> <span class=err>的临界区</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=nf>V</span><span class=p>(</span><span class=n>S</span><span class=p>);</span>  <span class=c1>// 访问结束，解锁
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=p>...</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>当没有进程在临界区时，任意一个进程要进入临界区，都要执行 P 操作，把 S 的值减为 0，然后进入临界区；当有进程存在于临界区时，S 的值为 0，再有进程要进入临界区，执行 P 操作时将会被阻塞，直至在临界区中的进程退出，这样便实现了临界区的互斥。</p><p>在同步问题中，若某个行为要用到某种资源，则这个行为前面执行 P 操作；若某个行为会提供某种资源，则在该行为后面执行 V 操作。在互斥问题中，P、V 操作要紧夹使用互斥资源的行为，不能有冗余代码。</p><h3 id=5-利用信号量实现前驱关系>5. 利用信号量实现前驱关系</h3><p>信号量也可用来描述程序之间或语句之间的前驱关系。</p><p><img src=https://pic.try-hard.cn/blog/2022/12/13/20221213-143146.png loading=lazy alt=前驱图></p><p>在上面的前驱图中，S1、S2&mldr;S6是最简单的程序段（只有一条语句）。为了使程序段能正确执行，需要设置若干初始值为 &ldquo;0&rdquo; 的信号量。</p><p>实现算法如下：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=n>semaphore</span> <span class=n>a1</span> <span class=o>=</span> <span class=n>a2</span> <span class=o>=</span> <span class=n>b1</span> <span class=o>=</span> <span class=n>b2</span> <span class=o>=</span> <span class=n>c1</span> <span class=o>=</span> <span class=n>c2</span> <span class=o>=</span> <span class=n>c3</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span>  <span class=c1>// 初始化信号量
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=nf>S1</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=p>...;</span>
+</span></span><span class=line><span class=cl>    <span class=nf>V</span><span class=p>(</span><span class=n>a1</span><span class=p>);</span> <span class=nf>V</span><span class=p>(</span><span class=n>a2</span><span class=p>);</span>  <span class=c1>// S1 已经完成
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nf>S2</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nf>P</span><span class=p>(</span><span class=n>a1</span><span class=p>);</span>  <span class=c1>// 检查 S1 是否完成
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=p>...;</span>
+</span></span><span class=line><span class=cl>    <span class=nf>V</span><span class=p>(</span><span class=n>b1</span><span class=p>);</span> <span class=nf>V</span><span class=p>(</span><span class=n>b2</span><span class=p>);</span>  <span class=c1>// S2 已经完成
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nf>S3</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nf>P</span><span class=p>(</span><span class=n>a2</span><span class=p>);</span>  <span class=c1>// 检查 S1 是否已经完成
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=p>...;</span>
+</span></span><span class=line><span class=cl>    <span class=nf>V</span><span class=p>(</span><span class=n>c1</span><span class=p>);</span>  <span class=c1>// S3 已经完成
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nf>S4</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nf>P</span><span class=p>(</span><span class=n>b1</span><span class=p>);</span>  <span class=c1>// 检查 S2 是否已经完成
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=p>...;</span>
+</span></span><span class=line><span class=cl>    <span class=nf>V</span><span class=p>(</span><span class=n>c2</span><span class=p>);</span>  <span class=c1>// S4 已经完成
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nf>S5</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nf>P</span><span class=p>(</span><span class=n>b2</span><span class=p>);</span>  <span class=c1>// 检查 S2 是否已经完成
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=p>...;</span>
+</span></span><span class=line><span class=cl>    <span class=nf>V</span><span class=p>(</span><span class=n>c3</span><span class=p>);</span>  <span class=c1>// S5 已经完成
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nf>S6</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nf>P</span><span class=p>(</span><span class=n>c1</span><span class=p>);</span> <span class=nf>P</span><span class=p>(</span><span class=n>c2</span><span class=p>);</span> <span class=nf>P</span><span class=p>(</span><span class=n>c3</span><span class=p>);</span>  <span class=c1>// 检查S3、S4、S5 是否已经完成
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=6-分析进程同步和互斥问题的方法步骤>6. 分析进程同步和互斥问题的方法步骤</h3><ul><li><strong>关系分析</strong>：找出问题中的进程数，并分析它们之间的同步和互斥的关系；</li><li><strong>整理思路</strong>：找出解决问题的关键点，根据进程的操作流程确定 P、V 的大致顺序；</li><li><strong>设置信号量</strong>：根据需要的信号量，确定初值。</li></ul><h2 id=四管程>四、管程</h2><h3 id=1-管程的定义>1. 管程的定义</h3><blockquote><p>系统中的各种硬件资源和软件资源均可以用数据结构进行抽象的描述其资源特性。管程是由一组数据及定义在这对数据之上的操作组成的软件模块，这组操作能初始化并改变管程中的数据和同步进程。</p></blockquote><h3 id=2-管程的组成>2. 管程的组成</h3><ul><li>局部于管程的共享变量；</li><li>对数据结构进行操作的一组过程；</li><li>对局部于管程的数据进行初始化的语句。</li></ul><h3 id=3-管程的基本特性>3. 管程的基本特性</h3><ul><li>局部于管程的数据只能被局部于管程内的过程访问；</li><li>一个进程只有通过调用管程内的过程才能进入管程访问共享数据；</li><li>每次仅允许一个进程在管程内执行某个内部过程。</li></ul><h3 id=4-管程的属性>4. 管程的属性</h3><ul><li><strong>共享性</strong>：管程可被系统范围内的进程互斥访问，属于共享资源；</li><li><strong>安全性</strong>：管程的局部变量只能由管程的过程访问，不允许进程或其它管程直接访问，管程也不能访问非局部于它的变量；</li><li><strong>互斥性</strong>：多个进程对管程的访问是互斥的。任一时刻，管程中只能有一个活跃进程；</li><li><strong>封装性</strong>：管程内的数据结构是私有的，只能在管程内使用，管程内的过程也只能使用管程内的数据结构。进程通过调用管程的过程使用临界资源。</li></ul><h2 id=五经典同步问题>五、经典同步问题</h2><h3 id=1-生产者-消费者问题>1. 生产者-消费者问题</h3><p><strong>问题描述</strong>：一组生产者进程和一组消费者进程共享一个初始为空、大小为 n 的缓冲区。只有缓冲区没满时生产者才能把消息放入缓冲区，否则必须等待；只有缓冲区不为空时，消费者才能从中取出消息，否则必须等待。由于缓冲区是临界资源，它只允许一个生产者放入消息，只允许一个消费者从中取出消息。</p><p><strong>问题分析</strong>：</p><ul><li><strong>关系分析</strong>：生产者和消费者对缓冲区访问是既是互斥关系又是同步关系；</li><li><strong>整理思路</strong>：需要解决互斥和同步 PV 操作的位置；</li><li><strong>信号量设置</strong>：信号量 mutex 作为互斥信号量，用于控制互斥访问缓冲池，互斥信号量为 1；信号量 full 用于记录当前缓冲池中的“满”缓冲区数，初值为 0；信号量 empty 用于记录当前缓冲池中“空”缓冲区数，初值为 n。</li></ul><p><strong>算法描述</strong>：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=n>semaphore</span> <span class=n>mutex</span> <span class=o>=</span> <span class=mi>1</span><span class=p>,</span> <span class=n>empty</span> <span class=o>=</span> <span class=n>n</span><span class=p>,</span> <span class=n>full</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span>  <span class=c1>// 初始化信号量
+</span></span></span><span class=line><span class=cl><span class=c1></span>
+</span></span><span class=line><span class=cl><span class=nf>producer</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>while</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>produce</span> <span class=n>an</span> <span class=n>item</span> <span class=n>in</span> <span class=n>nextp</span><span class=p>;</span>  <span class=c1>// 生产数据
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=nf>P</span><span class=p>(</span><span class=n>empty</span><span class=p>);</span>  <span class=c1>// （要用什么 P 什么）获取空缓冲单元
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=nf>P</span><span class=p>(</span><span class=n>mutex</span><span class=p>);</span>  <span class=c1>// （互斥夹紧）进入临界区
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=n>add</span> <span class=n>nextp</span> <span class=n>to</span> <span class=n>buffer</span><span class=p>;</span>  <span class=c1>// （行为）将数据放入缓冲区
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=nf>V</span><span class=p>(</span><span class=n>mutex</span><span class=p>);</span>  <span class=c1>// （互斥夹紧）离开临界区
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=nf>V</span><span class=p>(</span><span class=n>full</span><span class=p>);</span>  <span class=c1>// （提供什么 V 什么）满缓冲区加一
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nf>consumer</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>while</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nf>P</span><span class=p>(</span><span class=n>full</span><span class=p>);</span>  <span class=c1>// 获取满缓冲区单元
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=nf>P</span><span class=p>(</span><span class=n>mutex</span><span class=p>);</span>  <span class=c1>// 进入临界区
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=n>remove</span> <span class=n>an</span> <span class=n>item</span> <span class=n>from</span> <span class=n>buffer</span><span class=p>;</span>  <span class=c1>// 从缓冲区取出数据
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=nf>V</span><span class=p>(</span><span class=n>mutex</span><span class=p>);</span>  <span class=c1>// 离开临界区，释放互斥信号量
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=nf>V</span><span class=p>(</span><span class=n>empty</span><span class=p>);</span>  <span class=c1>// 空缓冲区数加一
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=n>consume</span> <span class=n>the</span> <span class=n>item</span><span class=p>;</span>  <span class=c1>// 消费数据
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>下面再来看一个较为复杂的生产者-消费者问题：</p><p><strong>问题描述</strong>：桌子上有一个盘子，每次只能向其中放入一个水果。爸爸专门向盘子中放苹果，妈妈专门向进程中放橘子，儿子专等吃盘子中的橘子，女儿专等吃盘子中的苹果。只有盘子为空时，爸爸或妈妈才可以向盘子中放水果，仅当盘子中有对应的水果时，儿子女儿才能从盘子中取出水果。</p><p><strong>问题分析</strong>：</p><ul><li><strong>关系分析</strong>：爸爸和妈妈是互斥关系，爸爸和女儿、妈妈和儿子是同步关系，儿子和女儿没有关系。女儿或儿子拿走水果后才能释放盘子；</li><li><strong>整理思路</strong>：四个进程可以抽象为两个生产者和两个消费者被连接到大小为 1 的缓冲区上；</li><li><strong>信号量设置</strong>：信号量 plate 为互斥信号量，初值为 1；信号量 apple 表示盘子中是否有水果，初值为 0；信号量 orange 表示盘子中是否有橘子，初值为 0。</li></ul><p><strong>算法描述</strong>：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=n>semaphore</span> <span class=n>plate</span> <span class=o>=</span> <span class=mi>1</span><span class=p>,</span> <span class=n>apple</span> <span class=o>=</span> <span class=mi>0</span><span class=p>,</span> <span class=n>orange</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span>  <span class=c1>// 初始化信号量
+</span></span></span><span class=line><span class=cl><span class=c1></span>
+</span></span><span class=line><span class=cl><span class=nf>dad</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>while</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>prepare</span> <span class=n>an</span> <span class=n>apple</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=nf>P</span><span class=p>(</span><span class=n>plate</span><span class=p>);</span>  <span class=c1>// 互斥向盘中取、放水果
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=n>put</span> <span class=n>the</span> <span class=n>apple</span> <span class=n>on</span> <span class=n>the</span> <span class=n>plate</span><span class=p>;</span>  <span class=c1>// 向盘中放水果
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=nf>V</span><span class=p>(</span><span class=n>apple</span><span class=p>);</span>  <span class=c1>// 允许取苹果
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nf>mom</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>while</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>prepare</span> <span class=n>an</span> <span class=n>orange</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=nf>P</span><span class=p>(</span><span class=n>plate</span><span class=p>);</span>  <span class=c1>// 互斥向盘中取、放水果
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=n>put</span> <span class=n>the</span> <span class=n>orange</span> <span class=n>on</span> <span class=n>the</span> <span class=n>plate</span><span class=p>;</span>  <span class=c1>// 向盘中放水果
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=nf>V</span><span class=p>(</span><span class=n>orange</span><span class=p>);</span>  <span class=c1>// 允许取橘子
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nf>son</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>while</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nf>P</span><span class=p>(</span><span class=n>orange</span><span class=p>);</span>  <span class=c1>// 互斥向盘中取水果
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=n>take</span> <span class=n>an</span> <span class=n>orange</span> <span class=n>from</span> <span class=n>plate</span><span class=p>;</span>  <span class=c1>// 取水果
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=nf>V</span><span class=p>(</span><span class=n>plate</span><span class=p>);</span>  <span class=c1>// 允许向盘子中取、放水果
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=n>eat</span> <span class=n>the</span> <span class=n>orange</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nf>daughter</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>while</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nf>P</span><span class=p>(</span><span class=n>apple</span><span class=p>);</span>  <span class=c1>// 互斥向盘中取水果
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=n>take</span> <span class=n>an</span> <span class=n>apple</span> <span class=n>from</span> <span class=n>plate</span><span class=p>;</span>  <span class=c1>// 取水果
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=nf>V</span><span class=p>(</span><span class=n>plate</span><span class=p>);</span>  <span class=c1>// 允许向盘子中取、放水果
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=n>eat</span> <span class=n>the</span> <span class=n>apple</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=2-读者-写者问题>2. 读者-写者问题</h3><p><strong>问题描述</strong>：有读者和写者两组并发进程，共享一个文件，当两个或以上的读进程同时访问数据时不会产生副作用。但若某个写进程和其他进程（读进程或写进程）同时访问共享数据时则可能导致数据不一致的错误。</p><p>因此要求：</p><ul><li>允许多个读者可以同时对文件执行读操作；</li><li>只允许一个写者往文件中写信息；</li><li>任意写者在完成操作前都不允许其他读者或写者工作；</li><li>写者操作前应该让已有的读者和写者退出。</li></ul><p><strong>问题分析</strong>：</p><ul><li><strong>关系分析</strong>：读者和写者是互斥的，写者和写者也是互斥的，读者和读者之间不存在互斥现象。</li><li><strong>整理思路</strong>：写者和任何进程互斥，用 PV 操作即可。写者必须在实现与写者互斥的同时，实现与其他读者的同步。这里需要使用一个计数器，用来判断当前是否有读者读文件。当有读者时，写者是无法写文件的，读者会一直占用文件，当没有读者时，写者才可以写文件。同时不同读者对计数器的访问也是互斥的。</li><li><strong>信号量设置</strong>：设置信号量 count 为计数器，用于记录当前读者的数量，初值为 0；设置 mutex 为互斥信号量，用于保护更新 count 变量时的互斥；设置互斥信号量 rw，用于保证读者和写者的互斥访问。</li></ul><p><strong>算法描述</strong>：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=kt>int</span> <span class=n>count</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span>  <span class=c1>// 用于记录当前的读者数量
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=n>semaphore</span> <span class=n>mutex</span> <span class=o>=</span> <span class=mi>1</span><span class=p>,</span> <span class=n>rw</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span>  <span class=c1>// 用于保护更新 count 变量时的互斥和读者写者互斥地访问
+</span></span></span><span class=line><span class=cl><span class=c1></span>
+</span></span><span class=line><span class=cl><span class=nf>writer</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>while</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nf>P</span><span class=p>(</span><span class=n>rw</span><span class=p>);</span>  <span class=c1>// 互斥访问共享文件
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=n>writing</span><span class=p>;</span>  <span class=c1>// 写入
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=nf>V</span><span class=p>(</span><span class=n>rw</span><span class=p>);</span>  <span class=c1>// 释放共享文件
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nf>reader</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>while</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nf>P</span><span class=p>(</span><span class=n>mutex</span><span class=p>);</span>  <span class=c1>// 互斥访问 count 变量
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=k>if</span> <span class=p>(</span><span class=n>count</span> <span class=o>==</span> <span class=mi>0</span><span class=p>)</span>  <span class=c1>// 当第一个读进程读共享文件时
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=nf>P</span><span class=p>(</span><span class=n>rw</span><span class=p>);</span>  <span class=c1>// 阻止写进程写
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=n>count</span><span class=o>++</span><span class=p>;</span>  <span class=c1>// 读者计数器加一
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=nf>V</span><span class=p>(</span><span class=n>mutex</span><span class=p>);</span>  <span class=c1>// 释放互斥变量 count
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=n>reading</span><span class=p>;</span>  <span class=c1>// 读取
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=nf>P</span><span class=p>(</span><span class=n>mutex</span><span class=p>);</span>  <span class=c1>// 互斥访问 count 变量
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=n>count</span><span class=o>--</span><span class=p>;</span>  <span class=c1>// 读者计数器减一
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=k>if</span><span class=p>(</span><span class=n>count</span> <span class=o>==</span> <span class=mi>0</span><span class=p>)</span>  <span class=c1>// 当最后一个读进程读完共享文件
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=nf>V</span><span class=p>(</span><span class=n>rw</span><span class=p>);</span>  <span class=c1>// 允许写进程
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=nf>V</span><span class=p>(</span><span class=n>mutex</span><span class=p>);</span>  <span class=c1>// 释放互斥变量 count
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>在上面地算法中，读进程是优先的。当存在读进程时，写操作将被延迟，且只要有一个读进程活跃，随后而来的读进程都将被允许文件。这样的方式会导致写进程可能长时间等待，且存在写进程“饿死”情况。</p><p>若希望写进程优先，即有读进程正在读共享文件时，有写进程请求访问，这时应禁止后续读进程的请求，等到已在共享文件的读进程执行完成，立即让写进程执行，只有在无写进程执行的情况下允许读进程再次运行。为此需要增加一个信号量并在上面程序的<code>write()</code> 和 <code>reader()</code>函数中各增加一个 PV 操作，就可以得到写进程优先的解决程序。</p><p><strong>算法实现</strong>：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=kt>int</span> <span class=n>count</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span>  <span class=c1>// 计数器初始化
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=n>semaphore</span> <span class=n>mutex</span> <span class=o>=</span> <span class=mi>1</span><span class=p>,</span> <span class=n>rw</span> <span class=o>=</span> <span class=mi>1</span><span class=p>,</span> <span class=n>w</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span>  <span class=c1>// 信号量初始化
+</span></span></span><span class=line><span class=cl><span class=c1></span>
+</span></span><span class=line><span class=cl><span class=nf>writer</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>while</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nf>P</span><span class=p>(</span><span class=n>w</span><span class=p>);</span>  <span class=c1>// 在无写进程请求时进入
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=nf>P</span><span class=p>(</span><span class=n>rw</span><span class=p>);</span>  <span class=c1>// 互斥访问共享文化
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=n>writing</span><span class=p>;</span>  <span class=c1>// 写入
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=nf>V</span><span class=p>(</span><span class=n>rw</span><span class=p>);</span>  <span class=c1>// 释放共享文件
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=nf>V</span><span class=p>(</span><span class=n>w</span><span class=p>);</span>  <span class=c1>// 恢复共享文件的访问
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nf>reader</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>while</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nf>P</span><span class=p>(</span><span class=n>w</span><span class=p>);</span>  <span class=c1>// 在无写进程请求时进入
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=nf>P</span><span class=p>(</span><span class=n>mutex</span><span class=p>);</span>  <span class=c1>// 互斥访问 count 变量
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=k>if</span> <span class=p>(</span><span class=n>count</span> <span class=o>==</span> <span class=mi>0</span><span class=p>)</span>  <span class=c1>// 在第一个读进程共享文件时
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=nf>P</span><span class=p>(</span><span class=n>rw</span><span class=p>);</span>  <span class=c1>// 阻止写进程写
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=n>count</span><span class=o>++</span><span class=p>;</span>  <span class=c1>// 读者计数器加一
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=nf>V</span><span class=p>(</span><span class=n>mutex</span><span class=p>);</span>  <span class=c1>// 释放互斥变量 count
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=nf>V</span><span class=p>(</span><span class=n>w</span><span class=p>);</span>  <span class=c1>// 恢复对共享文件的访问
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=n>reading</span><span class=p>;</span>  <span class=c1>// 读取
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=nf>P</span><span class=p>(</span><span class=n>mutex</span><span class=p>);</span>  <span class=c1>// 互斥访问 count 变量
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=n>count</span><span class=o>--</span><span class=p>;</span>  <span class=c1>// 读者计数器减一
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=k>if</span> <span class=p>(</span><span class=n>count</span> <span class=o>==</span> <span class=mi>0</span><span class=p>)</span>  <span class=c1>// 当最后一个读进程读完共享文件
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=nf>V</span><span class=p>(</span><span class=n>rw</span><span class=p>);</span>  <span class=c1>// 运行写进程写
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=nf>V</span><span class=p>(</span><span class=n>mutex</span><span class=p>);</span>  <span class=c1>// 释放互斥变量 count
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>读者-写者问题有一个关键的特征：有一个互斥访问的 count 计数器。我们解决其他互斥问题时也可以尝试以下 count 计数器互斥。</p><h3 id=3-哲学家进餐问题>3. 哲学家进餐问题</h3><p><strong>问题描述</strong>：一张圆桌上坐着五名哲学家，每两名哲学家之间的桌子上摆一根筷子，两根筷子中间是一碗米饭。哲学家在思考时，并不影响他人；当哲学家饥饿时，才试图拿起左、右两根筷子（一根一根地拿起）。若筷子已在他人手上，则需要等待。饥饿地哲学家只有同时拿到两根筷子才可以开始进餐，进餐完毕后继续思考。</p><p><strong>问题分析</strong>：</p><ul><li><strong>关系分析</strong>：五名哲学家与左右邻居是互斥的关系。</li><li><strong>整理思路</strong>：本问题的关键是如何让一名哲学家拿到左右两根筷子而不造成死锁现象。解决办法有两个：一是让他们同时拿到两根筷子；二是对每个哲学家的动作制定规则。</li><li><strong>信号量设置</strong>：定义互斥信号量数组 <code>chopstick[5] = {1, 1, 1, 1, 1}</code>，用于五个筷子的互斥访问。哲学家按顺序标号 0~4，哲学家 i 左边筷子的编号为 i，哲学家右边筷子的编号为<code>(i + 1) % 5</code>。</li></ul><p><strong>算法实现</strong>：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=n>semaphore</span> <span class=n>chopstick</span><span class=p>[</span><span class=mi>5</span><span class=p>]</span> <span class=o>=</span> <span class=p>{</span><span class=mi>1</span><span class=p>,</span> <span class=mi>1</span><span class=p>,</span> <span class=mi>1</span><span class=p>,</span> <span class=mi>1</span><span class=p>,</span> <span class=mi>1</span><span class=p>};</span>  <span class=c1>// 定义信号量数组 chopstick[5]
+</span></span></span><span class=line><span class=cl><span class=c1></span>
+</span></span><span class=line><span class=cl><span class=nf>Pi</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>do</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nf>P</span><span class=p>(</span><span class=n>chopstick</span><span class=p>[</span><span class=n>i</span><span class=p>]);</span>  <span class=c1>// 取左边筷子
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=nf>P</span><span class=p>(</span><span class=n>chopstick</span><span class=p>[(</span><span class=n>i</span> <span class=o>+</span> <span class=mi>1</span><span class=p>)</span> <span class=o>%</span> <span class=mi>5</span><span class=p>]);</span>  <span class=c1>// 取右边筷子
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=n>eat</span><span class=p>;</span>  <span class=c1>// 进餐
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=nf>V</span><span class=p>(</span><span class=n>chopstick</span><span class=p>[</span><span class=n>i</span><span class=p>]);</span>  <span class=c1>// 放回左边筷子
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=nf>V</span><span class=p>(</span><span class=n>chopstick</span><span class=p>[(</span><span class=n>i</span> <span class=o>+</span> <span class=mi>1</span><span class=p>)</span> <span class=o>%</span> <span class=mi>5</span><span class=p>]);</span>  <span class=c1>// 放回右边筷子
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=n>think</span><span class=p>;</span>  <span class=c1>// 思考
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=p>}</span> <span class=k>while</span><span class=p>(</span><span class=mi>1</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>该算法存在以下问题：当五名哲学家都想要进餐并分别拿起左边筷子时（都恰好执行完<code>wait(chopstick[i]);</code>）筷子已经被拿完，等到他们再想拿右边筷子时就全部阻塞，因此出现了死锁。</p><p>为了防止死锁的发生，可对哲学家进餐施加一些限制条件：当左右两边筷子都可以用时，才允许他抓取筷子。</p><p><strong>算法描述</strong>：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=n>semaphore</span> <span class=n>chopstick</span><span class=p>[</span><span class=mi>5</span><span class=p>]</span> <span class=o>=</span> <span class=p>{</span><span class=mi>1</span><span class=p>,</span> <span class=mi>1</span><span class=p>,</span> <span class=mi>1</span><span class=p>,</span> <span class=mi>1</span><span class=p>,</span> <span class=mi>1</span><span class=p>};</span>  <span class=c1>// 定义信号量数组 chopstick[5]
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=n>semaphore</span> <span class=n>mutex</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span>  <span class=c1>// 设置取筷子信号量
+</span></span></span><span class=line><span class=cl><span class=c1></span>
+</span></span><span class=line><span class=cl><span class=nf>Pi</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>do</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nf>P</span><span class=p>(</span><span class=n>mutex</span><span class=p>);</span>  <span class=c1>// 在取筷子前获得互斥量
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=nf>P</span><span class=p>(</span><span class=n>chopstick</span><span class=p>[</span><span class=n>i</span><span class=p>]);</span>  <span class=c1>// 取左边筷子
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=nf>P</span><span class=p>(</span><span class=n>chopstick</span><span class=p>[(</span><span class=n>i</span> <span class=o>+</span> <span class=mi>1</span><span class=p>)</span> <span class=o>%</span> <span class=mi>5</span><span class=p>]);</span>  <span class=c1>// 取右边筷子
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=nf>V</span><span class=p>(</span><span class=n>mutex</span><span class=p>);</span>  <span class=c1>// 释放取筷子信号量
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=n>eat</span><span class=p>;</span>  <span class=c1>// 进餐
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=nf>V</span><span class=p>(</span><span class=n>chopstick</span><span class=p>[</span><span class=n>i</span><span class=p>]);</span>  <span class=c1>// 放回左边筷子
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=nf>V</span><span class=p>(</span><span class=n>chopstick</span><span class=p>[(</span><span class=n>i</span> <span class=o>+</span> <span class=mi>1</span><span class=p>)</span> <span class=o>%</span> <span class=mi>5</span><span class=p>]);</span>  <span class=c1>// 放回右边筷子
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=n>think</span><span class=p>;</span>  <span class=c1>// 思考
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=p>}</span> <span class=k>while</span><span class=p>(</span><span class=mi>1</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=4-吸烟者问题>4. 吸烟者问题</h3><p><strong>问题描述</strong>：假设一个系统有三个抽烟者进程和一个供应者进程。每个抽烟者不停地卷烟并抽掉它，但要卷起并抽掉一支烟，抽烟者必须要有三种材料：烟草、纸和胶水。三个抽烟者中，第一个拥有烟草，第二个拥有纸，第三个拥有胶水。供应者无限地提供三种材料，供应者每次将两种材料放到桌子上，拥有剩下那种材料的抽烟者卷起一根烟并抽掉它，并给供应者一个信号已完成，此时供应者就会将另外两种材料放到桌上，如此重复。</p><p><strong>问题分析</strong>：</p><ul><li><strong>关系分析</strong>：供应者与三个抽烟者分别是同步关系。由于供应者同时只能满足一个抽烟者，因此三个抽烟者对抽烟这个动作互斥。</li><li><strong>整理思路</strong>：供应者作为生产者向三个抽烟者提供材料。</li><li><strong>信号量设置</strong>：信号量 offer1、offer2、offer3 分别表示三个吸烟者需要的资源组合。信号量 finish 用于互斥进行抽烟动作。</li></ul><p><strong>算法描述</strong>：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=kt>int</span> <span class=n>random</span><span class=p>;</span>  <span class=c1>// 存储随机数
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=n>semaphore</span> <span class=n>offer1</span> <span class=o>=</span> <span class=n>offer2</span> <span class=o>=</span> <span class=n>offer3</span> <span class=o>=</span> <span class=n>finsh</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span>  
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>process</span> <span class=nf>P</span><span class=p>()</span> <span class=p>{</span>  <span class=c1>// 供应者
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>while</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>random</span> <span class=o>=</span> <span class=err>任意整数</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=n>random</span> <span class=o>=</span> <span class=n>random</span> <span class=o>%</span> <span class=mi>3</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=p>(</span><span class=n>random</span> <span class=o>==</span> <span class=mi>0</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=nf>V</span><span class=p>(</span><span class=n>offer1</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=k>else</span> <span class=k>if</span> <span class=p>(</span><span class=n>random</span> <span class=o>==</span> <span class=mi>1</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=nf>V</span><span class=p>(</span><span class=n>offer2</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=k>else</span>
+</span></span><span class=line><span class=cl>            <span class=nf>V</span><span class=p>(</span><span class=n>offer3</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=err>任意两种材料放在桌子上</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=nf>P</span><span class=p>(</span><span class=n>finish</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>process</span> <span class=nf>C1</span><span class=p>()</span> <span class=p>{</span>  <span class=c1>// 抽烟者1
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>while</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nf>P</span><span class=p>(</span><span class=n>offer1</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=err>抽烟</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=nf>V</span><span class=p>(</span><span class=n>finish</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>process</span> <span class=nf>C2</span><span class=p>()</span> <span class=p>{</span>  <span class=c1>// 抽烟者2
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>while</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nf>P</span><span class=p>(</span><span class=n>offer2</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=err>抽烟</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=nf>V</span><span class=p>(</span><span class=n>finish</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>process</span> <span class=nf>C3</span><span class=p>()</span> <span class=p>{</span>  <span class=c1>// 抽烟者3
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>while</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nf>P</span><span class=p>(</span><span class=n>offer3</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=err>抽烟</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=nf>V</span><span class=p>(</span><span class=n>finish</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div></section><script src=https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js></script><script>mermaid.initialize({startOnLoad:!0}),document.addEventListener("DOMContentLoaded",function(){var e=document.querySelectorAll("pre code.language-mermaid");e.forEach(function(e){var n,t=document.createElement("div");t.className="mermaid",t.innerHTML=e.textContent,n=e.parentElement,n.parentNode.replaceChild(t,n)})})</script><footer class=article-footer><section class=article-copyright><svg class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg>
+<span>Licensed under CC BY-NC-SA 4.0</span></section><section class=article-lastmod><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<span>最后更新于 May 16, 2024 11:09 +0800</span></section></footer><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css integrity=sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV crossorigin=anonymous><script src=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js integrity=sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8 crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js integrity=sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05 crossorigin=anonymous defer></script><script>window.addEventListener("DOMContentLoaded",()=>{renderMathInElement(document.body,{delimiters:[{left:"$$",right:"$$",display:!0},{left:"$",right:"$",display:!1},{left:"\\(",right:"\\)",display:!1},{left:"\\[",right:"\\]",display:!0}],ignoredClasses:["gist"]})})</script></article><aside class=related-content--wrapper><h2 class=section-title>相关文章</h2><div class=related-content><div class="flex article-list--tile"><article><a href=/blog/p/1.1-%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/><div class=article-details><h2 class=article-title>1.1 操作系统的基本概念</h2></div></a></article><article><a href=/blog/p/1.2-%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E7%9A%84%E5%8F%91%E5%B1%95%E4%B8%8E%E5%88%86%E7%B1%BB/><div class=article-details><h2 class=article-title>1.2 操作系统的发展与分类</h2></div></a></article><article><a href=/blog/p/1.3-%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E7%9A%84%E8%BF%90%E8%A1%8C%E7%8E%AF%E5%A2%83/><div class=article-details><h2 class=article-title>1.3 操作系统的运行环境</h2></div></a></article><article><a href=/blog/p/1.4-%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E7%9A%84%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84/><div class=article-details><h2 class=article-title>1.4 操作系统的体系结构</h2></div></a></article><article><a href=/blog/p/2.1-%E8%BF%9B%E7%A8%8B%E4%B8%8E%E7%BA%BF%E7%A8%8B/><div class=article-details><h2 class=article-title>2.1 进程与线程</h2></div></a></article></div></div></aside><footer class=site-footer><section class=copyright>&copy;
+2020 -
+2025 Wlynxg's Blog</section><section class=powerby>使用 <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> 构建<br>主题 <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.29.0>Stack</a></b> 由 <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a> 设计</section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/blog/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>

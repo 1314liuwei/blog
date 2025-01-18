@@ -1,0 +1,635 @@
+<!doctype html><html lang=zh-cn dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="修复 Go #40569 问题 问题描述 问题 issue： https://github.com/golang/go/issues/40569\n在安卓 11 以上版本中，go 调用 net.InterfaceAddrs() 和 net.Interfaces()时会抛出 route ip+net: netlinkrib: permission denied 错误。\n出现原因 查找原因发现是由于安卓 11 以上版本对 netlink 套接字的能力进行了限制，详情见：https://developer.android.com/training/articles/user-data-ids#mac-11-plus。\n查看 Go 源码，发现在两个地方会存在问题：\n（一）在syscall.NetlinkRIB 函数中，进行了 netlink 套接字 bind 操作：\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 // NetlinkRIB returns routing information base, as known as RIB, which // consists of network facility information, states and parameters. func NetlinkRIB(proto, family int) ([]byte, error) { s, err := Socket(AF_NETLINK, SOCK_RAW|SOCK_CLOEXEC, NETLINK_ROUTE) if err != nil { return nil, err } defer Close(s) sa := &amp;SockaddrNetlink{Family: AF_NETLINK} //------------------------------------------------- // 进行了 bind 操作 if err := Bind(s, sa); err != nil { return nil, err } //------------------------------------------------- wb := newNetlinkRouteRequest(proto, 1, family) if err := Sendto(s, wb, 0, sa); err != nil { return nil, err } lsa, err := Getsockname(s) if err != nil { return nil, err } lsanl, ok := lsa.(*SockaddrNetlink) if !ok { return nil, EINVAL } var tab []byte rbNew := make([]byte, Getpagesize()) done: for { rb := rbNew nr, _, err := Recvfrom(s, rb, 0) if err != nil { return nil, err } if nr < NLMSG_HDRLEN { return nil, EINVAL } rb = rb[:nr] tab = append(tab, rb...) msgs, err := ParseNetlinkMessage(rb) if err != nil { return nil, err } for _, m := range msgs { if m.Header.Seq != 1 || m.Header.Pid != lsanl.Pid { return nil, EINVAL } if m.Header.Type == NLMSG_DONE { break done } if m.Header.Type == NLMSG_ERROR { return nil, EINVAL } } } return tab, nil } （二）在 interfaceTable 函数中，调用了 Netlink 套接字的 RTM_GETLINK 能力：\n"><title>修复 Go #40569 问题</title>
+<link rel=canonical href=https://wlynxg.github.io/blog/p/%E4%BF%AE%E5%A4%8D-go-%2340569-%E9%97%AE%E9%A2%98/><link rel=stylesheet href=/blog/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css><meta property='og:title' content="修复 Go #40569 问题"><meta property='og:description' content="修复 Go #40569 问题 问题描述 问题 issue： https://github.com/golang/go/issues/40569\n在安卓 11 以上版本中，go 调用 net.InterfaceAddrs() 和 net.Interfaces()时会抛出 route ip+net: netlinkrib: permission denied 错误。\n出现原因 查找原因发现是由于安卓 11 以上版本对 netlink 套接字的能力进行了限制，详情见：https://developer.android.com/training/articles/user-data-ids#mac-11-plus。\n查看 Go 源码，发现在两个地方会存在问题：\n（一）在syscall.NetlinkRIB 函数中，进行了 netlink 套接字 bind 操作：\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 // NetlinkRIB returns routing information base, as known as RIB, which // consists of network facility information, states and parameters. func NetlinkRIB(proto, family int) ([]byte, error) { s, err := Socket(AF_NETLINK, SOCK_RAW|SOCK_CLOEXEC, NETLINK_ROUTE) if err != nil { return nil, err } defer Close(s) sa := &amp;SockaddrNetlink{Family: AF_NETLINK} //------------------------------------------------- // 进行了 bind 操作 if err := Bind(s, sa); err != nil { return nil, err } //------------------------------------------------- wb := newNetlinkRouteRequest(proto, 1, family) if err := Sendto(s, wb, 0, sa); err != nil { return nil, err } lsa, err := Getsockname(s) if err != nil { return nil, err } lsanl, ok := lsa.(*SockaddrNetlink) if !ok { return nil, EINVAL } var tab []byte rbNew := make([]byte, Getpagesize()) done: for { rb := rbNew nr, _, err := Recvfrom(s, rb, 0) if err != nil { return nil, err } if nr < NLMSG_HDRLEN { return nil, EINVAL } rb = rb[:nr] tab = append(tab, rb...) msgs, err := ParseNetlinkMessage(rb) if err != nil { return nil, err } for _, m := range msgs { if m.Header.Seq != 1 || m.Header.Pid != lsanl.Pid { return nil, EINVAL } if m.Header.Type == NLMSG_DONE { break done } if m.Header.Type == NLMSG_ERROR { return nil, EINVAL } } } return tab, nil } （二）在 interfaceTable 函数中，调用了 Netlink 套接字的 RTM_GETLINK 能力：\n"><meta property='og:url' content='https://wlynxg.github.io/blog/p/%E4%BF%AE%E5%A4%8D-go-%2340569-%E9%97%AE%E9%A2%98/'><meta property='og:site_name' content="Wlynxg's Blog"><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:published_time' content='2023-07-02T22:12:53+08:00'><meta property='article:modified_time' content='2023-07-02T22:12:53+08:00'><meta name=twitter:title content="修复 Go #40569 问题"><meta name=twitter:description content="修复 Go #40569 问题 问题描述 问题 issue： https://github.com/golang/go/issues/40569\n在安卓 11 以上版本中，go 调用 net.InterfaceAddrs() 和 net.Interfaces()时会抛出 route ip+net: netlinkrib: permission denied 错误。\n出现原因 查找原因发现是由于安卓 11 以上版本对 netlink 套接字的能力进行了限制，详情见：https://developer.android.com/training/articles/user-data-ids#mac-11-plus。\n查看 Go 源码，发现在两个地方会存在问题：\n（一）在syscall.NetlinkRIB 函数中，进行了 netlink 套接字 bind 操作：\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 // NetlinkRIB returns routing information base, as known as RIB, which // consists of network facility information, states and parameters. func NetlinkRIB(proto, family int) ([]byte, error) { s, err := Socket(AF_NETLINK, SOCK_RAW|SOCK_CLOEXEC, NETLINK_ROUTE) if err != nil { return nil, err } defer Close(s) sa := &amp;SockaddrNetlink{Family: AF_NETLINK} //------------------------------------------------- // 进行了 bind 操作 if err := Bind(s, sa); err != nil { return nil, err } //------------------------------------------------- wb := newNetlinkRouteRequest(proto, 1, family) if err := Sendto(s, wb, 0, sa); err != nil { return nil, err } lsa, err := Getsockname(s) if err != nil { return nil, err } lsanl, ok := lsa.(*SockaddrNetlink) if !ok { return nil, EINVAL } var tab []byte rbNew := make([]byte, Getpagesize()) done: for { rb := rbNew nr, _, err := Recvfrom(s, rb, 0) if err != nil { return nil, err } if nr < NLMSG_HDRLEN { return nil, EINVAL } rb = rb[:nr] tab = append(tab, rb...) msgs, err := ParseNetlinkMessage(rb) if err != nil { return nil, err } for _, m := range msgs { if m.Header.Seq != 1 || m.Header.Pid != lsanl.Pid { return nil, EINVAL } if m.Header.Type == NLMSG_DONE { break done } if m.Header.Type == NLMSG_ERROR { return nil, EINVAL } } } return tab, nil } （二）在 interfaceTable 函数中，调用了 Netlink 套接字的 RTM_GETLINK 能力：\n"><link rel="shortcut icon" href=/blog/favicon.ico></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label=切换菜单>
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/blog/><img src=/blog/img/file_hu6889846174828548036.png width=300 height=300 class=site-logo loading=lazy alt=Avatar>
+</a><span class=emoji>🐂</span></figure><div class=site-meta><h1 class=site-name><a href=/blog>Wlynxg's Blog</a></h1><h2 class=site-description>The harder, ther luckier!</h2></div></header><ol class=menu-social><li><a href=https://github.com/wlynxg target=_blank title=GitHub rel=me><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li><li><a href=mailto:liuauthor@foxmail.com target=_blank title=Mail rel=me><svg t="1730733819354" class="icon" viewBox="0 0 1024 1024" p-id="3570" width="24" height="24"><path d="M942.08 200.704s-1.024.0.0.0c-1.024-2.048-1.024-4.096-2.048-6.144-1.024-1.024-2.048-3.072-3.072-4.096l-1.024-1.024-1.024-1.024c-1.024-1.024-2.048-2.048-4.096-2.048h-1.024c-2.048-1.024-3.072-1.024-5.12-1.024h-1.024C788.48 163.84 649.216 153.6 512 153.6s-276.48 10.24-412.672 30.72h-1.024c-2.048.0-3.072 1.024-5.12 1.024H92.16c-1.024 1.024-3.072 1.024-4.096 2.048l-1.024 1.024-1.024 1.024c-1.024 1.024-2.048 2.048-3.072 4.096v1.024c-1.024 2.048-1.024 3.072-2.048 5.12C61.44 304.128 51.2 408.576 51.2 512s10.24 207.872 30.72 311.296c2.048 8.192 8.192 15.36 17.408 16.384C235.52 860.16 374.784 870.4 512 870.4s276.48-10.24 412.672-30.72c8.192-1.024 15.36-8.192 17.408-16.384C962.56 719.872 972.8 615.424 972.8 512s-10.24-207.872-30.72-311.296zm-60.416 19.456c-44.032 50.176-96.256 97.28-156.672 142.336C654.336 415.744 582.656 457.728 512 489.472c-77.824-36.864-148.48-78.848-212.992-126.976-56.32-41.984-108.544-90.112-156.672-142.336 122.88-17.408 246.784-25.6 369.664-25.6s246.784 8.192 369.664 25.6zm22.528 580.608C774.144 820.224 642.048 829.44 512 829.44s-262.144-9.216-392.192-28.672C101.376 705.536 92.16 608.256 92.16 512c0-87.04 8.192-175.104 22.528-262.144 48.128 53.248 102.4 102.4 159.744 145.408 69.632 52.224 144.384 96.256 229.376 135.168 3.072 1.024 6.144 2.048 8.192 2.048 3.072.0 5.12-1.024 8.192-2.048 76.8-32.768 153.6-78.848 229.376-135.168 60.416-46.08 114.688-94.208 159.744-144.384C924.672 337.92 931.84 424.96 931.84 512c0 96.256-9.216 193.536-27.648 288.768z" p-id="3571" fill="#707070"/></svg></a></li><li><a href=/blog/index.xml target=_blank title=RSS rel=me><svg t="1730718821658" class="icon" viewBox="0 0 1024 1024" p-id="21619" width="24" height="24"><path d="M554.666667 896C529.066667 896 512 878.933333 512 853.333333 512 665.6 358.4 512 170.666667 512 145.066667 512 128 494.933333 128 469.333333s17.066667-42.666667 42.666667-42.666666c234.666667.0 426.666667 192 426.666666 426.666666.0 25.6-17.066667 42.666667-42.666666 42.666667z" p-id="21620" fill="#707070"/><path d="M853.333333 896c-25.6.0-42.666667-17.066667-42.666666-42.666667.0-354.133333-285.866667-640-640-640-25.6.0-42.666667-17.066667-42.666667-42.666666S145.066667 128 170.666667 128C571.733334 128 896 452.266667 896 853.333333 896 878.933333 878.933333 896 853.333333 896z" p-id="21621" fill="#707070"/><path d="M213.333333 810.666667m-85.333333.0a85.333333 85.333333.0 10170.666667.0 85.333333 85.333333.0 10-170.666667.0z" p-id="21622" fill="#707070"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/blog/><svg class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>Home</span></a></li><li><a href=/blog/archives/><svg class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+<span>Archives</span></a></li><li><a href=/blog/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>Search</span></a></li><li><a href=/blog/links/><svg class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg>
+<span>Links</span></a></li><li><a href=/blog/plan/><svg t="1730733517435" class="icon" viewBox="0 0 1024 1024" p-id="1581" width="24" height="24"><path d="M874.24 1013.76H143.36a94.72 94.72.0 01-94.72-94.72V188.16a94.72 94.72.0 0194.72-94.72h730.88a95.36 95.36.0 0194.72 94.72v730.88a94.72 94.72.0 01-94.72 94.72zM143.36 156.8a31.36 31.36.0 00-32 31.36v730.88a32 32 0 0032 32h730.88a32 32 0 0031.36-32V188.16a31.36 31.36.0 00-31.36-31.36z" fill="#707070" p-id="1582"/><path d="M926.08 399.36h-832a32 32 0 010-64h832a32 32 0 110 64zM339.84 273.28a31.36 31.36.0 01-31.36-32V39.04a31.36 31.36.0 0131.36-32 32 32 0 0132 32v202.24a32 32 0 01-32 32zm337.28.0a31.36 31.36.0 01-31.36-32V39.04a31.36 31.36.0 1164 0v202.24a31.36 31.36.0 01-32.64 32zM444.16 841.6a33.92 33.92.0 01-23.04-9.6l-128-138.24a32 32 0 1146.08-43.52L448 768l280.32-279.68a30.72 30.72.0 0144.8.0 31.36 31.36.0 010 44.16L466.56 832a32 32 0 01-22.4 9.6z" fill="#707070" p-id="1583"/></svg>
+<span>Plan</span></a></li><li class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>暗色模式</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">目录</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#问题描述>问题描述</a></li><li><a href=#出现原因>出现原因</a></li><li><a href=#解决方案>解决方案</a></li><li><a href=#实现代码>实现代码</a></li></ol></nav></div></section></aside><main class="main full-width"><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/blog/categories/go/ style=background-color:#79d4fd;color:#fff>Go</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/blog/p/%E4%BF%AE%E5%A4%8D-go-%2340569-%E9%97%AE%E9%A2%98/>修复 Go #40569 问题</a></h2></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published>Jul 02, 2023</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>阅读时长: 7 分钟</time></div></footer></div></header><section class=article-content><h1 id=修复-go-40569-问题>修复 Go #40569 问题</h1><h2 id=问题描述>问题描述</h2><blockquote><p>问题 issue： <a class=link href=https://github.com/golang/go/issues/40569 target=_blank rel=noopener>https://github.com/golang/go/issues/40569</a></p><p>在安卓 11 以上版本中，go 调用 <code>net.InterfaceAddrs()</code> 和 <code>net.Interfaces()</code>时会抛出 <code>route ip+net: netlinkrib: permission denied</code> 错误。</p></blockquote><h2 id=出现原因>出现原因</h2><p>查找原因发现是由于安卓 11 以上版本对 netlink 套接字的能力进行了限制，详情见：<a class=link href=https://developer.android.com/training/articles/user-data-ids#mac-11-plus target=_blank rel=noopener>https://developer.android.com/training/articles/user-data-ids#mac-11-plus</a>。</p><p>查看 Go 源码，发现在两个地方会存在问题：</p><p>（一）在<code>syscall.NetlinkRIB</code> 函数中，进行了 netlink 套接字 bind 操作：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=c1>// NetlinkRIB returns routing information base, as known as RIB, which
+</span></span></span><span class=line><span class=cl><span class=c1>// consists of network facility information, states and parameters.
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kd>func</span> <span class=nf>NetlinkRIB</span><span class=p>(</span><span class=nx>proto</span><span class=p>,</span> <span class=nx>family</span> <span class=kt>int</span><span class=p>)</span> <span class=p>([]</span><span class=kt>byte</span><span class=p>,</span> <span class=kt>error</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=nx>s</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nf>Socket</span><span class=p>(</span><span class=nx>AF_NETLINK</span><span class=p>,</span> <span class=nx>SOCK_RAW</span><span class=p>|</span><span class=nx>SOCK_CLOEXEC</span><span class=p>,</span> <span class=nx>NETLINK_ROUTE</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=k>return</span> <span class=kc>nil</span><span class=p>,</span> <span class=nx>err</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=k>defer</span> <span class=nf>Close</span><span class=p>(</span><span class=nx>s</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=nx>sa</span> <span class=o>:=</span> <span class=o>&amp;</span><span class=nx>SockaddrNetlink</span><span class=p>{</span><span class=nx>Family</span><span class=p>:</span> <span class=nx>AF_NETLINK</span><span class=p>}</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    <span class=c1>//-------------------------------------------------
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=c1>// 进行了 bind 操作
+</span></span></span><span class=line><span class=cl><span class=c1></span>	<span class=k>if</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nf>Bind</span><span class=p>(</span><span class=nx>s</span><span class=p>,</span> <span class=nx>sa</span><span class=p>);</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=k>return</span> <span class=kc>nil</span><span class=p>,</span> <span class=nx>err</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=c1>//-------------------------------------------------
+</span></span></span><span class=line><span class=cl><span class=c1></span>    
+</span></span><span class=line><span class=cl>	<span class=nx>wb</span> <span class=o>:=</span> <span class=nf>newNetlinkRouteRequest</span><span class=p>(</span><span class=nx>proto</span><span class=p>,</span> <span class=mi>1</span><span class=p>,</span> <span class=nx>family</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nf>Sendto</span><span class=p>(</span><span class=nx>s</span><span class=p>,</span> <span class=nx>wb</span><span class=p>,</span> <span class=mi>0</span><span class=p>,</span> <span class=nx>sa</span><span class=p>);</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=k>return</span> <span class=kc>nil</span><span class=p>,</span> <span class=nx>err</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=nx>lsa</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nf>Getsockname</span><span class=p>(</span><span class=nx>s</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=k>return</span> <span class=kc>nil</span><span class=p>,</span> <span class=nx>err</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=nx>lsanl</span><span class=p>,</span> <span class=nx>ok</span> <span class=o>:=</span> <span class=nx>lsa</span><span class=p>.(</span><span class=o>*</span><span class=nx>SockaddrNetlink</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=p>!</span><span class=nx>ok</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=k>return</span> <span class=kc>nil</span><span class=p>,</span> <span class=nx>EINVAL</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=kd>var</span> <span class=nx>tab</span> <span class=p>[]</span><span class=kt>byte</span>
+</span></span><span class=line><span class=cl>	<span class=nx>rbNew</span> <span class=o>:=</span> <span class=nb>make</span><span class=p>([]</span><span class=kt>byte</span><span class=p>,</span> <span class=nf>Getpagesize</span><span class=p>())</span>
+</span></span><span class=line><span class=cl><span class=nx>done</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>	<span class=k>for</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=nx>rb</span> <span class=o>:=</span> <span class=nx>rbNew</span>
+</span></span><span class=line><span class=cl>		<span class=nx>nr</span><span class=p>,</span> <span class=nx>_</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nf>Recvfrom</span><span class=p>(</span><span class=nx>s</span><span class=p>,</span> <span class=nx>rb</span><span class=p>,</span> <span class=mi>0</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>		<span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>			<span class=k>return</span> <span class=kc>nil</span><span class=p>,</span> <span class=nx>err</span>
+</span></span><span class=line><span class=cl>		<span class=p>}</span>
+</span></span><span class=line><span class=cl>		<span class=k>if</span> <span class=nx>nr</span> <span class=p>&lt;</span> <span class=nx>NLMSG_HDRLEN</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>			<span class=k>return</span> <span class=kc>nil</span><span class=p>,</span> <span class=nx>EINVAL</span>
+</span></span><span class=line><span class=cl>		<span class=p>}</span>
+</span></span><span class=line><span class=cl>		<span class=nx>rb</span> <span class=p>=</span> <span class=nx>rb</span><span class=p>[:</span><span class=nx>nr</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>		<span class=nx>tab</span> <span class=p>=</span> <span class=nb>append</span><span class=p>(</span><span class=nx>tab</span><span class=p>,</span> <span class=nx>rb</span><span class=o>...</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>		<span class=nx>msgs</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nf>ParseNetlinkMessage</span><span class=p>(</span><span class=nx>rb</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>		<span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>			<span class=k>return</span> <span class=kc>nil</span><span class=p>,</span> <span class=nx>err</span>
+</span></span><span class=line><span class=cl>		<span class=p>}</span>
+</span></span><span class=line><span class=cl>		<span class=k>for</span> <span class=nx>_</span><span class=p>,</span> <span class=nx>m</span> <span class=o>:=</span> <span class=k>range</span> <span class=nx>msgs</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>			<span class=k>if</span> <span class=nx>m</span><span class=p>.</span><span class=nx>Header</span><span class=p>.</span><span class=nx>Seq</span> <span class=o>!=</span> <span class=mi>1</span> <span class=o>||</span> <span class=nx>m</span><span class=p>.</span><span class=nx>Header</span><span class=p>.</span><span class=nx>Pid</span> <span class=o>!=</span> <span class=nx>lsanl</span><span class=p>.</span><span class=nx>Pid</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>				<span class=k>return</span> <span class=kc>nil</span><span class=p>,</span> <span class=nx>EINVAL</span>
+</span></span><span class=line><span class=cl>			<span class=p>}</span>
+</span></span><span class=line><span class=cl>			<span class=k>if</span> <span class=nx>m</span><span class=p>.</span><span class=nx>Header</span><span class=p>.</span><span class=nx>Type</span> <span class=o>==</span> <span class=nx>NLMSG_DONE</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>				<span class=k>break</span> <span class=nx>done</span>
+</span></span><span class=line><span class=cl>			<span class=p>}</span>
+</span></span><span class=line><span class=cl>			<span class=k>if</span> <span class=nx>m</span><span class=p>.</span><span class=nx>Header</span><span class=p>.</span><span class=nx>Type</span> <span class=o>==</span> <span class=nx>NLMSG_ERROR</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>				<span class=k>return</span> <span class=kc>nil</span><span class=p>,</span> <span class=nx>EINVAL</span>
+</span></span><span class=line><span class=cl>			<span class=p>}</span>
+</span></span><span class=line><span class=cl>		<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=k>return</span> <span class=nx>tab</span><span class=p>,</span> <span class=kc>nil</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>（二）在 <code>interfaceTable</code> 函数中，调用了 Netlink 套接字的 <code>RTM_GETLINK</code> 能力：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=kd>func</span> <span class=nf>interfaceTable</span><span class=p>(</span><span class=nx>ifindex</span> <span class=kt>int</span><span class=p>)</span> <span class=p>([]</span><span class=nx>Interface</span><span class=p>,</span> <span class=kt>error</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 调用了 syscall.RTM_GETLINK 套接字
+</span></span></span><span class=line><span class=cl><span class=c1></span>	<span class=nx>tab</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>syscall</span><span class=p>.</span><span class=nf>NetlinkRIB</span><span class=p>(</span><span class=nx>syscall</span><span class=p>.</span><span class=nx>RTM_GETLINK</span><span class=p>,</span> <span class=nx>syscall</span><span class=p>.</span><span class=nx>AF_UNSPEC</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=k>return</span> <span class=kc>nil</span><span class=p>,</span> <span class=nx>os</span><span class=p>.</span><span class=nf>NewSyscallError</span><span class=p>(</span><span class=s>&#34;netlinkrib&#34;</span><span class=p>,</span> <span class=nx>err</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=nx>msgs</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>syscall</span><span class=p>.</span><span class=nf>ParseNetlinkMessage</span><span class=p>(</span><span class=nx>tab</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=k>return</span> <span class=kc>nil</span><span class=p>,</span> <span class=nx>os</span><span class=p>.</span><span class=nf>NewSyscallError</span><span class=p>(</span><span class=s>&#34;parsenetlinkmessage&#34;</span><span class=p>,</span> <span class=nx>err</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=kd>var</span> <span class=nx>ift</span> <span class=p>[]</span><span class=nx>Interface</span>
+</span></span><span class=line><span class=cl><span class=nx>loop</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>	<span class=k>for</span> <span class=nx>_</span><span class=p>,</span> <span class=nx>m</span> <span class=o>:=</span> <span class=k>range</span> <span class=nx>msgs</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=k>switch</span> <span class=nx>m</span><span class=p>.</span><span class=nx>Header</span><span class=p>.</span><span class=nx>Type</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=k>case</span> <span class=nx>syscall</span><span class=p>.</span><span class=nx>NLMSG_DONE</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>			<span class=k>break</span> <span class=nx>loop</span>
+</span></span><span class=line><span class=cl>		<span class=k>case</span> <span class=nx>syscall</span><span class=p>.</span><span class=nx>RTM_NEWLINK</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>			<span class=nx>ifim</span> <span class=o>:=</span> <span class=p>(</span><span class=o>*</span><span class=nx>syscall</span><span class=p>.</span><span class=nx>IfInfomsg</span><span class=p>)(</span><span class=nx>unsafe</span><span class=p>.</span><span class=nf>Pointer</span><span class=p>(</span><span class=o>&amp;</span><span class=nx>m</span><span class=p>.</span><span class=nx>Data</span><span class=p>[</span><span class=mi>0</span><span class=p>]))</span>
+</span></span><span class=line><span class=cl>			<span class=k>if</span> <span class=nx>ifindex</span> <span class=o>==</span> <span class=mi>0</span> <span class=o>||</span> <span class=nx>ifindex</span> <span class=o>==</span> <span class=nb>int</span><span class=p>(</span><span class=nx>ifim</span><span class=p>.</span><span class=nx>Index</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>				<span class=nx>attrs</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>syscall</span><span class=p>.</span><span class=nf>ParseNetlinkRouteAttr</span><span class=p>(</span><span class=o>&amp;</span><span class=nx>m</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>				<span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>					<span class=k>return</span> <span class=kc>nil</span><span class=p>,</span> <span class=nx>os</span><span class=p>.</span><span class=nf>NewSyscallError</span><span class=p>(</span><span class=s>&#34;parsenetlinkrouteattr&#34;</span><span class=p>,</span> <span class=nx>err</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>				<span class=p>}</span>
+</span></span><span class=line><span class=cl>				<span class=nx>ift</span> <span class=p>=</span> <span class=nb>append</span><span class=p>(</span><span class=nx>ift</span><span class=p>,</span> <span class=o>*</span><span class=nf>newLink</span><span class=p>(</span><span class=nx>ifim</span><span class=p>,</span> <span class=nx>attrs</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>				<span class=k>if</span> <span class=nx>ifindex</span> <span class=o>==</span> <span class=nb>int</span><span class=p>(</span><span class=nx>ifim</span><span class=p>.</span><span class=nx>Index</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>					<span class=k>break</span> <span class=nx>loop</span>
+</span></span><span class=line><span class=cl>				<span class=p>}</span>
+</span></span><span class=line><span class=cl>			<span class=p>}</span>
+</span></span><span class=line><span class=cl>		<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=k>return</span> <span class=nx>ift</span><span class=p>,</span> <span class=kc>nil</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=解决方案>解决方案</h2><p>经过调研，发现在 Android 中存在一个 <code>NetworkInterface.getNetworkInterfaces()</code> 接口，该接口能够正常返回网卡地址和相关信息（在 Android 11 之后的版本种 HwAddr 为空）。</p><p>因此决定参考<code>NetworkInterface.getNetworkInterfaces()</code>接口实现对 Go 的代码进行修复。</p><p>相关 Android 代码：</p><ul><li><p><a class=link href=https://android.googlesource.com/platform/libcore/+/refs/heads/android11-mainline-cellbroadcast-release/luni/src/main/native/libcore_io_Linux.cpp target=_blank rel=noopener>https://android.googlesource.com/platform/libcore/+/refs/heads/android11-mainline-cellbroadcast-release/luni/src/main/native/libcore_io_Linux.cpp</a></p></li><li><p><a class=link href=https://android.googlesource.com/platform/bionic/+/froyo/libc/bionic/if_indextoname.c target=_blank rel=noopener>https://android.googlesource.com/platform/bionic/+/froyo/libc/bionic/if_indextoname.c</a></p></li><li><p><a class=link href=https://android.googlesource.com/platform/libcore/+/refs/heads/gingerbread-release/luni/src/main/native/ifaddrs-android.h target=_blank rel=noopener>https://android.googlesource.com/platform/libcore/+/refs/heads/gingerbread-release/luni/src/main/native/ifaddrs-android.h</a></p></li><li><p><a class=link href=https://android.googlesource.com/platform/libcore/+/5d930ca/luni/src/main/java/java/net/NetworkInterface.java target=_blank rel=noopener>https://android.googlesource.com/platform/libcore/+/5d930ca/luni/src/main/java/java/net/NetworkInterface.java</a></p></li></ul><h2 id=实现代码>实现代码</h2><p>完整代码可见：</p><p><a class=link href=https://github.com/golang/go/pull/61089 target=_blank rel=noopener>https://github.com/golang/go/pull/61089</a></p><p><a class=link href=https://github.com/wlynxg/anet target=_blank rel=noopener>https://github.com/wlynxg/anet</a></p><p>部分代码：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>  1
+</span><span class=lnt>  2
+</span><span class=lnt>  3
+</span><span class=lnt>  4
+</span><span class=lnt>  5
+</span><span class=lnt>  6
+</span><span class=lnt>  7
+</span><span class=lnt>  8
+</span><span class=lnt>  9
+</span><span class=lnt> 10
+</span><span class=lnt> 11
+</span><span class=lnt> 12
+</span><span class=lnt> 13
+</span><span class=lnt> 14
+</span><span class=lnt> 15
+</span><span class=lnt> 16
+</span><span class=lnt> 17
+</span><span class=lnt> 18
+</span><span class=lnt> 19
+</span><span class=lnt> 20
+</span><span class=lnt> 21
+</span><span class=lnt> 22
+</span><span class=lnt> 23
+</span><span class=lnt> 24
+</span><span class=lnt> 25
+</span><span class=lnt> 26
+</span><span class=lnt> 27
+</span><span class=lnt> 28
+</span><span class=lnt> 29
+</span><span class=lnt> 30
+</span><span class=lnt> 31
+</span><span class=lnt> 32
+</span><span class=lnt> 33
+</span><span class=lnt> 34
+</span><span class=lnt> 35
+</span><span class=lnt> 36
+</span><span class=lnt> 37
+</span><span class=lnt> 38
+</span><span class=lnt> 39
+</span><span class=lnt> 40
+</span><span class=lnt> 41
+</span><span class=lnt> 42
+</span><span class=lnt> 43
+</span><span class=lnt> 44
+</span><span class=lnt> 45
+</span><span class=lnt> 46
+</span><span class=lnt> 47
+</span><span class=lnt> 48
+</span><span class=lnt> 49
+</span><span class=lnt> 50
+</span><span class=lnt> 51
+</span><span class=lnt> 52
+</span><span class=lnt> 53
+</span><span class=lnt> 54
+</span><span class=lnt> 55
+</span><span class=lnt> 56
+</span><span class=lnt> 57
+</span><span class=lnt> 58
+</span><span class=lnt> 59
+</span><span class=lnt> 60
+</span><span class=lnt> 61
+</span><span class=lnt> 62
+</span><span class=lnt> 63
+</span><span class=lnt> 64
+</span><span class=lnt> 65
+</span><span class=lnt> 66
+</span><span class=lnt> 67
+</span><span class=lnt> 68
+</span><span class=lnt> 69
+</span><span class=lnt> 70
+</span><span class=lnt> 71
+</span><span class=lnt> 72
+</span><span class=lnt> 73
+</span><span class=lnt> 74
+</span><span class=lnt> 75
+</span><span class=lnt> 76
+</span><span class=lnt> 77
+</span><span class=lnt> 78
+</span><span class=lnt> 79
+</span><span class=lnt> 80
+</span><span class=lnt> 81
+</span><span class=lnt> 82
+</span><span class=lnt> 83
+</span><span class=lnt> 84
+</span><span class=lnt> 85
+</span><span class=lnt> 86
+</span><span class=lnt> 87
+</span><span class=lnt> 88
+</span><span class=lnt> 89
+</span><span class=lnt> 90
+</span><span class=lnt> 91
+</span><span class=lnt> 92
+</span><span class=lnt> 93
+</span><span class=lnt> 94
+</span><span class=lnt> 95
+</span><span class=lnt> 96
+</span><span class=lnt> 97
+</span><span class=lnt> 98
+</span><span class=lnt> 99
+</span><span class=lnt>100
+</span><span class=lnt>101
+</span><span class=lnt>102
+</span><span class=lnt>103
+</span><span class=lnt>104
+</span><span class=lnt>105
+</span><span class=lnt>106
+</span><span class=lnt>107
+</span><span class=lnt>108
+</span><span class=lnt>109
+</span><span class=lnt>110
+</span><span class=lnt>111
+</span><span class=lnt>112
+</span><span class=lnt>113
+</span><span class=lnt>114
+</span><span class=lnt>115
+</span><span class=lnt>116
+</span><span class=lnt>117
+</span><span class=lnt>118
+</span><span class=lnt>119
+</span><span class=lnt>120
+</span><span class=lnt>121
+</span><span class=lnt>122
+</span><span class=lnt>123
+</span><span class=lnt>124
+</span><span class=lnt>125
+</span><span class=lnt>126
+</span><span class=lnt>127
+</span><span class=lnt>128
+</span><span class=lnt>129
+</span><span class=lnt>130
+</span><span class=lnt>131
+</span><span class=lnt>132
+</span><span class=lnt>133
+</span><span class=lnt>134
+</span><span class=lnt>135
+</span><span class=lnt>136
+</span><span class=lnt>137
+</span><span class=lnt>138
+</span><span class=lnt>139
+</span><span class=lnt>140
+</span><span class=lnt>141
+</span><span class=lnt>142
+</span><span class=lnt>143
+</span><span class=lnt>144
+</span><span class=lnt>145
+</span><span class=lnt>146
+</span><span class=lnt>147
+</span><span class=lnt>148
+</span><span class=lnt>149
+</span><span class=lnt>150
+</span><span class=lnt>151
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=c1>// src/net/interface_android.go
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kn>package</span> <span class=nx>net</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=p>(</span>
+</span></span><span class=line><span class=cl>	<span class=s>&#34;bytes&#34;</span>
+</span></span><span class=line><span class=cl>	<span class=s>&#34;os&#34;</span>
+</span></span><span class=line><span class=cl>	<span class=s>&#34;syscall&#34;</span>
+</span></span><span class=line><span class=cl>	<span class=s>&#34;unsafe&#34;</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>type</span> <span class=nx>ifReq</span> <span class=p>[</span><span class=mi>40</span><span class=p>]</span><span class=kt>byte</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// Starting from Android 11, it is no longer possible to retrieve network card information
+</span></span></span><span class=line><span class=cl><span class=c1>// using the RTM_GETLINK method.
+</span></span></span><span class=line><span class=cl><span class=c1>// As a result, alternative methods need to be employed.
+</span></span></span><span class=line><span class=cl><span class=c1>// After considering the Android NetworkInterface.getNetworkInterfaces() method,
+</span></span></span><span class=line><span class=cl><span class=c1>// I opted to utilize the RTM_GETADDR + ioctl approach to obtain network card information.
+</span></span></span><span class=line><span class=cl><span class=c1>// However, it appears that retrieving the
+</span></span></span><span class=line><span class=cl><span class=c1>// HWAddr (hardware address) of the network card is currently not achievable.
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kd>func</span> <span class=nf>interfaceTableAndroid</span><span class=p>(</span><span class=nx>ifindex</span> <span class=kt>int</span><span class=p>)</span> <span class=p>([]</span><span class=nx>Interface</span><span class=p>,</span> <span class=kt>error</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=nx>tab</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>syscall</span><span class=p>.</span><span class=nf>NetlinkRIB</span><span class=p>(</span><span class=nx>syscall</span><span class=p>.</span><span class=nx>RTM_GETADDR</span><span class=p>,</span> <span class=nx>syscall</span><span class=p>.</span><span class=nx>AF_UNSPEC</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=k>return</span> <span class=kc>nil</span><span class=p>,</span> <span class=nx>os</span><span class=p>.</span><span class=nf>NewSyscallError</span><span class=p>(</span><span class=s>&#34;netlinkrib&#34;</span><span class=p>,</span> <span class=nx>err</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=nx>msgs</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>syscall</span><span class=p>.</span><span class=nf>ParseNetlinkMessage</span><span class=p>(</span><span class=nx>tab</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=k>return</span> <span class=kc>nil</span><span class=p>,</span> <span class=nx>os</span><span class=p>.</span><span class=nf>NewSyscallError</span><span class=p>(</span><span class=s>&#34;parsenetlinkmessage&#34;</span><span class=p>,</span> <span class=nx>err</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>	<span class=kd>var</span> <span class=nx>ift</span> <span class=p>[]</span><span class=nx>Interface</span>
+</span></span><span class=line><span class=cl>	<span class=nx>im</span> <span class=o>:=</span> <span class=nb>make</span><span class=p>(</span><span class=kd>map</span><span class=p>[</span><span class=kt>uint32</span><span class=p>]</span><span class=kd>struct</span><span class=p>{})</span>
+</span></span><span class=line><span class=cl><span class=nx>loop</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>	<span class=k>for</span> <span class=nx>_</span><span class=p>,</span> <span class=nx>m</span> <span class=o>:=</span> <span class=k>range</span> <span class=nx>msgs</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=k>switch</span> <span class=nx>m</span><span class=p>.</span><span class=nx>Header</span><span class=p>.</span><span class=nx>Type</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=k>case</span> <span class=nx>syscall</span><span class=p>.</span><span class=nx>NLMSG_DONE</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>			<span class=k>break</span> <span class=nx>loop</span>
+</span></span><span class=line><span class=cl>		<span class=k>case</span> <span class=nx>syscall</span><span class=p>.</span><span class=nx>RTM_NEWADDR</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>			<span class=nx>ifam</span> <span class=o>:=</span> <span class=p>(</span><span class=o>*</span><span class=nx>syscall</span><span class=p>.</span><span class=nx>IfAddrmsg</span><span class=p>)(</span><span class=nx>unsafe</span><span class=p>.</span><span class=nf>Pointer</span><span class=p>(</span><span class=o>&amp;</span><span class=nx>m</span><span class=p>.</span><span class=nx>Data</span><span class=p>[</span><span class=mi>0</span><span class=p>]))</span>
+</span></span><span class=line><span class=cl>			<span class=k>if</span> <span class=nx>_</span><span class=p>,</span> <span class=nx>ok</span> <span class=o>:=</span> <span class=nx>im</span><span class=p>[</span><span class=nx>ifam</span><span class=p>.</span><span class=nx>Index</span><span class=p>];</span> <span class=nx>ok</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>				<span class=k>continue</span>
+</span></span><span class=line><span class=cl>			<span class=p>}</span> <span class=k>else</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>				<span class=nx>im</span><span class=p>[</span><span class=nx>ifam</span><span class=p>.</span><span class=nx>Index</span><span class=p>]</span> <span class=p>=</span> <span class=kd>struct</span><span class=p>{}{}</span>
+</span></span><span class=line><span class=cl>			<span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>			<span class=k>if</span> <span class=nx>ifindex</span> <span class=o>==</span> <span class=mi>0</span> <span class=o>||</span> <span class=nx>ifindex</span> <span class=o>==</span> <span class=nb>int</span><span class=p>(</span><span class=nx>ifam</span><span class=p>.</span><span class=nx>Index</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>				<span class=nx>ifi</span> <span class=o>:=</span> <span class=nf>newLinkAndroid</span><span class=p>(</span><span class=nx>ifam</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>				<span class=k>if</span> <span class=nx>ifi</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>					<span class=nx>ift</span> <span class=p>=</span> <span class=nb>append</span><span class=p>(</span><span class=nx>ift</span><span class=p>,</span> <span class=o>*</span><span class=nx>ifi</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>				<span class=p>}</span>
+</span></span><span class=line><span class=cl>				<span class=k>if</span> <span class=nx>ifindex</span> <span class=o>==</span> <span class=nb>int</span><span class=p>(</span><span class=nx>ifam</span><span class=p>.</span><span class=nx>Index</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>					<span class=k>break</span> <span class=nx>loop</span>
+</span></span><span class=line><span class=cl>				<span class=p>}</span>
+</span></span><span class=line><span class=cl>			<span class=p>}</span>
+</span></span><span class=line><span class=cl>		<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>	<span class=k>return</span> <span class=nx>ift</span><span class=p>,</span> <span class=kc>nil</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// According to the network card Index, get the Name, MTU and Flags of the network card through ioctl
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kd>func</span> <span class=nf>newLinkAndroid</span><span class=p>(</span><span class=nx>ifam</span> <span class=o>*</span><span class=nx>syscall</span><span class=p>.</span><span class=nx>IfAddrmsg</span><span class=p>)</span> <span class=o>*</span><span class=nx>Interface</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=nx>ift</span> <span class=o>:=</span> <span class=o>&amp;</span><span class=nx>Interface</span><span class=p>{</span><span class=nx>Index</span><span class=p>:</span> <span class=nb>int</span><span class=p>(</span><span class=nx>ifam</span><span class=p>.</span><span class=nx>Index</span><span class=p>)}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>	<span class=nx>name</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nf>indexToName</span><span class=p>(</span><span class=nx>ifam</span><span class=p>.</span><span class=nx>Index</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=k>return</span> <span class=kc>nil</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=nx>ift</span><span class=p>.</span><span class=nx>Name</span> <span class=p>=</span> <span class=nx>name</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>	<span class=nx>mtu</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nf>nameToMTU</span><span class=p>(</span><span class=nx>name</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=k>return</span> <span class=kc>nil</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=nx>ift</span><span class=p>.</span><span class=nx>MTU</span> <span class=p>=</span> <span class=nx>mtu</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>	<span class=nx>flags</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nf>nameToFlags</span><span class=p>(</span><span class=nx>name</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=k>return</span> <span class=kc>nil</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=nx>ift</span><span class=p>.</span><span class=nx>Flags</span> <span class=p>=</span> <span class=nx>flags</span>
+</span></span><span class=line><span class=cl>	<span class=k>return</span> <span class=nx>ift</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>ioctl</span><span class=p>(</span><span class=nx>fd</span> <span class=kt>int</span><span class=p>,</span> <span class=nx>req</span> <span class=kt>uint</span><span class=p>,</span> <span class=nx>arg</span> <span class=nx>unsafe</span><span class=p>.</span><span class=nx>Pointer</span><span class=p>)</span> <span class=kt>error</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=nx>_</span><span class=p>,</span> <span class=nx>_</span><span class=p>,</span> <span class=nx>e1</span> <span class=o>:=</span> <span class=nx>syscall</span><span class=p>.</span><span class=nf>Syscall</span><span class=p>(</span><span class=nx>syscall</span><span class=p>.</span><span class=nx>SYS_IOCTL</span><span class=p>,</span> <span class=nb>uintptr</span><span class=p>(</span><span class=nx>fd</span><span class=p>),</span> <span class=nb>uintptr</span><span class=p>(</span><span class=nx>req</span><span class=p>),</span> <span class=nb>uintptr</span><span class=p>(</span><span class=nx>arg</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=nx>e1</span> <span class=o>!=</span> <span class=mi>0</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=k>return</span> <span class=nx>e1</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=k>return</span> <span class=kc>nil</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>indexToName</span><span class=p>(</span><span class=nx>index</span> <span class=kt>uint32</span><span class=p>)</span> <span class=p>(</span><span class=kt>string</span><span class=p>,</span> <span class=kt>error</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=nx>fd</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>syscall</span><span class=p>.</span><span class=nf>Socket</span><span class=p>(</span><span class=nx>syscall</span><span class=p>.</span><span class=nx>AF_INET</span><span class=p>,</span> <span class=nx>syscall</span><span class=p>.</span><span class=nx>SOCK_DGRAM</span><span class=p>|</span><span class=nx>syscall</span><span class=p>.</span><span class=nx>SOCK_CLOEXEC</span><span class=p>,</span> <span class=mi>0</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=k>return</span> <span class=s>&#34;&#34;</span><span class=p>,</span> <span class=nx>err</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=k>defer</span> <span class=nx>syscall</span><span class=p>.</span><span class=nf>Close</span><span class=p>(</span><span class=nx>fd</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>	<span class=kd>var</span> <span class=nx>ifr</span> <span class=nx>ifReq</span>
+</span></span><span class=line><span class=cl>	<span class=o>*</span><span class=p>(</span><span class=o>*</span><span class=kt>uint32</span><span class=p>)(</span><span class=nx>unsafe</span><span class=p>.</span><span class=nf>Pointer</span><span class=p>(</span><span class=o>&amp;</span><span class=nx>ifr</span><span class=p>[</span><span class=nx>syscall</span><span class=p>.</span><span class=nx>IFNAMSIZ</span><span class=p>]))</span> <span class=p>=</span> <span class=nx>index</span>
+</span></span><span class=line><span class=cl>	<span class=nx>err</span> <span class=p>=</span> <span class=nf>ioctl</span><span class=p>(</span><span class=nx>fd</span><span class=p>,</span> <span class=nx>syscall</span><span class=p>.</span><span class=nx>SIOCGIFNAME</span><span class=p>,</span> <span class=nx>unsafe</span><span class=p>.</span><span class=nf>Pointer</span><span class=p>(</span><span class=o>&amp;</span><span class=nx>ifr</span><span class=p>[</span><span class=mi>0</span><span class=p>]))</span>
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=k>return</span> <span class=s>&#34;&#34;</span><span class=p>,</span> <span class=nx>err</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>	<span class=k>return</span> <span class=nb>string</span><span class=p>(</span><span class=nx>bytes</span><span class=p>.</span><span class=nf>Trim</span><span class=p>(</span><span class=nx>ifr</span><span class=p>[:</span><span class=nx>syscall</span><span class=p>.</span><span class=nx>IFNAMSIZ</span><span class=p>],</span> <span class=s>&#34;\x00&#34;</span><span class=p>)),</span> <span class=kc>nil</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>nameToMTU</span><span class=p>(</span><span class=nx>name</span> <span class=kt>string</span><span class=p>)</span> <span class=p>(</span><span class=kt>int</span><span class=p>,</span> <span class=kt>error</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=c1>// Leave room for terminating NULL byte.
+</span></span></span><span class=line><span class=cl><span class=c1></span>	<span class=k>if</span> <span class=nb>len</span><span class=p>(</span><span class=nx>name</span><span class=p>)</span> <span class=o>&gt;=</span> <span class=nx>syscall</span><span class=p>.</span><span class=nx>IFNAMSIZ</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=k>return</span> <span class=mi>0</span><span class=p>,</span> <span class=nx>syscall</span><span class=p>.</span><span class=nx>EINVAL</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>	<span class=nx>fd</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>syscall</span><span class=p>.</span><span class=nf>Socket</span><span class=p>(</span><span class=nx>syscall</span><span class=p>.</span><span class=nx>AF_INET</span><span class=p>,</span> <span class=nx>syscall</span><span class=p>.</span><span class=nx>SOCK_DGRAM</span><span class=p>|</span><span class=nx>syscall</span><span class=p>.</span><span class=nx>SOCK_CLOEXEC</span><span class=p>,</span> <span class=mi>0</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=k>return</span> <span class=mi>0</span><span class=p>,</span> <span class=nx>err</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=k>defer</span> <span class=nx>syscall</span><span class=p>.</span><span class=nf>Close</span><span class=p>(</span><span class=nx>fd</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>	<span class=kd>var</span> <span class=nx>ifr</span> <span class=nx>ifReq</span>
+</span></span><span class=line><span class=cl>	<span class=nb>copy</span><span class=p>(</span><span class=nx>ifr</span><span class=p>[:],</span> <span class=nx>name</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=nx>err</span> <span class=p>=</span> <span class=nf>ioctl</span><span class=p>(</span><span class=nx>fd</span><span class=p>,</span> <span class=nx>syscall</span><span class=p>.</span><span class=nx>SIOCGIFMTU</span><span class=p>,</span> <span class=nx>unsafe</span><span class=p>.</span><span class=nf>Pointer</span><span class=p>(</span><span class=o>&amp;</span><span class=nx>ifr</span><span class=p>[</span><span class=mi>0</span><span class=p>]))</span>
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=k>return</span> <span class=mi>0</span><span class=p>,</span> <span class=nx>err</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>	<span class=k>return</span> <span class=nb>int</span><span class=p>(</span><span class=o>*</span><span class=p>(</span><span class=o>*</span><span class=kt>int32</span><span class=p>)(</span><span class=nx>unsafe</span><span class=p>.</span><span class=nf>Pointer</span><span class=p>(</span><span class=o>&amp;</span><span class=nx>ifr</span><span class=p>[</span><span class=nx>syscall</span><span class=p>.</span><span class=nx>IFNAMSIZ</span><span class=p>]))),</span> <span class=kc>nil</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kd>func</span> <span class=nf>nameToFlags</span><span class=p>(</span><span class=nx>name</span> <span class=kt>string</span><span class=p>)</span> <span class=p>(</span><span class=nx>Flags</span><span class=p>,</span> <span class=kt>error</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=c1>// Leave room for terminating NULL byte.
+</span></span></span><span class=line><span class=cl><span class=c1></span>	<span class=k>if</span> <span class=nb>len</span><span class=p>(</span><span class=nx>name</span><span class=p>)</span> <span class=o>&gt;=</span> <span class=nx>syscall</span><span class=p>.</span><span class=nx>IFNAMSIZ</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=k>return</span> <span class=mi>0</span><span class=p>,</span> <span class=nx>syscall</span><span class=p>.</span><span class=nx>EINVAL</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>	<span class=nx>fd</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nx>syscall</span><span class=p>.</span><span class=nf>Socket</span><span class=p>(</span><span class=nx>syscall</span><span class=p>.</span><span class=nx>AF_INET</span><span class=p>,</span> <span class=nx>syscall</span><span class=p>.</span><span class=nx>SOCK_DGRAM</span><span class=p>|</span><span class=nx>syscall</span><span class=p>.</span><span class=nx>SOCK_CLOEXEC</span><span class=p>,</span> <span class=mi>0</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=k>return</span> <span class=mi>0</span><span class=p>,</span> <span class=nx>err</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=k>defer</span> <span class=nx>syscall</span><span class=p>.</span><span class=nf>Close</span><span class=p>(</span><span class=nx>fd</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>	<span class=kd>var</span> <span class=nx>ifr</span> <span class=nx>ifReq</span>
+</span></span><span class=line><span class=cl>	<span class=nb>copy</span><span class=p>(</span><span class=nx>ifr</span><span class=p>[:],</span> <span class=nx>name</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=nx>err</span> <span class=p>=</span> <span class=nf>ioctl</span><span class=p>(</span><span class=nx>fd</span><span class=p>,</span> <span class=nx>syscall</span><span class=p>.</span><span class=nx>SIOCGIFFLAGS</span><span class=p>,</span> <span class=nx>unsafe</span><span class=p>.</span><span class=nf>Pointer</span><span class=p>(</span><span class=o>&amp;</span><span class=nx>ifr</span><span class=p>[</span><span class=mi>0</span><span class=p>]))</span>
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=k>return</span> <span class=mi>0</span><span class=p>,</span> <span class=nx>err</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>	<span class=k>return</span> <span class=nf>linkFlags</span><span class=p>(</span><span class=o>*</span><span class=p>(</span><span class=o>*</span><span class=kt>uint32</span><span class=p>)(</span><span class=nx>unsafe</span><span class=p>.</span><span class=nf>Pointer</span><span class=p>(</span><span class=o>&amp;</span><span class=nx>ifr</span><span class=p>[</span><span class=nx>syscall</span><span class=p>.</span><span class=nx>IFNAMSIZ</span><span class=p>]))),</span> <span class=kc>nil</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span><span class=lnt>62
+</span><span class=lnt>63
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=c1>// src/syscall/netlink_linux.go
+</span></span></span><span class=line><span class=cl><span class=c1></span>
+</span></span><span class=line><span class=cl><span class=c1>// NetlinkRIB returns routing information base, as known as RIB, which
+</span></span></span><span class=line><span class=cl><span class=c1>// consists of network facility information, states and parameters.
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kd>func</span> <span class=nf>NetlinkRIB</span><span class=p>(</span><span class=nx>proto</span><span class=p>,</span> <span class=nx>family</span> <span class=kt>int</span><span class=p>)</span> <span class=p>([]</span><span class=kt>byte</span><span class=p>,</span> <span class=kt>error</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=nx>s</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nf>Socket</span><span class=p>(</span><span class=nx>AF_NETLINK</span><span class=p>,</span> <span class=nx>SOCK_RAW</span><span class=p>|</span><span class=nx>SOCK_CLOEXEC</span><span class=p>,</span> <span class=nx>NETLINK_ROUTE</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=k>return</span> <span class=kc>nil</span><span class=p>,</span> <span class=nx>err</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=k>defer</span> <span class=nf>Close</span><span class=p>(</span><span class=nx>s</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=nx>sa</span> <span class=o>:=</span> <span class=o>&amp;</span><span class=nx>SockaddrNetlink</span><span class=p>{</span><span class=nx>Family</span><span class=p>:</span> <span class=nx>AF_NETLINK</span><span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nf>Bind</span><span class=p>(</span><span class=nx>s</span><span class=p>,</span> <span class=nx>sa</span><span class=p>);</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=c1>// Bind operation of Netlink socket is prohibited in Android11 and later versions
+</span></span></span><span class=line><span class=cl><span class=c1></span>		<span class=k>if</span> <span class=p>!(</span><span class=nx>runtime</span><span class=p>.</span><span class=nx>GOOS</span> <span class=o>==</span> <span class=s>&#34;android&#34;</span> <span class=o>&amp;&amp;</span> <span class=nx>os</span><span class=p>.</span><span class=nf>IsPermission</span><span class=p>(</span><span class=nx>err</span><span class=p>))</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>			<span class=k>return</span> <span class=kc>nil</span><span class=p>,</span> <span class=nx>err</span>
+</span></span><span class=line><span class=cl>		<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=nx>wb</span> <span class=o>:=</span> <span class=nf>newNetlinkRouteRequest</span><span class=p>(</span><span class=nx>proto</span><span class=p>,</span> <span class=mi>1</span><span class=p>,</span> <span class=nx>family</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nf>Sendto</span><span class=p>(</span><span class=nx>s</span><span class=p>,</span> <span class=nx>wb</span><span class=p>,</span> <span class=mi>0</span><span class=p>,</span> <span class=nx>sa</span><span class=p>);</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=k>return</span> <span class=kc>nil</span><span class=p>,</span> <span class=nx>err</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=nx>lsa</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nf>Getsockname</span><span class=p>(</span><span class=nx>s</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=k>return</span> <span class=kc>nil</span><span class=p>,</span> <span class=nx>err</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=nx>lsanl</span><span class=p>,</span> <span class=nx>ok</span> <span class=o>:=</span> <span class=nx>lsa</span><span class=p>.(</span><span class=o>*</span><span class=nx>SockaddrNetlink</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=k>if</span> <span class=p>!</span><span class=nx>ok</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=k>return</span> <span class=kc>nil</span><span class=p>,</span> <span class=nx>EINVAL</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=kd>var</span> <span class=nx>tab</span> <span class=p>[]</span><span class=kt>byte</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>	<span class=nx>rbNew</span> <span class=o>:=</span> <span class=nx>pageBufPool</span><span class=p>.</span><span class=nf>Get</span><span class=p>().(</span><span class=o>*</span><span class=p>[]</span><span class=kt>byte</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>	<span class=k>defer</span> <span class=nx>pageBufPool</span><span class=p>.</span><span class=nf>Put</span><span class=p>(</span><span class=nx>rbNew</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nx>done</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>	<span class=k>for</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>		<span class=nx>rb</span> <span class=o>:=</span> <span class=o>*</span><span class=nx>rbNew</span>
+</span></span><span class=line><span class=cl>		<span class=nx>nr</span><span class=p>,</span> <span class=nx>_</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nf>Recvfrom</span><span class=p>(</span><span class=nx>s</span><span class=p>,</span> <span class=nx>rb</span><span class=p>,</span> <span class=mi>0</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>		<span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>			<span class=k>return</span> <span class=kc>nil</span><span class=p>,</span> <span class=nx>err</span>
+</span></span><span class=line><span class=cl>		<span class=p>}</span>
+</span></span><span class=line><span class=cl>		<span class=k>if</span> <span class=nx>nr</span> <span class=p>&lt;</span> <span class=nx>NLMSG_HDRLEN</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>			<span class=k>return</span> <span class=kc>nil</span><span class=p>,</span> <span class=nx>EINVAL</span>
+</span></span><span class=line><span class=cl>		<span class=p>}</span>
+</span></span><span class=line><span class=cl>		<span class=nx>rb</span> <span class=p>=</span> <span class=nx>rb</span><span class=p>[:</span><span class=nx>nr</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>		<span class=nx>tab</span> <span class=p>=</span> <span class=nb>append</span><span class=p>(</span><span class=nx>tab</span><span class=p>,</span> <span class=nx>rb</span><span class=o>...</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>		<span class=nx>msgs</span><span class=p>,</span> <span class=nx>err</span> <span class=o>:=</span> <span class=nf>ParseNetlinkMessage</span><span class=p>(</span><span class=nx>rb</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>		<span class=k>if</span> <span class=nx>err</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>			<span class=k>return</span> <span class=kc>nil</span><span class=p>,</span> <span class=nx>err</span>
+</span></span><span class=line><span class=cl>		<span class=p>}</span>
+</span></span><span class=line><span class=cl>		<span class=k>for</span> <span class=nx>_</span><span class=p>,</span> <span class=nx>m</span> <span class=o>:=</span> <span class=k>range</span> <span class=nx>msgs</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>			<span class=k>if</span> <span class=nx>m</span><span class=p>.</span><span class=nx>Header</span><span class=p>.</span><span class=nx>Seq</span> <span class=o>!=</span> <span class=mi>1</span> <span class=o>||</span> <span class=nx>m</span><span class=p>.</span><span class=nx>Header</span><span class=p>.</span><span class=nx>Pid</span> <span class=o>!=</span> <span class=nx>lsanl</span><span class=p>.</span><span class=nx>Pid</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>				<span class=k>return</span> <span class=kc>nil</span><span class=p>,</span> <span class=nx>EINVAL</span>
+</span></span><span class=line><span class=cl>			<span class=p>}</span>
+</span></span><span class=line><span class=cl>			<span class=k>if</span> <span class=nx>m</span><span class=p>.</span><span class=nx>Header</span><span class=p>.</span><span class=nx>Type</span> <span class=o>==</span> <span class=nx>NLMSG_DONE</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>				<span class=k>break</span> <span class=nx>done</span>
+</span></span><span class=line><span class=cl>			<span class=p>}</span>
+</span></span><span class=line><span class=cl>			<span class=k>if</span> <span class=nx>m</span><span class=p>.</span><span class=nx>Header</span><span class=p>.</span><span class=nx>Type</span> <span class=o>==</span> <span class=nx>NLMSG_ERROR</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>				<span class=k>return</span> <span class=kc>nil</span><span class=p>,</span> <span class=nx>EINVAL</span>
+</span></span><span class=line><span class=cl>			<span class=p>}</span>
+</span></span><span class=line><span class=cl>		<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>	<span class=k>return</span> <span class=nx>tab</span><span class=p>,</span> <span class=kc>nil</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div></section><script src=https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js></script><script>mermaid.initialize({startOnLoad:!0}),document.addEventListener("DOMContentLoaded",function(){var e=document.querySelectorAll("pre code.language-mermaid");e.forEach(function(e){var n,t=document.createElement("div");t.className="mermaid",t.innerHTML=e.textContent,n=e.parentElement,n.parentNode.replaceChild(t,n)})})</script><footer class=article-footer><section class=article-copyright><svg class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg>
+<span>Licensed under CC BY-NC-SA 4.0</span></section></footer><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css integrity=sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV crossorigin=anonymous><script src=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js integrity=sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8 crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js integrity=sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05 crossorigin=anonymous defer></script><script>window.addEventListener("DOMContentLoaded",()=>{renderMathInElement(document.body,{delimiters:[{left:"$$",right:"$$",display:!0},{left:"$",right:"$",display:!1},{left:"\\(",right:"\\)",display:!1},{left:"\\[",right:"\\]",display:!0}],ignoredClasses:["gist"]})})</script></article><aside class=related-content--wrapper><h2 class=section-title>相关文章</h2><div class=related-content><div class="flex article-list--tile"><article><a href=/blog/p/yamux-%E6%B5%81%E7%A8%8B%E5%88%86%E6%9E%90/><div class=article-details><h2 class=article-title>yamux 流程分析</h2></div></a></article><article><a href=/blog/p/mutlistream-select-%E6%B5%81%E7%A8%8B%E5%88%86%E6%9E%90/><div class=article-details><h2 class=article-title>mutlistream-select 流程分析</h2></div></a></article><article><a href=/blog/p/%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%AE%9A%E4%B9%89-ttl-udp-%E5%8C%85%E5%8F%91%E9%80%81/><div class=article-details><h2 class=article-title>实现自定义 TTL UDP 包发送</h2></div></a></article><article><a href=/blog/p/go-%E9%98%B2%E8%B8%A9%E5%9D%91%E7%BC%96%E7%A8%8B%E6%8C%87%E5%8D%97/><div class=article-details><h2 class=article-title>Go 防踩坑编程指南</h2></div></a></article><article><a href=/blog/p/%E6%AF%94%E8%BE%83%E9%AA%9A%E7%9A%84%E4%B8%80%E4%BA%9B%E4%BB%A3%E7%A0%81/><div class=article-details><h2 class=article-title>比较骚的一些代码</h2></div></a></article></div></div></aside><footer class=site-footer><section class=copyright>&copy;
+2020 -
+2025 Wlynxg's Blog</section><section class=powerby>使用 <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> 构建<br>主题 <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.29.0>Stack</a></b> 由 <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a> 设计</section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/blog/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>

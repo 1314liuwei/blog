@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><follow_challenge><feedId>77250260013802496</feedId><userId>42117541714060288</userId></follow_challenge><title>数据结构与算法 on Wlynxg's Blog</title><link>https://wlynxg.github.io/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/</link><description>Recent content in 数据结构与算法 on Wlynxg's Blog</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Thu, 16 May 2024 11:09:11 +0800</lastBuildDate><atom:link href="https://wlynxg.github.io/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/index.xml" rel="self" type="application/rss+xml"/><item><title>1.1 数据结构的基本概念</title><link>https://wlynxg.github.io/blog/p/1.1-%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/</link><pubDate>Thu, 02 Mar 2023 09:55:21 +0800</pubDate><guid>https://wlynxg.github.io/blog/p/1.1-%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/</guid><description>&lt;h1 id="11-数据结构的基本概念">1.1 数据结构的基本概念
+&lt;/h1>&lt;h2 id="知识图谱">知识图谱
+&lt;/h2>&lt;p>&lt;img src="https://pic.try-hard.cn/blog/%e6%95%b0%e6%8d%ae%e7%bb%93%e6%9e%84%e7%9a%84%e5%9f%ba%e6%9c%ac%e6%a6%82%e5%bf%b5.png"
+loading="lazy"
+>&lt;/p>
+&lt;h2 id="一基本概念和术语">一、基本概念和术语
+&lt;/h2>&lt;h3 id="1-数据">1. 数据
+&lt;/h3>&lt;p>数据是信息的载体，是描述客观事物属性的数、字符及所有能被输入到计算机中并被计算机程序识别和处理的符号集合。数据是计算机程序加工的原料。&lt;/p>
+&lt;h3 id="2-数据元素">2. 数据元素
+&lt;/h3>&lt;p>&lt;strong>数据元素是数据的基本单位&lt;/strong>，通常作为一个整体进行考虑和处理。一个数据元素可由若干个数据项组成，&lt;strong>数据项是构成数据元素的不可分割的最小单位&lt;/strong>。&lt;/p>
+&lt;h3 id="3-数据对象">3. 数据对象
+&lt;/h3>&lt;p>数据对象是具有相同性质的数据元素的集合，是数据的一个子集。&lt;/p>
+&lt;h3 id="4-数据类型">4. 数据类型
+&lt;/h3>&lt;p>数据类型是一个值的集合和定义在此集合上的一组操作的总称。&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>原子类型&lt;/strong>：其值不可再分的数据类型；&lt;/li>
+&lt;li>&lt;strong>结构类型&lt;/strong>：其值可以再分解为若干成分（分量）的数据类型；&lt;/li>
+&lt;li>&lt;strong>抽象数据类型&lt;/strong>：抽象数据组织与之相关的操作。&lt;/li>
+&lt;/ul>
+&lt;h3 id="5-数据结构">5. 数据结构
+&lt;/h3>&lt;p>数据结构是相互之间存在一种或多种特定关系的数据元素的集合。在任何问题中，数据元素都不是孤立的存在，它们之间存在着某种关系，这种数据元素相互之间的关系称为&lt;strong>结构（Structure）&lt;/strong>。数据结构包含三个方面的内容：&lt;strong>逻辑结构、存储结构和数据的运算&lt;/strong>。&lt;/p>
+&lt;p>数据的逻辑结构和存储结构是密不可分的两个方面，一个算法的设计取决于选定的逻辑结构，而算法的实现依赖于所采用的存储结构。&lt;/p>
+&lt;h2 id="二数据结构三要素">二、数据结构三要素
+&lt;/h2>&lt;h3 id="1-数据的逻辑结构">1. 数据的逻辑结构
+&lt;/h3>&lt;p>逻辑结构是指数据元素之间的逻辑关系，即从逻辑关系上描述数据。它与数据的存储结构无关，是独立于计算机的。数据的结构为线性结构和非线性结构，线性表是典型的线性结构；集合、树和图是典型的非线性结构。&lt;/p>
+&lt;p>数据的逻辑结构分类：&lt;/p>
+&lt;p>&lt;img src="https://pic.try-hard.cn/blog/%e6%95%b0%e6%8d%ae%e7%9a%84%e9%80%bb%e8%be%91%e7%bb%93%e6%9e%84.png"
+loading="lazy"
+alt="image-20210303190051014"
+>&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>集合&lt;/strong>：结构中的数据元素之间除“同属一个集合”外，别无其它关系；&lt;/li>
+&lt;li>&lt;strong>线性结构&lt;/strong>：结构中的数据元素只存在一对一的关系；&lt;/li>
+&lt;li>&lt;strong>树形结构&lt;/strong>：结构中的数据元素之间存在一对多的关系；&lt;/li>
+&lt;li>&lt;strong>图状结构&lt;/strong>：结构中的数据元素之间存在多对多的关系。&lt;/li>
+&lt;/ul>
+&lt;h3 id="2-数据的存储结构">2. 数据的存储结构
+&lt;/h3>&lt;p>存储结构是指数据结构在计算机中的表示（又称&lt;strong>映像&lt;/strong>），也称物理结构。它包括数据元素的表示和关系的表示。数据的存储结构是用计算机语言实现的逻辑结构，它依赖于计算机语言。数据的存储结构主要有顺序存储、链式存储、索引存储和散列存储：&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>顺序存储&lt;/strong>：把逻辑上相邻的元素存储在物理位置上也相邻的存储单元中，元素之间的关系由存储单元的邻接关系来体现。其优点是可以实现随机存取，每个元素占用最少的存储空间；缺点是只能使用相邻的一整块存储单元，因此可能产生较多的外部碎片。&lt;/li>
+&lt;li>&lt;strong>链式存储&lt;/strong>：不要求逻辑上相邻的元素在物理位置上也相邻，借助指示元素存储地址的指针来表示元素之间的逻辑关系。其优点是不会出现碎片现象，能充分利用所有存储单元；缺点是每个元素因存储指针而占用额外的存储空间，且只能实现顺序存储。&lt;/li>
+&lt;li>&lt;strong>索引存储&lt;/strong>：在存储元素信息时，还建立附加的索引表。索引表中的每项称为&lt;strong>索引项&lt;/strong>，索引项的一般形式是&lt;strong>关键字&lt;/strong>和&lt;strong>地址&lt;/strong>。其优点是检索速度快；缺点是附加的索引表额外占用存储空间。另外，增加和删除数据时也要修改索引表，因而会花费较多的时间。&lt;/li>
+&lt;li>&lt;strong>散列存储&lt;/strong>：根据元素的关键字直接计算出该元素的存储地址，又称哈希（Hash）存储。其优点是检索、增加和删除节点的操作都很快；缺点是若散列函数不好，则可能出现元素存储单元的冲突，而解决冲突会增加时间和空间开销。&lt;/li>
+&lt;/ul>
+&lt;h3 id="3-数据的运算">3. 数据的运算
+&lt;/h3>&lt;p>施加在数据上的运算包括运算的定义和实现。运算的定于是针对逻辑结构，指出运算的功能；运算的实现是针对存储结构的，指出运算的具体操作步骤。&lt;/p></description></item><item><title>1.2 算法和算法评价</title><link>https://wlynxg.github.io/blog/p/1.2-%E7%AE%97%E6%B3%95%E5%92%8C%E7%AE%97%E6%B3%95%E8%AF%84%E4%BB%B7/</link><pubDate>Thu, 02 Mar 2023 09:55:21 +0800</pubDate><guid>https://wlynxg.github.io/blog/p/1.2-%E7%AE%97%E6%B3%95%E5%92%8C%E7%AE%97%E6%B3%95%E8%AF%84%E4%BB%B7/</guid><description>&lt;h1 id="12-算法和算法评价">1.2 算法和算法评价
+&lt;/h1>&lt;h2 id="知识图谱">知识图谱
+&lt;/h2>&lt;p>&lt;img src="https://pic.try-hard.cn/blog/%e7%ae%97%e6%b3%95%e5%92%8c%e7%ae%97%e6%b3%95%e8%af%84%e4%bb%b7.png"
+loading="lazy"
+>&lt;/p>
+&lt;h2 id="一算法的基本概念">一、算法的基本概念
+&lt;/h2>&lt;p>算法（Algorithm）是特定问题求解步骤的一种描述，它是指令的有限序列，其中的每条指令表示一个或多个操作。此外，一个算法还具有下列5个重要特性：&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>有穷性&lt;/strong>：一个算法中必须总在执行有穷步之后结束，且每一步都可能在有穷时间内完成；&lt;/li>
+&lt;li>&lt;strong>确定性&lt;/strong>：算法中每条指令必须有确切的含义，对于相同的输入只能得出相同的输出；&lt;/li>
+&lt;li>&lt;strong>可行性&lt;/strong>：算法中描述操作都可以通过已经实现的基本运算执行有限次来实现；&lt;/li>
+&lt;li>&lt;strong>输入&lt;/strong>：一个算法有零个或多个输入，这些输入取自于某个特定的对象的集合；&lt;/li>
+&lt;li>&lt;strong>输出&lt;/strong>：一个算法有一个或多个输出，这些输出是于输入有着某种特定关系的量。&lt;/li>
+&lt;/ul>
+&lt;p>通常，设计一个好算法应考虑达到以后目标：&lt;/p>
+&lt;ul>
+&lt;li>正确性：算法应能够正确地解决问题；&lt;/li>
+&lt;li>可读性：算法应具有良好的可读性，以帮助人们理解；&lt;/li>
+&lt;li>健壮性：输入非法数据时，算法能适当地做出反应或进行处理，而不会产生莫名其妙地输出结果；&lt;/li>
+&lt;li>效率与低存储量需求：效率是指算法执行的时间，存储量需求是指算法执行过程中所需要的最大存储空间，这两者都与问题的规模有关。&lt;/li>
+&lt;/ul>
+&lt;h2 id="二算法效率的度量">二、算法效率的度量
+&lt;/h2>&lt;p>算法效率的度量是通过&lt;strong>时间复杂度&lt;/strong>和&lt;strong>空间复杂度&lt;/strong>来描述的。&lt;/p>
+&lt;h3 id="1-时间复杂度">1. 时间复杂度
+&lt;/h3>&lt;p>一个语句的频度是指该语句在算法中被重复执行的次数。算法中所有语句的频度之和记为 T(n)，它是该算法问题规模 n 的函数，时间复杂度主要分析 T(n) 的数量级。算法中基本运算（最深层循环内的语句）的频度与 T(n) 同数量级，因此通常采用算法中基本运算的频度 f(n) 来分析算法的时间复杂度。&lt;/p>
+$$
+T(n) = O(f(n))
+$$&lt;p>
+O 的含义是 T(n) 的数量级，其严格的数学意义是：若 T(n) 和 f(n) 是定义在正整数集合上的两个函数，则存在正常数 C 和 n0，使得 n &amp;gt;= n0 时，都满足 0 &amp;lt;= T(n) &amp;lt;= C(fn)。&lt;/p>
+&lt;p>算法的时间复杂度不仅依赖于问题的规模 n，也取决于待输入数据的性质（如输入数据元素的初始状态）。&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>最坏时间复杂度&lt;/strong>：最坏的情况下，算法的时间复杂度；&lt;/li>
+&lt;li>&lt;strong>平均时间复杂度&lt;/strong>：所有可能输入实例在等概率出现的情况下，算法的期望运行时间；&lt;/li>
+&lt;li>&lt;strong>最好时间复杂度&lt;/strong>：在最好的情况下，算法的时间复杂度。&lt;/li>
+&lt;/ul>
+&lt;p>一般总是考虑在最坏情况下，算法的时间复杂度，以保证算法的运行时间不会比它更长。&lt;/p>
+&lt;p>在分析一个程序的时间复杂性时，有以下两条规则：&lt;/p>
+&lt;ul>
+&lt;li>
+$$
+T(n) = T_1(n) + T_2(n) = O(f(n)) + O(g(n)) = O(max(f(n)), g(n))
+$$&lt;/li>
+&lt;li>
+$$
+T(n) = T_1(n) * T_2(n) = O(f(n)) * O(g(n)) = O(f(n) * g(n))
+$$&lt;/li>
+&lt;/ul>
+$$
+O(1) &lt; O(log_2n) &lt; O(n) &lt; O(nlog_2n) &lt; O(n^2) &lt; O(n^3) &lt; O(2^n) &lt; O(2n!) &lt; O(n^n)
+$$&lt;h3 id="2-空间复杂度">2. 空间复杂度
+&lt;/h3>$$
+S(n) = O(g(n))
+$$&lt;p>
+一个程序在执行时除需要存储空间来存放本身所用的指令、常数、变量和输入数据外，还需要一些对数据进行操作的工作单元和存储一些为实现计算所需信息的辅助空间。若输入数据所占空间只取决于问题本身，和算法无关，则只需分析除输入和程序之外的额外空间。&lt;/p>
+&lt;p>算法原地工作是指算法所需的辅助空间为&lt;strong>常量&lt;/strong>，即 O(1)。&lt;/p></description></item><item><title>2.1 线性表的定义和基本操作</title><link>https://wlynxg.github.io/blog/p/2.1-%E7%BA%BF%E6%80%A7%E8%A1%A8%E7%9A%84%E5%AE%9A%E4%B9%89%E5%92%8C%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/</link><pubDate>Thu, 02 Mar 2023 09:55:21 +0800</pubDate><guid>https://wlynxg.github.io/blog/p/2.1-%E7%BA%BF%E6%80%A7%E8%A1%A8%E7%9A%84%E5%AE%9A%E4%B9%89%E5%92%8C%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/</guid><description>&lt;h1 id="21-线性表的定义和基本操作">2.1 线性表的定义和基本操作
+&lt;/h1>&lt;h2 id="思维导图">思维导图
+&lt;/h2>&lt;p>&lt;img src="https://pic.try-hard.cn/blog/%e7%ba%bf%e6%80%a7%e8%a1%a8%e7%9a%84%e5%ae%9a%e4%b9%89%e5%92%8c%e5%9f%ba%e6%9c%ac%e6%93%8d%e4%bd%9c.png"
+loading="lazy"
+>&lt;/p>
+&lt;h2 id="一线性表的定义">一、线性表的定义
+&lt;/h2>&lt;p>线性表是具有&lt;strong>相同数据类型&lt;/strong>的 n（n &amp;gt;= 0）个数据元素的&lt;strong>有限&lt;/strong>序列，其中 n 为表长，当 n = 0 时，线性表是一个空表。&lt;/p>
+$$
+L = (a_1, a_2, ..., a_i, a_{i+1}, ..., a_n)
+$$&lt;p>
+式中，a1 是唯一一个“第一个”数据元素，又称表头元素：an是唯一的“最后一个”数据元素，又称表尾元素。除第一个元素外，每个元素有且仅有一个直接前驱。除最后一个元素外，每个元素有且仅有一个直接后继。以上就是线性表的逻辑特性，这种线性有序的逻辑结构正是线性表名字的由来。&lt;/p>
+&lt;p>线性表的特点如下：&lt;/p>
+&lt;ul>
+&lt;li>表中元素的个数有限；&lt;/li>
+&lt;li>表中元素具有逻辑上的顺序性，表中元素有其先后次序；&lt;/li>
+&lt;li>表中元素都是数据元素，每个元素都是单个元素；&lt;/li>
+&lt;li>表中元素的数据类型都相同，这意味着每个元素占有相同大小的存储空间；&lt;/li>
+&lt;li>表中元素具有抽象性，即仅讨论元素间的逻辑关系，而不考虑元素究竟是表示什么内容。&lt;/li>
+&lt;/ul>
+&lt;h2 id="二线性表的基本操作">二、线性表的基本操作
+&lt;/h2>&lt;p>线性表的主要操作如下：&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>初始化表&lt;/strong>：构造一个空的线性表；&lt;/li>
+&lt;li>&lt;strong>求表长&lt;/strong>：返回线性表 L 的长度；&lt;/li>
+&lt;li>&lt;strong>按值查找&lt;/strong>：在线性表中查找具有给定关键字的元素；&lt;/li>
+&lt;li>&lt;strong>按位查找&lt;/strong>：获取线性表中第 i 个位置的元素的值；&lt;/li>
+&lt;li>&lt;strong>插入操作&lt;/strong>：在表的第 i 个位置上插入指定元素 e；&lt;/li>
+&lt;li>&lt;strong>删除操作&lt;/strong>：删除表的第 i 个位置的元素，并用 e 返回删除元素；&lt;/li>
+&lt;li>&lt;strong>输出操作&lt;/strong>：按前后顺序输出线性表 L 的所有元素值；&lt;/li>
+&lt;li>&lt;strong>判空操作&lt;/strong>：若 L 为空表，则返回 True，反之为 Fasle；&lt;/li>
+&lt;li>&lt;strong>销毁操作&lt;/strong>：销毁线性表，并释放线性表所占用空间。&lt;/li>
+&lt;/ul></description></item></channel></rss>
